@@ -12,7 +12,7 @@ A native Android app (Kotlin, Jetpack Compose, Material 3) that bundles everyday
 
 The run also executes the unit tests and uploads a **`unit-test-report`** artifact. The APK is uploaded *before* the tests run, so a failing test turns the run red but never hides the APK.
 
-> **Build status:** this code was written in an environment with no Android SDK and no access to Google/Maven, so it has **not been compiled or run yet**. The first CI run is the first real build; if it fails, the log in the Actions tab shows the exact error.
+> **Build status:** the debug APK compiles and all 34 JVM unit tests pass in CI. The app has **not yet been run on a real device**, so UI behaviour, camera scanning, permission handling, sharing and saving still need manual testing on a phone. Release (R8-minified) builds are untested.
 
 ## What's in Part 1
 

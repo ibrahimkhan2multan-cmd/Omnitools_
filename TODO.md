@@ -1,8 +1,7 @@
 # TODO
 
 ## Next
-- Confirm the first CI build is green; fix any compile errors it reports.
-- Test on a phone: camera scanning, permission-denied flow, QR save/share, notes surviving a restart.
+- Test on a phone (CI already builds the APK and passes unit tests): camera scanning, permission-denied flow, QR save/share, notes surviving a restart.
 - Replace the leftover template store images in `fastlane/metadata/android/en-US/images/` (screenshots and graphics are still from the Hello World template).
 - Fill in the contact placeholders in `fastlane/.../privacy_policy.md`.
 
