@@ -1,6 +1,8 @@
 package com.omnitools.app.ui.tools
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import com.omnitools.app.data.Prefs
 import com.omnitools.app.data.ToolRegistry
 import com.omnitools.app.tools.calc.CalculatorScreen
@@ -27,7 +29,7 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "device_info" -> DeviceInfoScreen(onBack)
         "password_generator" -> PasswordScreen(onBack)
         else -> ScreenScaffold(ToolRegistry.find(toolId)?.name ?: "Unknown tool", onBack) { padding ->
-            EmptyState("This tool is not available.", androidx.compose.ui.Modifier.then(androidx.compose.ui.Modifier.padding(padding)))
+            EmptyState("This tool is not available.", Modifier.padding(padding))
         }
     }
 }
