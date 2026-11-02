@@ -48,7 +48,8 @@ class TextAndPasswordTest {
 
     @Test fun json() {
         assertEquals("{\"a\":1,\"b\":[1,2]}", TextTools.jsonMinify("{ \"a\": 1,\n \"b\": [1, 2] }"))
-        assertTrue(TextTools.jsonFormat("{\"a\":1}").contains("\n"))
+        // Two keys: the JVM org.json test library prints single-key objects on one line, Android does not.
+        assertTrue(TextTools.jsonFormat("{\"a\":1,\"b\":2}").contains("\n"))
         assertThrows(TextTools.TextToolException::class.java) { TextTools.jsonFormat("{bad json") }
         assertThrows(TextTools.TextToolException::class.java) { TextTools.jsonFormat("") }
         assertThrows(TextTools.TextToolException::class.java) { TextTools.jsonFormat("hello") }
