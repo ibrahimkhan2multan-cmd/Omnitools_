@@ -117,8 +117,10 @@ class NewToolsTest {
         assertTrue(RegexTester.run("(", "x") is RegexTester.Result.Error)
         assertTrue(RegexTester.run("", "x") is RegexTester.Result.Error)
         assertTrue(RegexTester.run("a", "x".repeat(RegexTester.MAX_INPUT + 1)) is RegexTester.Result.Error)
-        val slow = RegexTester.run("(a+)+$", "a".repeat(40) + "b", timeoutMs = 200)
-        assertTrue("catastrophic pattern must be stopped", slow is RegexTester.Result.Error && slow.message.startsWith("Stopped"))
+        // Newer JDKs optimise the classic "(a+)+$" pattern, so a real slow pattern is not reliable in a unit test.
+        // Instead use a deadline that has already passed: the very first character read must abort the match.
+        val stopped = RegexTester.run("a+b", "a".repeat(5000), timeoutMs = -1)
+        assertTrue("time limit must stop the match", stopped is RegexTester.Result.Error && stopped.message.startsWith("Stopped"))
     }
 
     // ---- Random ----

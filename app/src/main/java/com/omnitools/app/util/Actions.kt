@@ -47,6 +47,21 @@ object Actions {
         context.startActivity(Intent.createChooser(send, "Share").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
+    /** Writes [bytes] to the app cache and shares them as a file of the given MIME type via FileProvider. */
+    fun shareBytes(context: Context, bytes: ByteArray, fileName: String, mime: String) {
+        val dir = File(context.cacheDir, "shared").apply { mkdirs() }
+        // Keep the name simple and inside the shared folder.
+        val file = File(dir, fileName.replace(Regex("[^A-Za-z0-9._-]"), "_"))
+        file.writeBytes(bytes)
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = mime
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(send, "Share").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     /** Opens an http/https URL in the user's browser. Callers must have already confirmed with the user. */
     fun openWebUrl(context: Context, url: String): Boolean {
         val uri = Uri.parse(url)

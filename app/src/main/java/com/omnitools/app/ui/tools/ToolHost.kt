@@ -11,6 +11,10 @@ import com.omnitools.app.tools.calc.PercentScreen
 import com.omnitools.app.tools.color.ColorScreen
 import com.omnitools.app.tools.random.RandomScreen
 import com.omnitools.app.tools.regex.RegexScreen
+import com.omnitools.app.tools.hash.HashScreen
+import com.omnitools.app.tools.image.ImageToolsScreen
+import com.omnitools.app.tools.pdf.ImagesToPdfScreen
+import com.omnitools.app.tools.pdf.PdfReaderScreen
 import com.omnitools.app.tools.tasks.TasksScreen
 import com.omnitools.app.tools.timer.StopwatchScreen
 import com.omnitools.app.tools.calc.UnitConverterScreen
@@ -42,6 +46,10 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "random_tools" -> RandomScreen(onBack)
         "color_tool" -> ColorScreen(onBack)
         "regex_tool" -> RegexScreen(onBack)
+        "hash_tool" -> HashScreen(onBack)
+        "image_tools" -> ImageToolsScreen(onBack)
+        "image_pdf" -> ImagesToPdfScreen(onBack)
+        "pdf_reader" -> PdfReaderScreen(onBack)
         else -> ScreenScaffold(ToolRegistry.find(toolId)?.name ?: "Unknown tool", onBack) { padding ->
             EmptyState("This tool is not available.", Modifier.padding(padding))
         }

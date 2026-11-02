@@ -24,6 +24,10 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Construction
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Crop
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
@@ -176,6 +180,38 @@ object ToolRegistry {
             category = Category.DEV,
             icon = Icons.Filled.FindInPage,
             keywords = listOf("regular expression", "pattern", "match", "groups"),
+        ),
+        Tool(
+            id = "hash_tool",
+            name = "Hash & Checksum",
+            description = "MD5, SHA-1, SHA-256 and SHA-512 of a file or text, with checksum compare and file details.",
+            category = Category.SECURITY,
+            icon = Icons.Filled.Fingerprint,
+            keywords = listOf("md5", "sha", "sha256", "checksum", "verify", "file info", "digest"),
+        ),
+        Tool(
+            id = "image_tools",
+            name = "Image Editor",
+            description = "Rotate, flip, crop and resize a picture, then save as JPEG, PNG or WebP with a size preview.",
+            category = Category.IMAGES,
+            icon = Icons.Filled.Crop,
+            keywords = listOf("photo", "resize", "compress", "convert", "jpg", "png", "webp", "rotate", "crop"),
+        ),
+        Tool(
+            id = "image_pdf",
+            name = "Images to PDF",
+            description = "Combine pictures into one PDF with page size, margin and quality options.",
+            category = Category.PDF,
+            icon = Icons.Filled.PictureAsPdf,
+            keywords = listOf("jpg", "photos", "scan", "combine", "merge", "convert"),
+        ),
+        Tool(
+            id = "pdf_reader",
+            name = "PDF Reader",
+            description = "Open a PDF, flip through pages, jump to a page and zoom. No text search.",
+            category = Category.PDF,
+            icon = Icons.Filled.Visibility,
+            keywords = listOf("view", "open", "read", "pages", "document"),
         ),
     )
 
