@@ -24,7 +24,7 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "qr_generate" -> QrGenerateScreen(onBack)
         "notes" -> NotesScreen(onBack)
         "text_tools" -> TextToolsScreen(onBack)
-        "calculator" -> CalculatorScreen(onBack)
+        "calculator" -> CalculatorScreen(prefs, onBack)
         "unit_converter" -> UnitConverterScreen(onBack)
         "device_info" -> DeviceInfoScreen(onBack)
         "password_generator" -> PasswordScreen(onBack)

@@ -1,5 +1,7 @@
 package com.omnitools.app
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -7,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +20,7 @@ import com.omnitools.app.ui.home.CategoryScreen
 import com.omnitools.app.ui.home.HomeScreen
 import com.omnitools.app.ui.settings.AboutScreen
 import com.omnitools.app.ui.settings.SettingsScreen
+import com.omnitools.app.ui.settings.ThemeChoiceScreen
 import com.omnitools.app.ui.theme.OmniToolsTheme
 import com.omnitools.app.ui.tools.ToolHost
 import kotlinx.coroutines.launch
@@ -29,10 +33,25 @@ private const val ROUTE_TOOL = "tool/{id}"
 
 @Composable
 fun OmniApp(prefs: Prefs) {
-    val themeMode by prefs.themeMode.collectAsStateWithLifecycle(initialValue = "system")
-    OmniToolsTheme(themeMode = themeMode) {
+    val scope = rememberCoroutineScope()
+    // null = still loading from disk. Waiting for both values avoids flashing the wrong theme.
+    val themeMode by prefs.themeMode.collectAsStateWithLifecycle<String, String?>(initialValue = null)
+    val onboarded by prefs.onboarded.collectAsStateWithLifecycle<Boolean, Boolean?>(initialValue = null)
+
+    val mode = themeMode
+    val done = onboarded
+    if (mode == null || done == null) {
+        Box(Modifier.fillMaxSize().background(Color(0xFF0E1220)))
+        return
+    }
+
+    OmniToolsTheme(themeMode = mode) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            AppNav(prefs, themeMode)
+            if (!done) {
+                ThemeChoiceScreen(onChosen = { choice -> scope.launch { prefs.completeOnboarding(choice) } })
+            } else {
+                AppNav(prefs, mode)
+            }
         }
     }
 }
@@ -43,6 +62,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     val scope = rememberCoroutineScope()
     val favorites by prefs.favorites.collectAsStateWithLifecycle(initialValue = emptySet())
     val recents by prefs.recents.collectAsStateWithLifecycle(initialValue = emptyList())
+    val showRecents by prefs.showRecents.collectAsStateWithLifecycle(initialValue = true)
 
     fun openTool(id: String) {
         scope.launch { prefs.pushRecent(id) }
@@ -54,6 +74,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
             HomeScreen(
                 favorites = favorites,
                 recents = recents,
+                showRecents = showRecents,
                 onOpenTool = ::openTool,
                 onOpenCategory = { nav.navigate("category/${it.name}") },
                 onToggleFavorite = { id -> scope.launch { prefs.toggleFavorite(id) } },

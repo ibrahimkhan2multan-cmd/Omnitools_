@@ -1,7 +1,12 @@
 package com.omnitools.app.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -54,16 +59,34 @@ private val OmniShapes = Shapes(
     large = RoundedCornerShape(22.dp),
 )
 
+/** The app's color scheme for dark or light mode (also used for the previews on the first-run screen). */
+fun omniColorScheme(dark: Boolean): ColorScheme = if (dark) DarkColors else LightColors
+
 /** themeMode: "system", "dark" or "light". */
 @Composable
 fun OmniToolsTheme(themeMode: String = "system", content: @Composable () -> Unit) {
+    val systemDark = isSystemInDarkTheme()
     val dark = when (themeMode) {
         "dark" -> true
         "light" -> false
-        else -> isSystemInDarkTheme()
+        else -> systemDark
     }
+
+    // Make status/navigation bar icons readable on the chosen background, regardless of the phone's own setting.
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                val controller = WindowCompat.getInsetsController(window, view)
+                controller.isAppearanceLightStatusBars = !dark
+                controller.isAppearanceLightNavigationBars = !dark
+            }
+        }
+    }
+
     MaterialTheme(
-        colorScheme = if (dark) DarkColors else LightColors,
+        colorScheme = omniColorScheme(dark),
         shapes = OmniShapes,
         content = content,
     )

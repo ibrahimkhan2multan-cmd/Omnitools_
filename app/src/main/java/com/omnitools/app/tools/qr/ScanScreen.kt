@@ -65,6 +65,7 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val history by prefs.scanHistory.collectAsStateWithLifecycle(initialValue = emptyList())
+    val saveHistory by prefs.saveScans.collectAsStateWithLifecycle(initialValue = true)
 
     var hasPermission by remember {
         mutableStateOf(ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)
@@ -124,7 +125,7 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
                             if (result == null) {
                                 val entry = ScanEntry(System.currentTimeMillis(), format, value)
                                 result = entry
-                                scope.launch { prefs.addScan(entry) }
+                                if (saveHistory) scope.launch { prefs.addScan(entry) }
                             }
                         },
                         onError = { cameraError = it },

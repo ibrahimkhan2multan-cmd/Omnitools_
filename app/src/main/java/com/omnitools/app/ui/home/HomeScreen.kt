@@ -50,6 +50,7 @@ import com.omnitools.app.ui.components.ToolRow
 fun HomeScreen(
     favorites: Set<String>,
     recents: List<String>,
+    showRecents: Boolean,
     onOpenTool: (String) -> Unit,
     onOpenCategory: (Category) -> Unit,
     onToggleFavorite: (String) -> Unit,
@@ -99,7 +100,7 @@ fun HomeScreen(
                     }
                 }
             } else {
-                if (recentTools.isNotEmpty()) {
+                if (showRecents && recentTools.isNotEmpty()) {
                     item { SectionTitle("Recently used") }
                     items(recentTools.take(3), key = { "r_" + it.id }) { tool ->
                         ToolRow(tool, tool.id in favorites, { onOpenTool(tool.id) }, { onToggleFavorite(tool.id) })

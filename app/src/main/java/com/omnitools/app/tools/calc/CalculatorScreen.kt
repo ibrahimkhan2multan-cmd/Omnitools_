@@ -21,14 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.omnitools.app.data.Prefs
 import com.omnitools.app.ui.components.ScreenScaffold
 
 @Composable
-fun CalculatorScreen(onBack: () -> Unit) {
+fun CalculatorScreen(prefs: Prefs, onBack: () -> Unit) {
     var expression by remember { mutableStateOf("") }
     var result by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    var degrees by remember { mutableStateOf(true) }
+    // The angle unit starts from the Settings default; tapping DEG/RAD here overrides it for this visit.
+    val defaultDegrees by prefs.calcDegrees.collectAsStateWithLifecycle(initialValue = true)
+    var degreesOverride by remember { mutableStateOf<Boolean?>(null) }
+    val degrees = degreesOverride ?: defaultDegrees
     var scientific by remember { mutableStateOf(false) }
 
     fun append(s: String) {
@@ -79,8 +84,8 @@ fun CalculatorScreen(onBack: () -> Unit) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(selected = scientific, onClick = { scientific = !scientific }, label = { Text("Scientific") })
                 if (scientific) {
-                    FilterChip(selected = degrees, onClick = { degrees = true }, label = { Text("DEG") })
-                    FilterChip(selected = !degrees, onClick = { degrees = false }, label = { Text("RAD") })
+                    FilterChip(selected = degrees, onClick = { degreesOverride = true }, label = { Text("DEG") })
+                    FilterChip(selected = !degrees, onClick = { degreesOverride = false }, label = { Text("RAD") })
                 }
             }
 

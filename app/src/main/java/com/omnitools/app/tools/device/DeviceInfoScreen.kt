@@ -16,15 +16,17 @@ import android.os.Environment
 import android.os.StatFs
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.omnitools.app.util.Actions
 import androidx.core.content.ContextCompat
 import com.omnitools.app.BuildConfig
 import com.omnitools.app.ui.components.ScreenScaffold
@@ -47,7 +49,18 @@ fun DeviceInfoScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val sections = remember { collect(context.applicationContext) }
 
-    ScreenScaffold(title = "Device Information", onBack = onBack) { padding ->
+    ScreenScaffold(
+        title = "Device Information",
+        onBack = onBack,
+        actions = {
+            IconButton(onClick = {
+                val text = sections.joinToString("\n\n") { s ->
+                    s.title + "\n" + s.rows.joinToString("\n") { (k, v) -> "$k: $v" }
+                }
+                Actions.copy(context, "Device information", text)
+            }) { Icon(Icons.Filled.ContentCopy, contentDescription = "Copy all device information") }
+        },
+    ) { padding ->
         Column(
             modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = 24.dp),
         ) {
@@ -66,24 +79,21 @@ fun DeviceInfoScreen(onBack: () -> Unit) {
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     shape = RoundedCornerShape(18.dp),
                 ) {
-                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    // Label above value: no width splitting, so text can never collapse to zero width.
+                    Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         section.rows.forEach { (label, value) ->
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Column(Modifier.fillMaxWidth()) {
                                 Text(
                                     label,
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.weight(0.42f),
                                 )
-                                SelectionContainer(Modifier.weight(0.58f)) {
-                                    Text(
-                                        value,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        textAlign = TextAlign.End,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                }
+                                Text(
+                                    value,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontWeight = FontWeight.Medium,
+                                )
                             }
                         }
                     }

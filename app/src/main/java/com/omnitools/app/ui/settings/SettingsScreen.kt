@@ -1,7 +1,11 @@
 package com.omnitools.app.ui.settings
 
+import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +15,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,18 +24,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omnitools.app.data.Prefs
+import com.omnitools.app.tools.notes.NotesRepository
 import com.omnitools.app.ui.components.ScreenScaffold
 import com.omnitools.app.ui.components.SectionTitle
 import kotlinx.coroutines.launch
 
-private enum class Confirm(val title: String, val body: String) {
-    RECENTS("Clear recently used?", "This only clears the list on the home screen."),
-    SCANS("Clear scan history?", "All saved QR and barcode scan results on this device will be deleted."),
+private enum class Confirm(val title: String, val body: String, val done: String) {
+    RECENTS("Clear recently used?", "This only clears the list on the home screen.", "Recently used cleared"),
+    FAVORITES("Remove all favorites?", "Your starred tools will be un-starred.", "Favorites cleared"),
+    SCANS("Clear scan history?", "All saved QR and barcode scan results on this device will be deleted.", "Scan history cleared"),
+    NOTES("Delete ALL notes?", "Every note in the Notepad will be permanently deleted. This cannot be undone.", "Notes deleted"),
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SettingsScreen(
     prefs: Prefs,
@@ -38,19 +50,23 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenAbout: () -> Unit,
 ) {
+    val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var confirm by remember { mutableStateOf<Confirm?>(null) }
+    val saveScans by prefs.saveScans.collectAsStateWithLifecycle(initialValue = true)
+    val showRecents by prefs.showRecents.collectAsStateWithLifecycle(initialValue = true)
+    val calcDegrees by prefs.calcDegrees.collectAsStateWithLifecycle(initialValue = true)
 
     ScreenScaffold(title = "Settings", onBack = onBack) { padding ->
         Column(
             modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = 24.dp),
         ) {
-            SectionTitle("Theme")
-            Row(
+            SectionTitle("Appearance")
+            FlowRow(
                 modifier = Modifier.padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                listOf("system" to "System", "dark" to "Dark", "light" to "Light").forEach { (mode, label) ->
+                listOf("dark" to "Dark", "light" to "Light", "system" to "Follow phone").forEach { (mode, label) ->
                     FilterChip(
                         selected = themeMode == mode,
                         onClick = { scope.launch { prefs.setThemeMode(mode) } },
@@ -59,21 +75,57 @@ fun SettingsScreen(
                 }
             }
 
-            SectionTitle("Your data")
+            SectionTitle("Calculator")
             Text(
-                "Everything OmniTools saves stays on this device. You can clear it here.",
+                "Angle unit used by sin, cos and tan when you open the calculator.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 20.dp),
             )
-            OutlinedButton(
-                onClick = { confirm = Confirm.RECENTS },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
-            ) { Text("Clear recently used") }
-            OutlinedButton(
-                onClick = { confirm = Confirm.SCANS },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
-            ) { Text("Clear scan history") }
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                FilterChip(selected = calcDegrees, onClick = { scope.launch { prefs.setCalcDegrees(true) } }, label = { Text("Degrees") })
+                FilterChip(selected = !calcDegrees, onClick = { scope.launch { prefs.setCalcDegrees(false) } }, label = { Text("Radians") })
+            }
+
+            SectionTitle("History & privacy")
+            SwitchRow(
+                title = "Save scan history",
+                subtitle = "Keep a list of scanned codes on this device. Turning this off does not delete existing history.",
+                checked = saveScans,
+                onChange = { scope.launch { prefs.setSaveScans(it) } },
+            )
+            SwitchRow(
+                title = "Show recently used tools",
+                subtitle = "Show the \"Recently used\" section on the home screen.",
+                checked = showRecents,
+                onChange = { scope.launch { prefs.setShowRecents(it) } },
+            )
+
+            SectionTitle("Your data")
+            Text(
+                "Everything OmniTools saves stays on this device. You can delete it here.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 20.dp),
+            )
+            Confirm.values().forEach { c ->
+                OutlinedButton(
+                    onClick = { confirm = c },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
+                ) {
+                    Text(
+                        when (c) {
+                            Confirm.RECENTS -> "Clear recently used"
+                            Confirm.FAVORITES -> "Clear favorites"
+                            Confirm.SCANS -> "Clear scan history"
+                            Confirm.NOTES -> "Delete all notes"
+                        }
+                    )
+                }
+            }
 
             SectionTitle("About")
             OutlinedButton(
@@ -93,13 +145,30 @@ fun SettingsScreen(
                     scope.launch {
                         when (c) {
                             Confirm.RECENTS -> prefs.clearRecents()
+                            Confirm.FAVORITES -> prefs.clearFavorites()
                             Confirm.SCANS -> prefs.clearScans()
+                            Confirm.NOTES -> NotesRepository(context.applicationContext).deleteAll()
                         }
+                        Toast.makeText(context, c.done, Toast.LENGTH_SHORT).show()
                     }
                     confirm = null
-                }) { Text("Clear") }
+                }) { Text("Delete") }
             },
             dismissButton = { TextButton(onClick = { confirm = null }) { Text("Cancel") } },
         )
+    }
+}
+
+@Composable
+private fun SwitchRow(title: String, subtitle: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(horizontal = 20.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = checked, onCheckedChange = onChange)
     }
 }

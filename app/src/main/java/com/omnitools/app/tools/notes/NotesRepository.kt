@@ -46,6 +46,11 @@ class NotesRepository(context: Context) {
 
     suspend fun delete(id: String) = withContext(Dispatchers.IO) { fileFor(id).delete() }
 
+    /** Deletes every note file and returns how many were removed. */
+    suspend fun deleteAll(): Int = withContext(Dispatchers.IO) {
+        (dir.listFiles() ?: emptyArray()).count { it.delete() }
+    }
+
     private fun read(file: File): Note? = try {
         val o = JSONObject(file.readText(Charsets.UTF_8))
         Note(o.getString("id"), o.optString("title"), o.optString("body"), o.optLong("updated"))

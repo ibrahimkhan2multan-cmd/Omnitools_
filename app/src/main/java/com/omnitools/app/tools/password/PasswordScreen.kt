@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -66,13 +65,12 @@ fun PasswordScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    SelectionContainer {
-                        Text(
-                            password.ifEmpty { "—" },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                    }
+                    Text(
+                        password.ifEmpty { "—" },
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontFamily = FontFamily.Monospace,
+                    )
                     if (password.isNotEmpty()) {
                         val bits = PasswordGenerator.entropyBits(options)
                         Text(
@@ -120,9 +118,12 @@ fun PasswordScreen(onBack: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SelectionContainer {
-                        Text(uuid.ifEmpty { "—" }, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodyMedium)
-                    }
+                    Text(
+                        uuid.ifEmpty { "—" },
+                        fontFamily = FontFamily.Monospace,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = { uuid = UUID.randomUUID().toString() }) { Text("Generate UUID") }
                         OutlinedButton(onClick = { Actions.copy(context, "UUID", uuid) }, enabled = uuid.isNotEmpty()) { Text("Copy") }

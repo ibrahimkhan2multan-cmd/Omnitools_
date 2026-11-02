@@ -1,7 +1,7 @@
 package com.omnitools.app.data
 
 import android.content.Context
-import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -28,6 +28,10 @@ class Prefs(private val context: Context) {
         val recents = stringPreferencesKey("recents")
         val themeMode = stringPreferencesKey("theme_mode")
         val scanHistory = stringPreferencesKey("scan_history")
+        val onboarded = booleanPreferencesKey("onboarded")
+        val saveScans = booleanPreferencesKey("save_scans")
+        val showRecents = booleanPreferencesKey("show_recents")
+        val calcDegrees = booleanPreferencesKey("calc_degrees")
     }
 
     private val store get() = context.dataStore
@@ -40,6 +44,30 @@ class Prefs(private val context: Context) {
 
     val scanHistory: Flow<List<ScanEntry>> = store.data.map { decodeScans(it[Keys.scanHistory]) }
 
+    /** False until the user has made the one-time dark/light choice on first launch. */
+    val onboarded: Flow<Boolean> = store.data.map { it[Keys.onboarded] ?: false }
+
+    /** Whether scanned codes are saved to the local history (default on). */
+    val saveScans: Flow<Boolean> = store.data.map { it[Keys.saveScans] ?: true }
+
+    /** Whether the home screen shows the "Recently used" section (default on). */
+    val showRecents: Flow<Boolean> = store.data.map { it[Keys.showRecents] ?: true }
+
+    /** Default calculator angle unit: true = degrees, false = radians. */
+    val calcDegrees: Flow<Boolean> = store.data.map { it[Keys.calcDegrees] ?: true }
+
+    /** Stores the first-run choice and marks onboarding as done in one write. */
+    suspend fun completeOnboarding(themeMode: String) {
+        store.edit {
+            it[Keys.themeMode] = themeMode
+            it[Keys.onboarded] = true
+        }
+    }
+
+    suspend fun setSaveScans(value: Boolean) { store.edit { it[Keys.saveScans] = value } }
+    suspend fun setShowRecents(value: Boolean) { store.edit { it[Keys.showRecents] = value } }
+    suspend fun setCalcDegrees(value: Boolean) { store.edit { it[Keys.calcDegrees] = value } }
+
     suspend fun toggleFavorite(toolId: String) {
         store.edit { p ->
             val current = p[Keys.favorites] ?: emptySet()
@@ -51,6 +79,10 @@ class Prefs(private val context: Context) {
         store.edit { p ->
             p[Keys.recents] = encodeRecents(addRecent(decodeRecents(p[Keys.recents]), toolId))
         }
+    }
+
+    suspend fun clearFavorites() {
+        store.edit { it.remove(Keys.favorites) }
     }
 
     suspend fun clearRecents() {
