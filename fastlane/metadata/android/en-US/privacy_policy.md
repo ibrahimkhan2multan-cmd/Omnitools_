@@ -1,37 +1,37 @@
-# Privacy Policy for Hello World: Developer Template App
+# Privacy Policy for OmniTools
 
-**Last Updated:** November 22, 2025
+**Last updated:** November 2, 2026
 
-The application **Hello World: Developer Template App** (the "Application") is a barebones template and open-source project developed by **[YOUR NAME OR COMPANY NAME]** (referred to as "We," "Us," or "the Developer").
+OmniTools ("the Application") is a utility app developed by **[YOUR NAME OR COMPANY NAME]**. This page describes what the Application does with your information.
 
-This page is used to inform users regarding our policies with the collection, use, and disclosure of Personal Information, should anyone decide to use our Application.
+## 1. Information collection and use
 
-## 1. Information Collection and Use
+The Application does **not** collect, transmit or share personal information. It has no account system, no advertising and no analytics. The Application's own code does not upload your notes, scans, generated codes or passwords.
 
-The Hello World: Developer Template App is a base template and is explicitly designed to **NOT collect, store, use, or share any personal or sensitive user information**.
+Data kept on your device only:
 
-As a template application, its core functionality is limited to displaying a basic "Hello World" message and demonstrating the minimum structure of an Android project.
+- **Notes** you write in the Notepad.
+- **Favorites and recently used tools.**
+- **Scan history** of QR and barcode results, which you can delete item by item or all at once.
 
-- **Personal Data:** We do not collect your name, email address, location, device identifiers, or any other information that can personally identify you.
-- **Log Data or Usage Data:** We do not collect data on how you use the Application, nor do we internally log any diagnostic information.
-- **Sensors and Access:** The Application does not access or use your camera, microphone, photo gallery, contacts, or any other sensitive device sensors or files.
+Generated passwords and UUIDs are created on your device and are not saved.
 
-## 2. Third-Party Services
+## 2. Camera
 
-Since the Application collects no data, We **DO NOT use third-party services** for data collection, analytics, advertising, or tracking.
+The Application asks for the camera permission only when you open the QR and barcode scanner. Camera frames are analysed on your device using the barcode model bundled with Google ML Kit. Pictures are not saved or sent by the Application. If you deny the permission, every other tool still works.
 
-## 3. Links to Other Sites
+## 3. Clipboard and sharing
 
-This Application does not contain links to other websites.
+When you copy or share a result, the data goes to the system clipboard or to the app you choose in the share sheet. Other apps may be able to read the clipboard on some Android versions.
 
-## 4. Changes to This Privacy Policy
+## 4. Links
 
-We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.
+Scanned links are never opened automatically. You are shown the destination and asked to confirm before a link is opened in your browser. That website's own privacy policy applies once it is open.
 
-It is your responsibility, as the end-user or developer utilizing this template, to review this policy periodically and, more importantly, to update it whenever you add new functionality that requires data collection (e.g., adding analytics services, user authentication, or in-app purchases).
+## 5. Changes to this policy
 
-## 5. Contact Us
+This policy will be updated when the Application's behaviour changes, for example when new tools that use files or network access are added.
 
-If you have any questions or suggestions about this Privacy Policy, do not hesitate to contact us:
+## 6. Contact
 
 - By email: [support@example.com]

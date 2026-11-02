@@ -1,126 +1,83 @@
-# Hello World: Minimal Kotin APK Template
+# OmniTools — All-in-One Utility Suite
 
-**Compile Android APKs in 2 minutes - ZERO installation required!**
+A native Android app (Kotlin, Jetpack Compose, Material 3) that bundles everyday utilities. Everything runs on-device: no account, no analytics, no ads, no backend.
 
-![kotlinapktemplate_screenshot](https://github.com/user-attachments/assets/4c8cf552-da53-46a3-85a1-0be9b1c02577)
+**No Android Studio needed.** GitHub Actions compiles the APK for you on every push.
 
+## Get the APK
 
-> **Just click "Use this template" and start coding - no Android Studio, no SDK, no JDK needed!**
+1. Push a change to `main` (or open the **Actions** tab ▸ **Android Native CI/CD** ▸ **Run workflow**).
+2. Open the finished run and download the **`debug-apk`** artifact (kept 7 days).
+3. Unzip it and install `app-debug.apk` on your phone (allow "install unknown apps" for your browser/files app).
 
-## 🚀 How It Works
+The run also executes the unit tests and uploads a **`unit-test-report`** artifact. The APK is uploaded *before* the tests run, so a failing test turns the run red but never hides the APK.
 
-This template uses **GitHub Actions** to compile your APK automatically. You only need a GitHub account - no development tools required!
+> **Build status:** this code was written in an environment with no Android SDK and no access to Google/Maven, so it has **not been compiled or run yet**. The first CI run is the first real build; if it fails, the log in the Actions tab shows the exact error.
 
-### 3-Step Process:
-1. **Click "Use this template"** → Create your repository
-2. **Edit code directly on GitHub**
-3. **Download APK from Actions tab**
+## What's in Part 1
 
-Your APK compiles automatically on every code change!
+| Tool | What it does |
+|---|---|
+| QR & Barcode Scanner | CameraX + on-device ML Kit. Camera permission requested only when the scanner opens. Never opens anything automatically; links are analysed (http, IP address, shortener, punycode, `user@` tricks, odd ports) and need confirmation. Local history with delete and clear-all. |
+| QR Code Generator | Text, web link, Wi-Fi and contact (vCard) codes via ZXing, fully offline. Save as PNG, share, copy. |
+| Notepad | Multiple notes, search, autosave, copy/share/delete. Stored as private JSON files. |
+| Text Tools | Counts, case, whitespace cleanup, duplicates, sort, reverse, line numbers, find & replace, Base64, URL encode/decode, JSON format/minify/validate. |
+| Calculator | Standard + scientific (brackets, `%`, `^`, `!`, roots, trig DEG/RAD, ln/log). |
+| Unit Converter | Length, weight, area, volume, speed, data size (decimal vs binary), temperature, number bases. |
+| Device Information | Model, Android/API, ABIs, screen, RAM/storage snapshot, battery, sensors, cameras. App-only values are shown separately. |
+| Password Generator | `SecureRandom`, entropy estimate, plus UUID generator. Nothing is stored. |
 
-## 🎯 Get Started Now
+Dashboard: search, recents, favorites, suggested tools, category screens, light/dark/system theme, settings, About & privacy.
 
-### Step 1: Create Your Project
-- Click the **"Use this template"** button above
-- Name your new repository
-- Create it
+**Not built yet:** PDF reader / image-to-PDF, image tools, file manager, ZIP manager, code editor and HTML/JS runner, productivity timers, premium/trial framework. Categories with no tools yet are hidden instead of showing dead buttons.
 
-### Step 2: Customize Your App
-Edit these files directly on GitHub:
+## Project layout
 
-| File | What to Change |
-|------|----------------|
-| `app/src/main/res/values/strings.xml` | App name & text |
-| `app/src/main/res/layout/activity_main.xml` | UI layout |
-| `app/src/main/res/values/colors.xml` | Color scheme |
-| `app/src/main/java/.../MainActivity.kt` | App logic |
-
-### Step 3: Get Your APK
-1. After saving changes, go to **Actions** tab
-2. Click the latest workflow run
-3. Download the `app-debug-apk` artifact
-4. Install on your Android device!
-
-## 📁 Project Structure - What Each File Does
-
-Here's what you need to know about the project files:
-
-### 🎨 App Resources (Edit These)
-
-**`app/src/main/res/values/strings.xml`**
-- Contains all text strings for your app
-- **Change**: App name, button texts, messages
-
-**`app/src/main/res/values/colors.xml`**
-- Defines your app's color scheme
-- **Change**: Primary color, background colors, text colors
-
-**`app/src/main/res/layout/activity_main.xml`**
-- Your app's user interface layout
-- **Change**: Add buttons, text views, images
-
-**`app/src/main/java/com/example/helloworld/MainActivity.kt`**
-- Your app's main logic
-- **Change**: Add functionality, handle button clicks
-
-### 🖼️ App Icons (Replace These)
-
-**Icon files to replace in `mipmap-*` folders:**
-- `mipmap-hdpi/ic_launcher.png` (72x72 pixels)
-- `mipmap-mdpi/ic_launcher.png` (48x48 pixels)
-- `mipmap-xhdpi/ic_launcher.png` (96x96 pixels)
-- `mipmap-xxhdpi/ic_launcher.png` (144x144 pixels)
-- `mipmap-xxxhdpi/ic_launcher.png` (192x192 pixels)
-
-**Replace all these PNG files** with your own app icon at the correct sizes.
-
-### ⚙️ Configuration Files (Usually Don't Edit)
-
-**`app/build.gradle`** - App dependencies and build settings
-**`build.gradle`** - Project-wide Gradle configuration
-**`AndroidManifest.xml`** - App permissions and components
-**`.github/workflows/build.yml`** - GitHub Actions auto-build script
-
-### 🔐 Signing Scripts (For Advanced Use)
-
-**`bash/utils-generate-keystore`** - Helps create signing keys for Play Store
-**`bash/utils-compile-apk`** - Local compilation script
-
-## 🛠️ Quick Customization Guide
-
-### Change App Name
-Edit `app/src/main/res/values/strings.xml`:
-```xml
-<string name="app_name">My Awesome App</string>
+```
+app/src/main/java/com/omnitools/app/
+  MainActivity.kt, OmniApp.kt     entry point and navigation
+  data/                           Prefs (DataStore), ToolRegistry
+  ui/                             theme, shared components, home, settings, ToolHost
+  tools/{qr,notes,text,calc,device,password}/
+  util/                           clipboard/share helpers, formatting
+app/src/test/                     JVM unit tests
+.github/workflows/android.yml     builds the APK (and a signed release on tags)
+bash/                             helper scripts (push to build, generate signing keys)
+fastlane/metadata/                store listing text, privacy policy
 ```
 
-### Change Colors
-Edit `app/src/main/res/values/colors.xml`:
-```xml
-<color name="colorPrimary">#FF3F51B5</color>
-```
+## Toolchain (changed from the original Hello World template)
 
-### Change Layout
-Edit `app/src/main/res/layout/activity_main.xml` to add buttons, text, or images.
+| | Template | Now | Why |
+|---|---|---|---|
+| Android Gradle Plugin | 8.2.0 | 8.7.3 | compileSdk 35 libraries |
+| Kotlin | 1.9.20 | 2.0.21 + Compose compiler plugin | Compose |
+| Gradle (CI) | 8.5 | 8.9 | required by AGP 8.7 |
+| compileSdk / targetSdk | 34 | 35 | AndroidX/CameraX requirements |
+| minSdk | 24 | 26 | `java.util.Base64`, adaptive icons |
+| UI | XML views | Jetpack Compose | |
 
-### Add Functionality
-Edit `app/src/main/java/com/example/helloworld/MainActivity.kt` to make your app interactive.
+The signing config, build types (debug uses the `.debug` application-id suffix) and tag-triggered signed release are unchanged from the template.
 
-## 🌟 Why This Template?
+## Signed release APK (optional)
 
-- ✅ **Zero installation** - code in browser, get APK
-- ✅ **Instant setup** - 2 minutes from template to APK
-- ✅ **Clean structure** - easy to understand and expand
-- ✅ **Auto-compilation** - APK built on every code change
-
----
-
-**Ready to start? Click "Use this template" above!** 🚀
-
-### Need Signed APK for Play Store?
-Run the signing script when you're ready to publish:
 ```bash
-cd ./bash
+cd bash
 ./utils-generate-keystore
 ```
-Then create a GitHub release to get your signed APK.
+
+Add the printed secrets in the repo's **Settings ▸ Secrets and variables ▸ Actions**, then push a tag such as `v0.1.0`. The workflow builds `app-release.apk` and attaches it to a GitHub release. Release builds use R8 shrinking and have not been tested yet; if a release build misbehaves where debug works, add the missing keep rule to `app/proguard-rules.pro`.
+
+## Local build (optional)
+
+Open the folder in Android Studio and let it sync, or with JDK 17 + Android SDK 35 and Gradle 8.9: `gradle assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk`; `gradle testDebugUnitTest` for tests.
+
+The package id `com.omnitools.app` is a placeholder; change `namespace` and `applicationId` in `app/build.gradle` before any public release.
+
+## Privacy
+
+Notes, favorites, recents and scan history stay on the device. The only permission is CAMERA. See `fastlane/metadata/android/en-US/privacy_policy.md` (fill in the contact placeholders before publishing).
+
+## Roadmap
+
+See [TODO.md](TODO.md).

@@ -1,9 +1,28 @@
-# TODO:
+# TODO
 
-List of pending changes.
+## Next
+- Confirm the first CI build is green; fix any compile errors it reports.
+- Test on a phone: camera scanning, permission-denied flow, QR save/share, notes surviving a restart.
+- Replace the leftover template store images in `fastlane/metadata/android/en-US/images/` (screenshots and graphics are still from the Hello World template).
+- Fill in the contact placeholders in `fastlane/.../privacy_policy.md`.
 
-- Add script to check project status (missing files);
-- Add script to integrate all scripts in a single cli tool
-- Cli tool asks for app details and renames paths and files (if user wants)
-- Add wiki to explain for example different allowed icons
-- Upload demo making a new repo with he template and a new app from 0
+## Part 2 — Files & media
+- Image tools (resize, crop, rotate, convert, compress)
+- PDF reader and image-to-PDF
+- File info and hash calculator
+
+## Part 3 — Developer tools
+- ZIP manager (Zip Slip-safe extraction)
+- Code editor with syntax highlighting
+- HTML/CSS/JS preview runner (restricted WebView)
+
+## Part 4 — Productivity
+- Stopwatch, timers, task lists, date and age calculators
+
+## Part 5 — Premium framework
+- Central entitlement manager, locked-feature list
+- Clearly labelled local five-day trial simulation (no payments)
+
+## Template tooling (carried over)
+- Script to check project status (missing files)
+- CLI tool that renames package/app name

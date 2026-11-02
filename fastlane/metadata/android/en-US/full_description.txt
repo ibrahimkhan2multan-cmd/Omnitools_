@@ -1,5 +1,13 @@
-A clean, base template for Android development in Kotlin. Start coding now!
-You can make your own apps using this code!
+OmniTools is an all-in-one utility suite that works offline, with no account, no ads and no analytics.
 
+Included tools:
+- QR and barcode scanner with link safety checks and local history
+- QR code generator for text, links, Wi-Fi and contacts
+- Notepad with autosave and search
+- Text tools: word counts, case, sort, find and replace, Base64, URL encode, JSON format
+- Scientific calculator
+- Unit and number-base converter
+- Device information
+- Secure password and UUID generator
 
-
+Notes, favorites and scan history stay on your device.

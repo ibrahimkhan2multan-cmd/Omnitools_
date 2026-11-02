@@ -1,1 +1,1 @@
-HelloWorld: Example APP Showcase Kotlin APK Template 
+QR scanner, notes, calculators and everyday tools. Offline, no ads.
