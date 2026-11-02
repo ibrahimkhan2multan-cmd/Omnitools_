@@ -35,8 +35,8 @@ private const val ROUTE_TOOL = "tool/{id}"
 fun OmniApp(prefs: Prefs) {
     val scope = rememberCoroutineScope()
     // null = still loading from disk. Waiting for both values avoids flashing the wrong theme.
-    val themeMode by prefs.themeMode.collectAsStateWithLifecycle<String, String?>(initialValue = null)
-    val onboarded by prefs.onboarded.collectAsStateWithLifecycle<Boolean, Boolean?>(initialValue = null)
+    val themeMode by prefs.themeMode.collectAsStateWithLifecycle<String?>(initialValue = null)
+    val onboarded by prefs.onboarded.collectAsStateWithLifecycle<Boolean?>(initialValue = null)
 
     val mode = themeMode
     val done = onboarded

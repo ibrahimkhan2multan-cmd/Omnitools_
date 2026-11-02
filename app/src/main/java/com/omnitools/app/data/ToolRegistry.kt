@@ -2,6 +2,12 @@ package com.omnitools.app.data
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Checklist
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.FindInPage
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Key
@@ -114,6 +120,62 @@ object ToolRegistry {
             category = Category.SECURITY,
             icon = Icons.Filled.Key,
             keywords = listOf("random", "secure", "strong", "uuid"),
+        ),
+        Tool(
+            id = "percent_calc",
+            name = "Percentage & Discount",
+            description = "X% of Y, percentage change, discounts with optional tax.",
+            category = Category.CALC,
+            icon = Icons.Filled.Percent,
+            keywords = listOf("sale", "price", "tax", "increase", "decrease", "percent"),
+        ),
+        Tool(
+            id = "date_calc",
+            name = "Date & Age Calculator",
+            description = "Days between dates, exact age, next birthday, add or subtract time from a date.",
+            category = Category.CALC,
+            icon = Icons.Filled.Event,
+            keywords = listOf("birthday", "difference", "calendar", "days", "weeks"),
+        ),
+        Tool(
+            id = "stopwatch",
+            name = "Stopwatch & Timer",
+            description = "Stopwatch with laps and a countdown timer with alarm sound.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.Timer,
+            keywords = listOf("lap", "countdown", "alarm", "clock"),
+        ),
+        Tool(
+            id = "tasks",
+            name = "Task List",
+            description = "Simple to-do list with progress. Saved on this device.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.Checklist,
+            keywords = listOf("todo", "to-do", "checklist", "reminder"),
+        ),
+        Tool(
+            id = "random_tools",
+            name = "Dice, Coin & Random",
+            description = "Roll dice, flip a coin, random numbers, or pick one option from a list.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.Casino,
+            keywords = listOf("random", "d20", "heads", "tails", "choose", "decide", "raffle"),
+        ),
+        Tool(
+            id = "color_tool",
+            name = "Color Converter",
+            description = "HEX, RGB and HSL conversion with a live preview and contrast check.",
+            category = Category.DEV,
+            icon = Icons.Filled.Palette,
+            keywords = listOf("hex", "rgb", "hsl", "picker", "contrast", "css"),
+        ),
+        Tool(
+            id = "regex_tool",
+            name = "Regex Tester",
+            description = "Test regular expressions with match positions and groups. Time-limited for safety.",
+            category = Category.DEV,
+            icon = Icons.Filled.FindInPage,
+            keywords = listOf("regular expression", "pattern", "match", "groups"),
         ),
     )
 

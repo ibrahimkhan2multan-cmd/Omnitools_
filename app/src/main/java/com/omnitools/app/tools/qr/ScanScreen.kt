@@ -25,10 +25,12 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -82,6 +84,39 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
     var confirmOpen by remember { mutableStateOf(false) }
     var confirmClear by remember { mutableStateOf(false) }
 
+    // Scan-from-picture state
+    var pictureBusy by remember { mutableStateOf(false) }
+    var pictureMessage by remember { mutableStateOf<String?>(null) }
+    var pictureChoices by remember { mutableStateOf<List<ImageBarcodeScanner.Found>>(emptyList()) }
+
+    fun accept(found: ImageBarcodeScanner.Found) {
+        val entry = ScanEntry(System.currentTimeMillis(), found.format, found.text)
+        result = entry
+        showHistory = false
+        if (saveHistory) scope.launch { prefs.addScan(entry) }
+    }
+
+    // GetContent needs no storage permission: the system picker hands back only the picture the user chose.
+    val pictureLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            pictureBusy = true
+            pictureMessage = null
+            scope.launch {
+                when (val outcome = ImageBarcodeScanner.scan(context, uri)) {
+                    is ImageBarcodeScanner.Outcome.Codes ->
+                        if (outcome.codes.size == 1) accept(outcome.codes.first()) else pictureChoices = outcome.codes
+                    ImageBarcodeScanner.Outcome.NoCode ->
+                        pictureMessage = "No QR code or barcode was found in that picture. Try a sharper, closer picture where the whole code is visible."
+                    ImageBarcodeScanner.Outcome.CouldNotRead ->
+                        pictureMessage = "That file could not be opened as a picture."
+                    is ImageBarcodeScanner.Outcome.Failed ->
+                        pictureMessage = "Scanning failed: ${outcome.message}"
+                }
+                pictureBusy = false
+            }
+        }
+    }
+
     ScreenScaffold(
         title = if (showHistory) "Scan history" else "Scanner",
         onBack = { if (showHistory) showHistory = false else onBack() },
@@ -93,6 +128,9 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
                     }
                 }
             } else {
+                IconButton(onClick = { pictureLauncher.launch("image/*") }, enabled = !pictureBusy) {
+                    Icon(Icons.Filled.Image, contentDescription = "Scan a QR code from a picture")
+                }
                 IconButton(onClick = { showHistory = true }) {
                     Icon(Icons.Filled.History, contentDescription = "Scan history")
                 }
@@ -109,6 +147,7 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
 
                 !hasPermission -> PermissionPrompt(
                     askedOnce = askedOnce,
+                    onPickPicture = { pictureLauncher.launch("image/*") },
                     onRequest = { permissionLauncher.launch(Manifest.permission.CAMERA) },
                     onOpenSettings = {
                         context.startActivity(
@@ -148,6 +187,22 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
                 }
             }
 
+            if (pictureBusy) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+            pictureMessage?.let { msg ->
+                Card(
+                    modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Row(Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(msg, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { pictureMessage = null }) { Text("OK") }
+                    }
+                }
+            }
+
             val current = result
             if (current != null && !showHistory) {
                 ResultCard(
@@ -160,6 +215,27 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
                 )
             }
         }
+    }
+
+    if (pictureChoices.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = { pictureChoices = emptyList() },
+            title = { Text("${pictureChoices.size} codes found") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    pictureChoices.forEach { found ->
+                        TextButton(onClick = { accept(found); pictureChoices = emptyList() }, modifier = Modifier.fillMaxWidth()) {
+                            Column(Modifier.fillMaxWidth()) {
+                                Text(found.format, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                                Text(found.text, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { pictureChoices = emptyList() }) { Text("Cancel") } },
+        )
     }
 
     val current = result
@@ -204,7 +280,7 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
 }
 
 @Composable
-private fun PermissionPrompt(askedOnce: Boolean, onRequest: () -> Unit, onOpenSettings: () -> Unit) {
+private fun PermissionPrompt(askedOnce: Boolean, onPickPicture: () -> Unit, onRequest: () -> Unit, onOpenSettings: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
         verticalArrangement = Arrangement.Center,
@@ -227,6 +303,9 @@ private fun PermissionPrompt(askedOnce: Boolean, onRequest: () -> Unit, onOpenSe
                 modifier = Modifier.padding(top = 12.dp),
             )
             OutlinedButton(onClick = onOpenSettings, modifier = Modifier.padding(top = 8.dp)) { Text("Open app settings") }
+        }
+        OutlinedButton(onClick = onPickPicture, modifier = Modifier.padding(top = 12.dp)) {
+            Text("Scan from a picture instead")
         }
         Text(
             "You can still use every other tool, and the QR generator works without the camera.",
