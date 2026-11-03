@@ -54,7 +54,7 @@ fun TimestampScreen(onBack: () -> Unit) {
                 if (instant == null) {
                     ErrorText("That number is outside the dates this tool can show.")
                 } else {
-                    ResultCard("Read as ${TimestampTool.detectUnit(value).label}", "")
+                    Text("Read as ${TimestampTool.detectUnit(value).label}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     ResultCard("UTC", TimestampTool.format(instant, ZoneOffset.UTC))
                     ResultCard("Your time zone (${local.id})", TimestampTool.format(instant, local))
                 }

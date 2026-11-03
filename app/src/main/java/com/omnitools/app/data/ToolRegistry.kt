@@ -24,6 +24,9 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Construction
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.FolderZip
+import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Html
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.MonitorWeight
@@ -293,6 +296,30 @@ object ToolRegistry {
             category = Category.QR,
             icon = Icons.Filled.ViewWeek,
             keywords = listOf("ean", "upc", "code128", "label", "product", "stripes"),
+        ),
+        Tool(
+            id = "zip_manager",
+            name = "ZIP Manager",
+            description = "See what is inside a ZIP, extract it to a folder (unsafe paths are blocked), or zip files together.",
+            category = Category.FILES,
+            icon = Icons.Filled.FolderZip,
+            keywords = listOf("archive", "compress", "unzip", "extract", "zip", "rar"),
+        ),
+        Tool(
+            id = "code_editor",
+            name = "Code Editor",
+            description = "Open, edit and save text and code files with line numbers, colours, find & replace and undo.",
+            category = Category.DEV,
+            icon = Icons.Filled.Terminal,
+            keywords = listOf("source", "program", "kotlin", "python", "javascript", "json", "edit file", "text file"),
+        ),
+        Tool(
+            id = "html_runner",
+            name = "HTML / JS Runner",
+            description = "Write HTML, CSS and JavaScript and run it right away in a locked-down page with a console.",
+            category = Category.DEV,
+            icon = Icons.Filled.Html,
+            keywords = listOf("web", "javascript", "css", "preview", "sandbox", "playground"),
         ),
     )
 

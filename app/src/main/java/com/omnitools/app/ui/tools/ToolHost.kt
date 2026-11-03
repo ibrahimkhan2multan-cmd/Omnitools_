@@ -11,6 +11,9 @@ import com.omnitools.app.tools.calc.PercentScreen
 import com.omnitools.app.tools.color.ColorScreen
 import com.omnitools.app.tools.random.RandomScreen
 import com.omnitools.app.tools.regex.RegexScreen
+import com.omnitools.app.tools.zip.ZipScreen
+import com.omnitools.app.tools.editor.CodeEditorScreen
+import com.omnitools.app.tools.html.HtmlRunnerScreen
 import com.omnitools.app.tools.calc.BmiScreen
 import com.omnitools.app.tools.calc.LoanScreen
 import com.omnitools.app.tools.calc.NumberWordsScreen
@@ -68,6 +71,9 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "morse_code" -> MorseScreen(onBack)
         "lorem_ipsum" -> LoremScreen(onBack)
         "barcode_gen" -> BarcodeScreen(onBack)
+        "zip_manager" -> ZipScreen(onBack)
+        "code_editor" -> CodeEditorScreen(onBack)
+        "html_runner" -> HtmlRunnerScreen(onBack)
         else -> ScreenScaffold(ToolRegistry.find(toolId)?.name ?: "Unknown tool", onBack) { padding ->
             EmptyState("This tool is not available.", Modifier.padding(padding))
         }
