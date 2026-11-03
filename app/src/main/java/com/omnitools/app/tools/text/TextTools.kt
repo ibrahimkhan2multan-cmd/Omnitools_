@@ -104,4 +104,56 @@ object TextTools {
         is JSONArray -> j.toString()
         else -> throw TextToolException("Invalid JSON.")
     }
+
+    /** "hELLO. wORLD" -> "Hello. World". Capitalises the first letter of the text, of each sentence and of each line. */
+    fun sentenceCase(text: String): String {
+        val sb = StringBuilder(text.length)
+        var capitalizeNext = true
+        for (ch in text.lowercase()) {
+            if (capitalizeNext && ch.isLetter()) {
+                sb.append(ch.uppercaseChar())
+                capitalizeNext = false
+            } else {
+                sb.append(ch)
+                if (ch == '.' || ch == '!' || ch == '?' || ch == '\n') capitalizeNext = true
+                else if (ch.isLetterOrDigit()) capitalizeNext = false
+            }
+        }
+        return sb.toString()
+    }
+
+    /** Swaps upper and lower case of every letter: "aBc" -> "AbC". */
+    fun toggleCase(text: String): String =
+        text.map { if (it.isUpperCase()) it.lowercaseChar() else if (it.isLowerCase()) it.uppercaseChar() else it }.joinToString("")
+
+    /** "hello" -> "hElLo": letters alternate lower, upper, lower... (spaces and symbols do not count). */
+    fun alternatingCase(text: String): String {
+        var n = 0
+        return text.map {
+            if (it.isLetter()) (if (n++ % 2 == 0) it.lowercaseChar() else it.uppercaseChar()) else it
+        }.joinToString("")
+    }
+
+    private fun words(line: String): List<String> =
+        line.replace(Regex("(?<=\\p{Ll})(?=\\p{Lu})"), " ")
+            .split(Regex("[^\\p{L}\\p{N}]+"))
+            .filter { it.isNotEmpty() }
+            .map { it.lowercase() }
+
+    /** Each line becomes one identifier: "Hello World-foo" -> "helloWorldFoo". */
+    fun camelCase(text: String): String = text.lines().joinToString("\n") { line ->
+        words(line).mapIndexed { i, w -> if (i == 0) w else w.replaceFirstChar { it.uppercase() } }.joinToString("")
+    }
+
+    fun snakeCase(text: String): String = text.lines().joinToString("\n") { words(it).joinToString("_") }
+
+    fun kebabCase(text: String): String = text.lines().joinToString("\n") { words(it).joinToString("-") }
+
+    /** Joins all lines into one, separated by single spaces. */
+    fun removeLineBreaks(text: String): String =
+        text.split(Regex("\\s*[\\r\\n]+\\s*")).filter { it.isNotEmpty() }.joinToString(" ")
+
+    fun removeEmptyLines(text: String): String = text.lines().filter { it.isNotBlank() }.joinToString("\n")
+
+    fun addBullets(text: String): String = text.lines().joinToString("\n") { if (it.isBlank()) it else "\u2022 $it" }
 }
