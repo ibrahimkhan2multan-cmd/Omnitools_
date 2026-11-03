@@ -11,6 +11,15 @@ import com.omnitools.app.tools.calc.PercentScreen
 import com.omnitools.app.tools.color.ColorScreen
 import com.omnitools.app.tools.random.RandomScreen
 import com.omnitools.app.tools.regex.RegexScreen
+import com.omnitools.app.tools.calc.BmiScreen
+import com.omnitools.app.tools.calc.LoanScreen
+import com.omnitools.app.tools.calc.NumberWordsScreen
+import com.omnitools.app.tools.calc.RomanScreen
+import com.omnitools.app.tools.calc.TipScreen
+import com.omnitools.app.tools.dev.TimestampScreen
+import com.omnitools.app.tools.qr.BarcodeScreen
+import com.omnitools.app.tools.text.LoremScreen
+import com.omnitools.app.tools.text.MorseScreen
 import com.omnitools.app.tools.hash.HashScreen
 import com.omnitools.app.tools.image.ImageToolsScreen
 import com.omnitools.app.tools.pdf.ImagesToPdfScreen
@@ -50,6 +59,15 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "image_tools" -> ImageToolsScreen(onBack)
         "image_pdf" -> ImagesToPdfScreen(onBack)
         "pdf_reader" -> PdfReaderScreen(onBack)
+        "loan_calc" -> LoanScreen(onBack)
+        "bmi_calc" -> BmiScreen(onBack)
+        "tip_split" -> TipScreen(onBack)
+        "roman_numerals" -> RomanScreen(onBack)
+        "number_words" -> NumberWordsScreen(onBack)
+        "timestamp_tool" -> TimestampScreen(onBack)
+        "morse_code" -> MorseScreen(onBack)
+        "lorem_ipsum" -> LoremScreen(onBack)
+        "barcode_gen" -> BarcodeScreen(onBack)
         else -> ScreenScaffold(ToolRegistry.find(toolId)?.name ?: "Unknown tool", onBack) { padding ->
             EmptyState("This tool is not available.", Modifier.padding(padding))
         }

@@ -24,6 +24,15 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.Construction
 import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.MonitorWeight
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material.icons.filled.ViewHeadline
+import androidx.compose.material.icons.filled.ViewWeek
+import androidx.compose.material.icons.filled.FormatListNumbered
 import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.PictureAsPdf
@@ -212,6 +221,78 @@ object ToolRegistry {
             category = Category.PDF,
             icon = Icons.Filled.Visibility,
             keywords = listOf("view", "open", "read", "pages", "document"),
+        ),
+        Tool(
+            id = "loan_calc",
+            name = "Loan & EMI Calculator",
+            description = "Monthly payment, total interest and the first payments of a fixed-rate loan.",
+            category = Category.CALC,
+            icon = Icons.Filled.AccountBalance,
+            keywords = listOf("emi", "mortgage", "interest", "payment", "credit", "car loan"),
+        ),
+        Tool(
+            id = "bmi_calc",
+            name = "BMI Calculator",
+            description = "Body mass index in kg/cm or lb/ft, with the weight range for your height.",
+            category = Category.CALC,
+            icon = Icons.Filled.MonitorWeight,
+            keywords = listOf("weight", "height", "health", "body mass"),
+        ),
+        Tool(
+            id = "tip_split",
+            name = "Tip & Bill Split",
+            description = "Add a tip and split a bill between people, with optional rounding up.",
+            category = Category.CALC,
+            icon = Icons.Filled.Receipt,
+            keywords = listOf("restaurant", "split", "share", "gratuity"),
+        ),
+        Tool(
+            id = "roman_numerals",
+            name = "Roman Numerals",
+            description = "Convert numbers 1 to 3999 to Roman numerals and back.",
+            category = Category.CALC,
+            icon = Icons.Filled.FormatListNumbered,
+            keywords = listOf("roman", "numeral", "xiv", "convert"),
+        ),
+        Tool(
+            id = "number_words",
+            name = "Number to Words",
+            description = "Write any number in English words, such as for cheques and documents.",
+            category = Category.CALC,
+            icon = Icons.Filled.Tag,
+            keywords = listOf("spell", "cheque", "check", "words", "say"),
+        ),
+        Tool(
+            id = "timestamp_tool",
+            name = "Timestamp Converter",
+            description = "Unix timestamps to dates and back, in UTC or your time zone.",
+            category = Category.DEV,
+            icon = Icons.Filled.Schedule,
+            keywords = listOf("unix", "epoch", "date", "time", "milliseconds"),
+        ),
+        Tool(
+            id = "morse_code",
+            name = "Morse Code",
+            description = "Translate text to Morse code and Morse code to text.",
+            category = Category.NOTES,
+            icon = Icons.Filled.GraphicEq,
+            keywords = listOf("dot", "dash", "sos", "telegraph"),
+        ),
+        Tool(
+            id = "lorem_ipsum",
+            name = "Lorem Ipsum Generator",
+            description = "Placeholder text by paragraphs, sentences or words.",
+            category = Category.NOTES,
+            icon = Icons.Filled.ViewHeadline,
+            keywords = listOf("dummy", "placeholder", "filler", "design"),
+        ),
+        Tool(
+            id = "barcode_gen",
+            name = "Barcode Generator",
+            description = "Code 128, Code 39, EAN-13, EAN-8, UPC-A and ITF barcodes. Save or share as PNG.",
+            category = Category.QR,
+            icon = Icons.Filled.ViewWeek,
+            keywords = listOf("ean", "upc", "code128", "label", "product", "stripes"),
         ),
     )
 

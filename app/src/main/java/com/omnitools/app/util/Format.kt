@@ -16,4 +16,7 @@ object Format {
         }
         return String.format(Locale.ROOT, "%.1f %s", v, units[i])
     }
+
+    /** 1234.5 -> "1,234.50" (always two decimals, English digits). */
+    fun money(value: Double): String = String.format(java.util.Locale.US, "%,.2f", value)
 }

@@ -1,6 +1,11 @@
 package com.omnitools.app.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -65,4 +70,14 @@ fun ResultCard(caption: String, value: String, modifier: Modifier = Modifier) {
 @Composable
 fun ErrorText(message: String?) {
     if (message != null) Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium)
+}
+
+/** Standard scrolling page for a tool: padding, spacing and a vertical scroll. */
+@Composable
+fun ToolPage(padding: PaddingValues, content: @Composable ColumnScope.() -> Unit) {
+    Column(
+        modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        content = content,
+    )
 }
