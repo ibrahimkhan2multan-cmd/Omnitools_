@@ -3,13 +3,14 @@ package com.omnitools.app.ui.home
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.omnitools.app.data.Category
 import com.omnitools.app.data.ToolRegistry
 import com.omnitools.app.ui.components.EmptyState
+import com.omnitools.app.ui.components.Entrance
 import com.omnitools.app.ui.components.ScreenScaffold
 import com.omnitools.app.ui.components.ToolRow
 
@@ -30,8 +31,10 @@ fun CategoryScreen(
                 modifier = Modifier.padding(padding),
                 contentPadding = PaddingValues(vertical = 8.dp),
             ) {
-                items(tools, key = { it.id }) { tool ->
-                    ToolRow(tool, tool.id in favorites, { onOpenTool(tool.id) }, { onToggleFavorite(tool.id) })
+                itemsIndexed(tools, key = { _, t -> t.id }) { index, tool ->
+                    Entrance("k_${tool.id}", index = index) {
+                        ToolRow(tool, tool.id in favorites, { onOpenTool(tool.id) }, { onToggleFavorite(tool.id) })
+                    }
                 }
             }
         }

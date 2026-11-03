@@ -1,5 +1,7 @@
 package com.omnitools.app.ui.settings
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +34,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.omnitools.app.ui.components.OmniLogo
+import com.omnitools.app.ui.components.pressable
 import com.omnitools.app.R
 import com.omnitools.app.ui.theme.omniColorScheme
 
@@ -53,11 +57,7 @@ fun ThemeChoiceScreen(onChosen: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_launcher_foreground),
-            contentDescription = "OmniTools logo",
-            modifier = Modifier.size(96.dp).padding(top = 8.dp),
-        )
+        OmniLogo(size = 84.dp, modifier = Modifier.padding(top = 16.dp, bottom = 8.dp))
         Text("Welcome to OmniTools", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
         Text(
             "Choose how the app should look. You can change this any time in Settings.",
@@ -86,12 +86,15 @@ fun ThemeChoiceScreen(onChosen: (String) -> Unit) {
 private fun ThemePreviewCard(label: String, dark: Boolean, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val scheme = omniColorScheme(dark)
     Surface(
-        modifier = modifier.clickable(onClick = onClick),
+        modifier = modifier.pressable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         color = scheme.background,
         border = BorderStroke(
-            width = if (selected) 3.dp else 1.dp,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+            width = animateDpAsState(if (selected) 3.dp else 1.dp, label = "border width").value,
+            color = animateColorAsState(
+                if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                label = "border color",
+            ).value,
         ),
     ) {
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

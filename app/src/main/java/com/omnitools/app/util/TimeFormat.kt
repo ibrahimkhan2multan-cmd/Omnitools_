@@ -14,6 +14,17 @@ object TimeFormat {
         else String.format(Locale.ROOT, "%02d:%02d.%02d", minutes, seconds, hundredths)
     }
 
+    /** Exact countdown, never rounded: 1 -> "00:00.001", 61_005 -> "01:01.005", 3_600_000 -> "1:00:00.000". */
+    fun countdownPrecise(ms: Long): String {
+        val total = if (ms < 0) 0 else ms
+        val millis = total % 1000
+        val seconds = (total / 1000) % 60
+        val minutes = (total / 60_000) % 60
+        val hours = total / 3_600_000
+        return if (hours > 0) String.format(Locale.ROOT, "%d:%02d:%02d.%03d", hours, minutes, seconds, millis)
+        else String.format(Locale.ROOT, "%02d:%02d.%03d", minutes, seconds, millis)
+    }
+
     /** Countdown display, rounded UP to whole seconds so it never shows 00:00 while time remains. */
     fun countdown(ms: Long): String {
         val totalSeconds = if (ms <= 0) 0 else (ms + 999) / 1000

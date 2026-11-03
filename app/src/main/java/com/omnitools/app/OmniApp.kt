@@ -1,5 +1,11 @@
 package com.omnitools.app
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,7 +75,14 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         nav.navigate("tool/$id")
     }
 
-    NavHost(navController = nav, startDestination = ROUTE_HOME) {
+    NavHost(
+        navController = nav,
+        startDestination = ROUTE_HOME,
+        enterTransition = { slideInHorizontally(tween(340, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(300)) },
+        exitTransition = { slideOutHorizontally(tween(340, easing = FastOutSlowInEasing)) { -it / 8 } + fadeOut(tween(220)) },
+        popEnterTransition = { slideInHorizontally(tween(340, easing = FastOutSlowInEasing)) { -it / 8 } + fadeIn(tween(300)) },
+        popExitTransition = { slideOutHorizontally(tween(320, easing = FastOutSlowInEasing)) { it / 5 } + fadeOut(tween(240)) },
+    ) {
         composable(ROUTE_HOME) {
             HomeScreen(
                 favorites = favorites,

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.omnitools.app.BuildConfig
 import com.omnitools.app.R
+import com.omnitools.app.ui.components.OmniLogo
 import com.omnitools.app.ui.components.ScreenScaffold
 import com.omnitools.app.ui.components.SectionTitle
 
@@ -27,11 +28,7 @@ fun AboutScreen(onBack: () -> Unit) {
             modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_launcher_foreground),
-                contentDescription = "OmniTools logo",
-                modifier = Modifier.size(96.dp),
-            )
+            OmniLogo(size = 84.dp, modifier = Modifier.padding(vertical = 12.dp))
             Text("OmniTools", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Text(
                 "All-in-One Utility Suite",

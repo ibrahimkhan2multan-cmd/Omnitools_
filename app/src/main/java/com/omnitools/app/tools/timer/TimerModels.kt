@@ -45,7 +45,10 @@ class StopwatchModel {
     }
 }
 
-/** Countdown timer state, same lifetime rules as [StopwatchModel]. */
+/**
+ * Countdown timer state. Time comes from SystemClock.elapsedRealtime(). The model only holds state: ringing, the
+ * system alarm and saving are handled by [TimerController], which is what the screen should call.
+ */
 class TimerModel {
     var totalMs by mutableStateOf(5 * 60_000L)
         private set
@@ -59,18 +62,21 @@ class TimerModel {
     fun remaining(now: Long = SystemClock.elapsedRealtime()): Long =
         if (running) (endAt - now).coerceAtLeast(0L) else remainingWhenPaused
 
+    /** Sets the length. Any value from 1 millisecond up to [MAX_MS] is accepted. Ignored while running. */
     fun setDuration(ms: Long) {
         if (running) return
-        totalMs = ms.coerceIn(1_000L, 99L * 3_600_000L)
+        totalMs = ms.coerceIn(MIN_MS, MAX_MS)
         remainingWhenPaused = totalMs
         finished = false
     }
 
-    fun start() {
-        if (running || remainingWhenPaused <= 0L) return
+    /** Starts or resumes. Returns the milliseconds left at the moment of starting, or 0 if it could not start. */
+    fun start(): Long {
+        if (running || remainingWhenPaused <= 0L) return 0L
         finished = false
         endAt = SystemClock.elapsedRealtime() + remainingWhenPaused
         running = true
+        return remainingWhenPaused
     }
 
     fun pause() {
@@ -85,20 +91,50 @@ class TimerModel {
         remainingWhenPaused = totalMs
     }
 
-    /** Called from the UI tick. Marks the timer finished once the end time has passed. */
-    fun checkFinished(now: Long = SystemClock.elapsedRealtime()): Boolean {
-        if (running && now >= endAt) {
-            running = false
-            finished = true
-            remainingWhenPaused = 0L
-            return true
-        }
-        return false
+    fun markFinished() {
+        running = false
+        finished = true
+        remainingWhenPaused = 0L
     }
 
     fun dismissFinished() {
         finished = false
         remainingWhenPaused = totalMs
+    }
+
+    /** Puts a timer that was running when the app process ended back into the running state. */
+    fun restoreRunning(remainingMs: Long, total: Long) {
+        totalMs = total.coerceIn(MIN_MS, MAX_MS)
+        remainingWhenPaused = remainingMs
+        endAt = SystemClock.elapsedRealtime() + remainingMs
+        finished = false
+        running = true
+    }
+
+    fun restoreFinished(total: Long) {
+        totalMs = total.coerceIn(MIN_MS, MAX_MS)
+        running = false
+        finished = true
+        remainingWhenPaused = 0L
+    }
+
+    data class Parts(val hours: Long, val minutes: Long, val seconds: Long, val millis: Long)
+
+    companion object {
+        const val MIN_MS = 1L
+        const val MAX_MS = 99L * 3_600_000L
+
+        /** Adds up the four fields (each may be any size, e.g. 90 seconds). 0 means nothing was entered. */
+        fun durationFrom(hours: Long, minutes: Long, seconds: Long, millis: Long): Long {
+            fun lim(v: Long) = v.coerceIn(0L, 1_000_000L)
+            val total = lim(hours) * 3_600_000L + lim(minutes) * 60_000L + lim(seconds) * 1_000L + lim(millis)
+            return if (total <= 0L) 0L else total.coerceAtMost(MAX_MS)
+        }
+
+        fun split(ms: Long): Parts {
+            val t = ms.coerceAtLeast(0L)
+            return Parts(t / 3_600_000L, (t / 60_000L) % 60, (t / 1_000L) % 60, t % 1_000L)
+        }
     }
 }
 
