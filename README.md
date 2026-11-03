@@ -12,7 +12,7 @@ A native Android app (Kotlin, Jetpack Compose, Material 3) that bundles everyday
 
 The run also executes the unit tests and uploads a **`unit-test-report`** artifact. The APK is uploaded *before* the tests run, so a failing test turns the run red but never hides the APK.
 
-> **Build status:** the debug APK compiles and all 34 JVM unit tests pass in CI. The app has **not yet been run on a real device**, so UI behaviour, camera scanning, permission handling, sharing and saving still need manual testing on a phone. Release (R8-minified) builds are untested.
+> **Build status:** the debug APK compiles and all JVM unit tests pass in CI. The app has **not yet been run on a real device**, so UI behaviour, camera scanning, permission handling, sharing and saving still need manual testing on a phone. Release (R8-minified) builds are untested.
 
 ## What's in Part 1
 
@@ -29,7 +29,14 @@ The run also executes the unit tests and uploads a **`unit-test-report`** artifa
 
 Dashboard: search, recents, favorites, suggested tools, category screens, light/dark/system theme, settings, About & privacy.
 
-**Not built yet:** PDF reader / image-to-PDF, image tools, file manager, ZIP manager, code editor and HTML/JS runner, productivity timers, premium/trial framework. Categories with no tools yet are hidden instead of showing dead buttons.
+### Stopwatch & Timer
+- Timer length from **1 millisecond** to 99 hours (hours / min / sec / ms fields), millisecond-exact countdown with a progress ring.
+- **Rings with the app closed.** A system alarm (`AlarmManager.setAlarmClock`: exact, works in Doze, no special permission) starts a foreground service that plays the phone's alarm sound on the alarm stream, vibrates, and shows a full-screen "Time's up" screen over the lock screen plus a notification with a Stop button. Auto-stops after 5 minutes.
+- A running timer is saved and restored if the app is closed, and re-armed after a phone restart (if its time has not passed).
+- Needs: notifications allowed (Android 13+ runtime permission) and, on Android 14+, the "full-screen notifications" switch. The timer screen shows what is missing and links to the right settings page.
+- Honest limits: Android delivers alarms with some latency (typically tens of milliseconds, sometimes more), so a 1 ms alarm *rings* when the system delivers it, not at exactly 1.000 ms; while the app is open the in-app wait ends at the millisecond but starting the sound still takes a few tens of milliseconds. It cannot ring while the phone is off. It follows the Alarm volume. Not yet tested on a real device or on OEM battery-saver skins that kill background apps.
+
+**Not built yet:** file manager, ZIP manager, code editor and HTML/JS runner, premium/trial framework. Batch 2 tools (Hash, Image Editor, Images to PDF, PDF Reader) are listed in the app. Categories with no tools yet are hidden instead of showing dead buttons. Categories with no tools yet are hidden instead of showing dead buttons.
 
 ## Project layout
 
