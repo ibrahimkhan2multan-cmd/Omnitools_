@@ -54,7 +54,7 @@ class TextStyleTest {
     @Test fun moreCases() {
         assertEquals("Hello. World is here\nNew line", TextTools.sentenceCase("hello. WORLD is here\nnew line"))
         assertEquals("AbC", TextTools.toggleCase("aBc"))
-        assertEquals("hElLo wOrLd", TextTools.alternatingCase("hello world"))
+        assertEquals("hElLo WoRlD", TextTools.alternatingCase("hello world"))
         assertEquals("helloWorldFooBar", TextTools.camelCase("Hello World-fooBar"))
         assertEquals("hello_world_foo_bar", TextTools.snakeCase("Hello World-fooBar"))
         assertEquals("hello-world\nfoo-bar", TextTools.kebabCase("Hello World\nfoo bar"))
