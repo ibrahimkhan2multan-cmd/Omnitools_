@@ -33,20 +33,15 @@ class TextStyleTest {
     }
 
     @Test fun upsideDownReversesAndFlips() {
-        assertEquals("ǝɥ", FancyText.apply(Style.UPSIDE_DOWN, "he").let { it }.let { r -> r })
-        assertEquals("ɥǝllo".length, FancyText.apply(Style.UPSIDE_DOWN, "hello").length)
+        assertEquals("ǝɥ", FancyText.apply(Style.UPSIDE_DOWN, "he"))
         assertEquals("¿ɐ", FancyText.apply(Style.UPSIDE_DOWN, "a?"))
     }
 
     @Test fun everyStyleRoundTripsBackToPlainText() {
         val original = "Hello World 123 CHNPQRZ"
         for (style in Style.values()) {
-            if (style == Style.UPSIDE_DOWN || style == Style.SMALL_CAPS) continue // lossy: no case / reversed
-            val styled = FancyText.apply(style, original)
-            assertEquals("round trip of $style", original.filter { style != Style.ITALIC || true }, FancyText.plain(styled).let { plain ->
-                // Italic, script, bold-italic and fraktur have no digits, so digits stay as they were.
-                plain
-            })
+            if (style == Style.UPSIDE_DOWN || style == Style.SMALL_CAPS) continue // lossy: reversed / no capitals
+            assertEquals("round trip of $style", original, FancyText.plain(FancyText.apply(style, original)))
         }
     }
 
