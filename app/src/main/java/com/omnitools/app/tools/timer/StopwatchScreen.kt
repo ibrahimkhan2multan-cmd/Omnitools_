@@ -408,7 +408,7 @@ private fun RingReadyCard(
 ) {
     val allOk = notificationsOk && fullScreenOk
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
         shape = RoundedCornerShape(18.dp),
         modifier = Modifier.fillMaxWidth().animateContentSize(),
     ) {

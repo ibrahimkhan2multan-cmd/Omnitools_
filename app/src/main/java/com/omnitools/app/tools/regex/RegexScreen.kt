@@ -78,7 +78,7 @@ fun RegexScreen(onBack: () -> Unit) {
                     )
                     r.matches.forEachIndexed { i, m ->
                         Card(
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Column(Modifier.padding(12.dp)) {

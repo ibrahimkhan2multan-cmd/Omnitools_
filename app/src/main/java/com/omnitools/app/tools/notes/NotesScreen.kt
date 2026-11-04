@@ -98,7 +98,7 @@ fun NotesScreen(onBack: () -> Unit) {
                         items(visible, key = { it.id }) { note ->
                             Card(
                                 modifier = Modifier.fillMaxWidth().clickable { editing = note },
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
                                 shape = RoundedCornerShape(18.dp),
                             ) {
                                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {

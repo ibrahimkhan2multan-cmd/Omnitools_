@@ -76,7 +76,7 @@ fun DeviceInfoScreen(onBack: () -> Unit) {
                 }
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
                     shape = RoundedCornerShape(18.dp),
                 ) {
                     // Label above value: no width splitting, so text can never collapse to zero width.

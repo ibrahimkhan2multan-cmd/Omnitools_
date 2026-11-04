@@ -193,7 +193,7 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
             pictureMessage?.let { msg ->
                 Card(
                     modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth().padding(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
                     shape = RoundedCornerShape(16.dp),
                 ) {
                     Row(Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -328,7 +328,7 @@ private fun ResultCard(
     val analysis = UrlSafety.analyze(entry.text)
     Card(
         modifier = modifier.fillMaxWidth().padding(12.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
         shape = RoundedCornerShape(22.dp),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

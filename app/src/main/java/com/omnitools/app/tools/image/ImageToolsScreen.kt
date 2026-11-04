@@ -188,7 +188,7 @@ fun ImageToolsScreen(onBack: () -> Unit) {
             }
 
             val (outW, outH) = ImageMath.scaledSize(bmp.width, bmp.height, scalePct)
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), modifier = Modifier.fillMaxWidth()) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     val o = originalInfo
                     Text(details?.name ?: "Picture", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)

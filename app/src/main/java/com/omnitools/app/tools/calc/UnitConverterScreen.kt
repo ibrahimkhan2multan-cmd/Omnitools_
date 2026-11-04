@@ -87,7 +87,7 @@ private fun UnitPanel(kind: UnitConverter.Kind) {
     outcome.second?.let { Text(it, color = MaterialTheme.colorScheme.error) }
     outcome.first?.let {
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(),
             modifier = Modifier.fillMaxWidth(),
         ) {
             Column(Modifier.padding(16.dp)) {
@@ -156,7 +156,7 @@ private fun BaseConverter() {
         Text(it, color = MaterialTheme.colorScheme.error)
     }
     if (results.all { it.second.first != null }) {
-        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), modifier = Modifier.fillMaxWidth()) {
+        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = com.omnitools.app.ui.components.cardBorder(), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 results.forEach { (b, r) ->
                     Text("${baseName(b)}: ${r.first}", style = MaterialTheme.typography.bodyLarge)
