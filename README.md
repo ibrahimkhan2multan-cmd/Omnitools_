@@ -88,3 +88,10 @@ Notes, favorites, recents and scan history stay on the device. The only permissi
 ## Roadmap
 
 See [TODO.md](TODO.md).
+
+## Release and signing
+
+- Every push builds debug, runs the unit tests and also builds the shrunk release variant with a throwaway key (never published).
+- A tag named `v*` (for example `v1.0.0`) builds `app-release.apk` signed with the key stored in the four repository secrets `SIGNING_KEY_STORE_BASE64`, `SIGNING_STORE_PASSWORD`, `SIGNING_KEY_ALIAS`, `SIGNING_KEY_PASSWORD`, verifies the signature with `apksigner`, and attaches the APK to a GitHub release.
+- The keystore is never committed. Back it up: losing it means updates can no longer be installed over the old version.
+- Privacy policy: [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
