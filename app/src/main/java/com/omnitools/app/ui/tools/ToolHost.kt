@@ -12,6 +12,10 @@ import com.omnitools.app.tools.color.ColorScreen
 import com.omnitools.app.tools.random.RandomScreen
 import com.omnitools.app.tools.regex.RegexScreen
 import com.omnitools.app.tools.zip.ZipScreen
+import com.omnitools.app.tools.everyday.BaseConverterScreen
+import com.omnitools.app.tools.everyday.CountdownScreen
+import com.omnitools.app.tools.everyday.DiscountScreen
+import com.omnitools.app.tools.everyday.HabitScreen
 import com.omnitools.app.tools.editor.CodeEditorScreen
 import com.omnitools.app.tools.html.HtmlRunnerScreen
 import com.omnitools.app.tools.calc.BmiScreen
@@ -71,6 +75,10 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "morse_code" -> MorseScreen(onBack)
         "lorem_ipsum" -> LoremScreen(onBack)
         "barcode_gen" -> BarcodeScreen(onBack)
+        "base_converter" -> BaseConverterScreen(onBack)
+        "discount_calc" -> DiscountScreen(onBack)
+        "countdown" -> CountdownScreen(onBack)
+        "habit_tracker" -> HabitScreen(onBack)
         "zip_manager" -> ZipScreen(onBack)
         "code_editor" -> CodeEditorScreen(onBack)
         "html_runner" -> HtmlRunnerScreen(onBack)

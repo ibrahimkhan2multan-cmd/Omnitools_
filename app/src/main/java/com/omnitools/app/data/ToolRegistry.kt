@@ -40,6 +40,10 @@ import androidx.compose.material.icons.filled.Crop
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.HourglassBottom
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
@@ -232,6 +236,38 @@ object ToolRegistry {
             category = Category.CALC,
             icon = Icons.Filled.AccountBalance,
             keywords = listOf("emi", "mortgage", "interest", "payment", "credit", "car loan"),
+        ),
+        Tool(
+            id = "base_converter",
+            name = "Number Base Converter",
+            description = "Convert whole numbers between binary, octal, decimal and hexadecimal.",
+            category = Category.CALC,
+            icon = Icons.Filled.Numbers,
+            keywords = listOf("binary", "hex", "octal", "decimal", "base"),
+        ),
+        Tool(
+            id = "discount_calc",
+            name = "Discount & Sale Price",
+            description = "Price after a discount and tax, or work out how many percent off a sale price is.",
+            category = Category.CALC,
+            icon = Icons.Filled.LocalOffer,
+            keywords = listOf("sale", "percent off", "tax", "vat", "shopping"),
+        ),
+        Tool(
+            id = "countdown",
+            name = "Countdown",
+            description = "Days left until your events, saved on this device.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.HourglassBottom,
+            keywords = listOf("days until", "birthday", "deadline", "event"),
+        ),
+        Tool(
+            id = "habit_tracker",
+            name = "Habit Tracker",
+            description = "Tick off daily habits and keep your streaks, saved on this device.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.CheckCircle,
+            keywords = listOf("streak", "routine", "daily"),
         ),
         Tool(
             id = "bmi_calc",
