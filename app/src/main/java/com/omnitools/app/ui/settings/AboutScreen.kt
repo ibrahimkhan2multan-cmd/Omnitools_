@@ -45,23 +45,19 @@ fun AboutScreen(onBack: () -> Unit) {
             Column(Modifier.fillMaxWidth()) {
                 SectionTitle("What this app does with your data")
                 Body(
-                    "Notes, favorites, recently used tools and scan history are stored only on this device. " +
-                        "OmniTools has no account system, no analytics and no advertising, and its own code " +
-                        "does not upload your notes, scans or generated codes anywhere."
+                    "OmniTools has no internet permission, no account, no analytics and no ads. Notes, favorites, " +
+                        "scan history and the running timer are stored only on this device. Nothing is uploaded or shared."
                 )
-                SectionTitle("Camera")
+                SectionTitle("Permissions")
                 Body(
-                    "The camera permission is requested only when you open the scanner. If you deny it, " +
-                        "every other tool keeps working. Scanning runs on-device using the barcode model " +
-                        "bundled with Google ML Kit. Scanned content is never opened automatically."
+                    "Camera: only when you open the scanner; analysed on-device. Notifications, sound, vibration, " +
+                        "full-screen alert and restart-after-reboot: only so a timer can ring when the app is closed. " +
+                        "Files are opened only through the system picker, only the ones you choose."
                 )
                 SectionTitle("Generated passwords")
                 Body("Passwords are created on your device with a secure random generator and are never saved or sent.")
-                SectionTitle("Current limits")
-                Body(
-                    "This is an early version. Only the tools listed on the home screen exist; more " +
-                        "(PDF, images, ZIP, code editor) will be added in later releases."
-                )
+                SectionTitle("Full privacy policy")
+                Body("github.com/ibrahimkhan2multan-cmd/Omnitools_ (PRIVACY_POLICY.md)")
             }
         }
     }

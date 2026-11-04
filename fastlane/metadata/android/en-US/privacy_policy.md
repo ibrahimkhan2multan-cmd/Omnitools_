@@ -1,37 +1,58 @@
 # Privacy Policy for OmniTools
 
-**Last updated:** November 2, 2026
+**Last updated:** November 4, 2026
 
-OmniTools ("the Application") is a utility app developed by **[YOUR NAME OR COMPANY NAME]**. This page describes what the Application does with your information.
+OmniTools ("the App") is a free utility app by **ibrahimkhan2multan-cmd** ("the developer"). This policy explains what the App does with your information. The short version: **the App does not collect, send or share your data.**
 
-## 1. Information collection and use
+## 1. No data collection
 
-The Application does **not** collect, transmit or share personal information. It has no account system, no advertising and no analytics. The Application's own code does not upload your notes, scans, generated codes or passwords.
+- The App does **not** declare the Android `INTERNET` permission, so it cannot send data over the network.
+- No accounts, no sign-in, no advertising, no analytics, no crash-reporting service, no payments.
+- The developer receives no information about you or your use of the App.
 
-Data kept on your device only:
+## 2. Data that stays on your device
 
-- **Notes** you write in the Notepad.
-- **Favorites and recently used tools.**
-- **Scan history** of QR and barcode results, which you can delete item by item or all at once.
+These are stored only in the App's private storage and are removed when you clear the App's data or uninstall it:
+
+- Notes you write in the Notepad.
+- Favorite tools, recently used tools and your theme choice.
+- QR/barcode scan history (if you keep it enabled; you can delete items or everything).
+- The running timer's end time, so the alarm can still ring if the App is closed.
 
 Generated passwords and UUIDs are created on your device and are not saved.
 
-## 2. Camera
+## 3. Permissions and why they are used
 
-The Application asks for the camera permission only when you open the QR and barcode scanner. Camera frames are analysed on your device using the barcode model bundled with Google ML Kit. Pictures are not saved or sent by the Application. If you deny the permission, every other tool still works.
+| Permission | Purpose |
+|---|---|
+| Camera | Only when you open the QR/barcode scanner. Frames are analysed on-device with Google ML Kit's bundled model; nothing is saved or sent. |
+| Notifications | To show the "Time's up" alarm notification for the timer. |
+| Foreground service (media playback), Wake lock, Vibrate | To play the alarm sound and vibrate while the timer rings, even when the App is closed. |
+| Full-screen intent | To show the "Time's up" screen over the lock screen when a timer you set finishes. |
+| Receive boot completed | To re-arm a running timer after the phone restarts. |
 
-## 3. Clipboard and sharing
+Every permission is used only for the feature listed. If you deny one, the rest of the App keeps working.
 
-When you copy or share a result, the data goes to the system clipboard or to the app you choose in the share sheet. Other apps may be able to read the clipboard on some Android versions.
+## 4. Files you choose
 
-## 4. Links
+Tools such as PDF, image, ZIP and code editor tools open or save files only through Android's system file picker, and only the files you pick. Processing happens on your device. Files are not uploaded anywhere.
 
-Scanned links are never opened automatically. You are shown the destination and asked to confirm before a link is opened in your browser. That website's own privacy policy applies once it is open.
+## 5. HTML/JS runner
 
-## 5. Changes to this policy
+The HTML/JS runner executes code you type or open inside a sandboxed web view with network access blocked. It cannot read your files or contacts.
 
-This policy will be updated when the Application's behaviour changes, for example when new tools that use files or network access are added.
+## 6. Clipboard, sharing and links
 
-## 6. Contact
+When you copy or share a result, it goes to the system clipboard or to the app you choose. Other apps may be able to read the clipboard on some Android versions. Scanned links are never opened automatically; you are asked first, and the destination site's own policy applies once it opens.
 
-- By email: [support@example.com]
+## 7. Children
+
+The App is a general utility, collects no personal information, and is not directed at children in a way that differs from adults.
+
+## 8. Changes
+
+If the App's behaviour changes (for example, a feature that needs network access), this policy will be updated before that release and the date above changed.
+
+## 9. Contact
+
+Questions: open an issue at https://github.com/ibrahimkhan2multan-cmd/Omnitools_/issues

@@ -56,6 +56,18 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+      # Every normal push also builds the shrunk (R8) release variant with a throwaway key, so release-only
+      # problems show up before a tag is pushed. This APK is never published.
+      - name: 🧪 Check Release Build (throwaway key)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        env:
+          RELEASE_STORE_PASSWORD: ci-check-only
+          RELEASE_KEY_PASSWORD: ci-check-only
+          RELEASE_KEY_ALIAS: ci
+        run: |
+          keytool -genkeypair -keystore $RUNNER_TEMP/ci.jks -storetype PKCS12 -alias ci -keyalg RSA -keysize 2048 -validity 2 -storepass ci-check-only -keypass ci-check-only -dname "CN=ci"
+          RELEASE_STORE_FILE=$RUNNER_TEMP/ci.jks gradle assembleRelease --stacktrace
+
       - name: 🔐 Config APK Signature
         if: startsWith(github.ref, 'refs/tags/')
         env:
@@ -71,6 +83,12 @@ jobs:
       - name: 🎯 Build Release APK
         if: startsWith(github.ref, 'refs/tags/')
         run: gradle assembleRelease --stacktrace
+
+      - name: ✅ Verify APK Signature
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | tail -1)
+          $APKSIGNER verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
 
       - name: 📦 Upload Release APK Artifact
         if: startsWith(github.ref, 'refs/tags/')
