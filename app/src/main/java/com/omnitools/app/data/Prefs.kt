@@ -29,6 +29,7 @@ class Prefs(private val context: Context) {
         val themeMode = stringPreferencesKey("theme_mode")
         val scanHistory = stringPreferencesKey("scan_history")
         val onboarded = booleanPreferencesKey("onboarded")
+        val privacyAccepted = booleanPreferencesKey("privacy_accepted")
         val saveScans = booleanPreferencesKey("save_scans")
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
@@ -46,6 +47,11 @@ class Prefs(private val context: Context) {
 
     /** False until the user has made the one-time dark/light choice on first launch. */
     val onboarded: Flow<Boolean> = store.data.map { it[Keys.onboarded] ?: false }
+
+    /** False until the user has tapped Accept on the privacy policy screen. */
+    val privacyAccepted: Flow<Boolean> = store.data.map { it[Keys.privacyAccepted] ?: false }
+
+    suspend fun acceptPrivacy() { store.edit { it[Keys.privacyAccepted] = true } }
 
     /** Whether scanned codes are saved to the local history (default on). */
     val saveScans: Flow<Boolean> = store.data.map { it[Keys.saveScans] ?: true }

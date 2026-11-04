@@ -33,7 +33,7 @@ import com.omnitools.app.ui.components.OmniCard
 import com.omnitools.app.ui.components.OmniLogo
 import com.omnitools.app.ui.components.ScreenScaffold
 
-private const val POLICY_URL = "https://github.com/ibrahimkhan2multan-cmd/Omnitools_/blob/main/PRIVACY_POLICY.md"
+const val POLICY_URL = "https://github.com/ibrahimkhan2multan-cmd/Omnitools_/blob/main/PRIVACY_POLICY.md"
 
 @Composable
 fun AboutScreen(onBack: () -> Unit) {

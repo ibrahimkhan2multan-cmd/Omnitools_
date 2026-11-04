@@ -27,6 +27,7 @@ import com.omnitools.app.ui.home.HomeScreen
 import com.omnitools.app.ui.settings.AboutScreen
 import com.omnitools.app.ui.settings.SettingsScreen
 import com.omnitools.app.ui.settings.ThemeChoiceScreen
+import com.omnitools.app.ui.settings.PrivacyGateScreen
 import com.omnitools.app.ui.theme.OmniToolsTheme
 import com.omnitools.app.ui.tools.ToolHost
 import kotlinx.coroutines.launch
@@ -43,17 +44,21 @@ fun OmniApp(prefs: Prefs) {
     // null = still loading from disk. Waiting for both values avoids flashing the wrong theme.
     val themeMode by prefs.themeMode.collectAsStateWithLifecycle<String?>(initialValue = null)
     val onboarded by prefs.onboarded.collectAsStateWithLifecycle<Boolean?>(initialValue = null)
+    val privacy by prefs.privacyAccepted.collectAsStateWithLifecycle<Boolean?>(initialValue = null)
 
     val mode = themeMode
     val done = onboarded
-    if (mode == null || done == null) {
+    val accepted = privacy
+    if (mode == null || done == null || accepted == null) {
         Box(Modifier.fillMaxSize().background(Color(0xFF0E1220)))
         return
     }
 
     OmniToolsTheme(themeMode = mode) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            if (!done) {
+            if (!accepted) {
+                PrivacyGateScreen(onAccept = { scope.launch { prefs.acceptPrivacy() } })
+            } else if (!done) {
                 ThemeChoiceScreen(onChosen = { choice -> scope.launch { prefs.completeOnboarding(choice) } })
             } else {
                 AppNav(prefs, mode)
