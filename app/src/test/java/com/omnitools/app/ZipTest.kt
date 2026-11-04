@@ -109,7 +109,7 @@ class ZipTest {
     }
 
     @Test fun uniqueNamesAvoidClashesAndFolders() {
-        assertEquals(listOf("a.txt", "a (1).txt", "a (2).txt", "b"), ZipEngine.uniqueNames(listOf("a.txt", "a.txt", "A.TXT", "b")))
+        assertEquals(listOf("a.txt", "a (1).txt", "A (2).TXT", "b"), ZipEngine.uniqueNames(listOf("a.txt", "a.txt", "A.TXT", "b")))
         assertEquals(listOf("x_y.txt", "file"), ZipEngine.uniqueNames(listOf("x/y.txt", " ")))
         assertEquals(listOf("noext", "noext (1)"), ZipEngine.uniqueNames(listOf("noext", "noext")))
     }
