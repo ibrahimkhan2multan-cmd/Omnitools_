@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -78,7 +79,8 @@ object HtmlDocument {
 fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier, onConsole: (String) -> Unit) {
     // The WebView is created once, so its callbacks must always call the newest onConsole.
     val latestConsole by rememberUpdatedState(onConsole)
-    AndroidView(
+    // A brand-new WebView for every run, so a run can never show the page from an earlier run.
+    key(runId) { AndroidView(
         modifier = modifier,
         factory = { context ->
             WebView(context).apply {
@@ -124,13 +126,18 @@ fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier
             }
         },
         update = { web ->
-            if (web.tag != runId) {
-                web.tag = runId
+            // Reload whenever the run number OR the code itself changed since this view last loaded.
+            val loadedKey = runId to document
+            if (web.tag != loadedKey) {
+                web.tag = loadedKey
+                web.stopLoading()
+                web.clearCache(true)
+                web.clearHistory()
                 web.loadDataWithBaseURL(null, document, "text/html", "utf-8", null)
             }
         },
         onRelease = { it.destroy() },
-    )
+    ) }
 }
 
 /** The running page with its console output underneath. */
