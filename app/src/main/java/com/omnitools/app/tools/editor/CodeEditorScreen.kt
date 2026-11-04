@@ -379,7 +379,6 @@ private fun CodeField(value: TextFieldValue, onChange: (TextFieldValue) -> Unit,
                     textStyle = textStyle,
                     cursorBrush = SolidColor(scheme.primary),
                     visualTransformation = transformation,
-                    softWrap = false,
                     modifier = Modifier.defaultMinSize(minWidth = minWidth, minHeight = minHeight).padding(8.dp),
                 )
             }
