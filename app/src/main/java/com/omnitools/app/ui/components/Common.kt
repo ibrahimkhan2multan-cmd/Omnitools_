@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Card
@@ -61,7 +62,7 @@ fun ScreenScaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                title = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                title = { Text(title, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -83,30 +84,72 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.colorScheme.onBackground,
-        modifier = modifier.padding(horizontal = 20.dp, vertical = 8.dp),
+        modifier = modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp, bottom = 8.dp),
     )
 }
 
-/** Rounded gradient badge that holds a tool/category icon. */
+/** Hairline border used on every card so surfaces read as one family. */
+@Composable
+fun cardBorder() = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
+
+/** The app's standard card: surface color, hairline border, no shadow. */
+@Composable
+fun OmniCard(
+    modifier: Modifier = Modifier,
+    content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = cardBorder(),
+        shape = RoundedCornerShape(18.dp),
+        content = content,
+    )
+}
+
+/** A clearly tappable row: icon, title, optional subtitle and a trailing icon (arrow by default). */
+@Composable
+fun LinkRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String? = null,
+    trailing: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).pressable(onClick = onClick),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.45f)),
+        shape = RoundedCornerShape(18.dp),
+    ) {
+        Row(
+            Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            IconBadge(icon, size = 40)
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                if (subtitle != null) {
+                    Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Icon(trailing, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
+
+/** Rounded badge that holds a tool/category icon: one calm accent color everywhere, so lists stay easy to scan. */
 @Composable
 fun IconBadge(icon: ImageVector, size: Int = 44) {
     Box(
         modifier = Modifier
             .size(size.dp)
-            .background(
-                Brush.linearGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
-                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
-                    )
-                ),
-                RoundedCornerShape(14.dp),
-            ),
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape((size * 0.32f).dp)),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = null, tint = androidx.compose.ui.graphics.Color.White, modifier = Modifier.size((size * 0.55f).dp))
+        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size((size * 0.5f).dp))
     }
 }
 
@@ -125,16 +168,17 @@ fun ToolRow(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .pressable(onClick = onOpen),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = cardBorder(),
         shape = RoundedCornerShape(18.dp),
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             IconBadge(tool.icon)
             Column(modifier = Modifier.weight(1f)) {
-                Text(tool.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                Text(tool.name, style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(2.dp))
                 Text(
                     tool.description,

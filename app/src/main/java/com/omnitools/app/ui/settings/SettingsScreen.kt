@@ -3,6 +3,9 @@ package com.omnitools.app.ui.settings
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import com.omnitools.app.ui.components.LinkRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -128,10 +131,12 @@ fun SettingsScreen(
             }
 
             SectionTitle("About")
-            OutlinedButton(
+            LinkRow(
+                icon = Icons.Filled.Info,
+                title = "About & privacy",
+                subtitle = "Version, permissions and privacy policy",
                 onClick = onOpenAbout,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
-            ) { Text("About & privacy") }
+            )
         }
     }
 

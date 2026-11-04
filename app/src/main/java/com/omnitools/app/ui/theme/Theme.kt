@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.material3.Typography
+import androidx.compose.ui.text.font.FontWeight
 
 val OmniBlue = Color(0xFF4F8CFF)
 val OmniViolet = Color(0xFF8B6CFF)
@@ -59,6 +62,20 @@ private val OmniShapes = Shapes(
     large = RoundedCornerShape(22.dp),
 )
 
+/** One type scale for the whole app: bolder headings, a little tighter large text, roomier body lines. */
+private val OmniTypography = Typography().let { t ->
+    t.copy(
+        headlineMedium = t.headlineMedium.copy(fontWeight = FontWeight.Bold, letterSpacing = (-0.3).sp),
+        headlineSmall = t.headlineSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = (-0.2).sp),
+        titleLarge = t.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+        titleMedium = t.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+        titleSmall = t.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+        bodyMedium = t.bodyMedium.copy(lineHeight = 21.sp),
+        bodySmall = t.bodySmall.copy(lineHeight = 18.sp),
+        labelLarge = t.labelLarge.copy(fontWeight = FontWeight.SemiBold),
+    )
+}
+
 /** The app's color scheme for dark or light mode (also used for the previews on the first-run screen). */
 fun omniColorScheme(dark: Boolean): ColorScheme = if (dark) DarkColors else LightColors
 
@@ -88,6 +105,7 @@ fun OmniToolsTheme(themeMode: String = "system", content: @Composable () -> Unit
     MaterialTheme(
         colorScheme = omniColorScheme(dark),
         shapes = OmniShapes,
+        typography = OmniTypography,
         content = content,
     )
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 /** Single-line number field. Accepts digits, one decimal point and a leading minus; the caller parses the text. */
 @Composable
@@ -58,10 +59,12 @@ fun TextInput(
 fun ResultCard(caption: String, value: String, modifier: Modifier = Modifier) {
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = cardBorder(),
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(Modifier.padding(16.dp)) {
-            Text(caption, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(caption, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
         }
     }
@@ -77,7 +80,7 @@ fun ErrorText(message: String?) {
 fun ToolPage(padding: PaddingValues, content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
         content = content,
     )
 }

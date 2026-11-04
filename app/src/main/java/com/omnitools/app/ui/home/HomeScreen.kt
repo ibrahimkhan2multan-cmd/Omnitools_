@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,8 +90,13 @@ fun HomeScreen(
                             }
                         }
                     },
-                    shape = RoundedCornerShape(18.dp),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f),
+                    ),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
                 )
             }
 
@@ -127,7 +133,7 @@ fun HomeScreen(
                     Entrance("cr_${row.joinToString { it.name }}", index = rowIndex + 1) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             row.forEach { category ->
                                 CategoryCard(category, Modifier.weight(1f)) { onOpenCategory(category) }
@@ -158,9 +164,9 @@ private fun Header(onOpenSettings: () -> Unit) {
         OmniLogo(size = 46.dp, modifier = Modifier.padding(start = 2.dp))
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
-            Text("OmniTools", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text("OmniTools", style = MaterialTheme.typography.headlineSmall)
             Text(
-                "All-in-One Utility Suite",
+                "${ToolRegistry.all.size} tools · works offline",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -177,11 +183,12 @@ private fun CategoryCard(category: Category, modifier: Modifier, onClick: () -> 
     Card(
         modifier = modifier.pressable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = com.omnitools.app.ui.components.cardBorder(),
         shape = RoundedCornerShape(18.dp),
     ) {
-        Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             IconBadge(category.icon, size = 40)
-            Text(category.title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+            Text(category.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             Text(
                 "$count tool${if (count == 1) "" else "s"}",
                 style = MaterialTheme.typography.bodySmall,
