@@ -25,7 +25,7 @@ object EncodeTools {
     fun decode(kind: EncodeKind, text: String): String = try {
         when (kind) {
             EncodeKind.BASE64 -> {
-                val bytes = Base64.getMimeDecoder().decode(text.trim().replace('-', '+').replace('_', '/'))
+                val bytes = Base64.getDecoder().decode(text.filter { !it.isWhitespace() }.replace('-', '+').replace('_', '/'))
                 strictUtf8(bytes)
             }
             EncodeKind.URL -> URLDecoder.decode(text.replace("+", "%2B"), "UTF-8")
