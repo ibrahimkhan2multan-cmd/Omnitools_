@@ -45,6 +45,8 @@ import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.HourglassBottom
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -270,6 +272,22 @@ object ToolRegistry {
             category = Category.PRODUCTIVITY,
             icon = Icons.Filled.CheckCircle,
             keywords = listOf("streak", "routine", "daily"),
+        ),
+        Tool(
+            id = "folder_analyzer",
+            name = "Folder Analyzer",
+            description = "See what takes space in a folder: totals, types and the biggest files. Read-only.",
+            category = Category.FILES,
+            icon = Icons.Filled.Storage,
+            keywords = listOf("storage", "space", "size", "largest", "disk", "cleanup"),
+        ),
+        Tool(
+            id = "duplicate_finder",
+            name = "Duplicate Finder",
+            description = "Find identical files in a folder and free space. Nothing is deleted without your confirmation.",
+            category = Category.FILES,
+            icon = Icons.Filled.ContentCopy,
+            keywords = listOf("duplicates", "same files", "clean", "free space", "copies"),
         ),
         Tool(
             id = "encode_tool",

@@ -79,6 +79,8 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "discount_calc" -> DiscountScreen(onBack)
         "countdown" -> CountdownScreen(onBack)
         "habit_tracker" -> HabitScreen(onBack)
+        "folder_analyzer" -> com.omnitools.app.tools.files.FolderAnalyzerScreen(onBack)
+        "duplicate_finder" -> com.omnitools.app.tools.files.DuplicateFinderScreen(onBack)
         "encode_tool" -> com.omnitools.app.tools.dev.EncodeScreen(onBack)
         "time_zones" -> com.omnitools.app.tools.dev.TimeZoneScreen(onBack)
         "zip_manager" -> ZipScreen(onBack)
