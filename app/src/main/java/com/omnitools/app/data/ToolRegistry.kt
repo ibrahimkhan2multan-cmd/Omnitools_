@@ -44,6 +44,8 @@ import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.HourglassBottom
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
@@ -268,6 +270,22 @@ object ToolRegistry {
             category = Category.PRODUCTIVITY,
             icon = Icons.Filled.CheckCircle,
             keywords = listOf("streak", "routine", "daily"),
+        ),
+        Tool(
+            id = "encode_tool",
+            name = "Encode / Decode",
+            description = "Base64, URL, HTML entities, hex and binary, both directions, on your device.",
+            category = Category.DEV,
+            icon = Icons.Filled.Link,
+            keywords = listOf("base64", "url", "percent", "html", "entities", "hex", "binary", "encode", "decode"),
+        ),
+        Tool(
+            id = "time_zones",
+            name = "Time Zones",
+            description = "See what time it is in other cities for a time you pick. Works offline.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.Public,
+            keywords = listOf("timezone", "world clock", "utc", "meeting", "convert time"),
         ),
         Tool(
             id = "bmi_calc",
