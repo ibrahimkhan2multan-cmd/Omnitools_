@@ -106,9 +106,7 @@ fun NotesScreen(onBack: () -> Unit) {
                                         note.title.ifBlank { "Untitled" },
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.SemiBold,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
+                                                                            )
                                     if (note.body.isNotBlank()) {
                                         Text(
                                             note.body,

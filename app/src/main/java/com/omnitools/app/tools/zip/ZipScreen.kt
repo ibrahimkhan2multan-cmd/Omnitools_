@@ -176,7 +176,7 @@ private fun ExtractTab() {
         entries.take(SHOWN_ENTRIES).forEach { e ->
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 Icon(if (e.isDirectory) Icons.Filled.Folder else Icons.Filled.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(e.name, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f), color = if (e.safe) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
+                Text(e.name, modifier = Modifier.weight(1f), color = if (e.safe) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
                 if (!e.isDirectory && e.size >= 0) Text(Format.bytes(e.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -257,7 +257,7 @@ private fun CreateTab() {
     files.forEach { uri ->
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Filled.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(names[uri] ?: "file", maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(horizontal = 8.dp))
+            Text(names[uri] ?: "file", modifier = Modifier.weight(1f).padding(horizontal = 8.dp))
             IconButton(onClick = { files = files - uri }, enabled = !busy) { Icon(Icons.Filled.Close, contentDescription = "Remove") }
         }
     }

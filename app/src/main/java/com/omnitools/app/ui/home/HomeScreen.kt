@@ -188,7 +188,7 @@ private fun CategoryCard(category: Category, modifier: Modifier, onClick: () -> 
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             IconBadge(category.icon, size = 40)
-            Text(category.title, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(category.title, style = MaterialTheme.typography.titleSmall)
             Text(
                 "$count tool${if (count == 1) "" else "s"}",
                 style = MaterialTheme.typography.bodySmall,
