@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.HourglassBottom
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Storage
+import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -288,6 +289,14 @@ object ToolRegistry {
             category = Category.FILES,
             icon = Icons.Filled.ContentCopy,
             keywords = listOf("duplicates", "same files", "clean", "free space", "copies"),
+        ),
+        Tool(
+            id = "batch_rename",
+            name = "Batch Rename",
+            description = "Rename many files at once: find and replace, prefix, numbering, letter case. Preview before anything changes.",
+            category = Category.FILES,
+            icon = Icons.Filled.DriveFileRenameOutline,
+            keywords = listOf("rename", "files", "numbering", "bulk", "photos", "names"),
         ),
         Tool(
             id = "encode_tool",

@@ -239,3 +239,146 @@ fun DuplicateFinderScreen(onBack: () -> Unit) {
         )
     }
 }
+
+@Composable
+fun BatchRenameScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var tree by remember { mutableStateOf<Uri?>(null) }
+    var files by remember { mutableStateOf<List<FileEntry>>(emptyList()) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var result by remember { mutableStateOf<String?>(null) }
+    var confirm by remember { mutableStateOf(false) }
+
+    var filter by remember { mutableStateOf("") }
+    var find by remember { mutableStateOf("") }
+    var replaceWith by remember { mutableStateOf("") }
+    var prefix by remember { mutableStateOf("") }
+    var suffix by remember { mutableStateOf("") }
+    var numbering by remember { mutableStateOf(false) }
+    var numberName by remember { mutableStateOf("") }
+    var start by remember { mutableStateOf("1") }
+    var digits by remember { mutableStateOf("2") }
+    var caseMode by remember { mutableStateOf(CaseMode.KEEP) }
+
+    fun load(t: Uri) {
+        scope.launch {
+            busy = true; error = null
+            try {
+                val walk = withContext(Dispatchers.IO) { SafWalker.walk(context.contentResolver, t, 5000, { false }, {}, recursive = false) }
+                files = walk.entries
+            } catch (e: Exception) { error = "Could not read that folder: ${e.message ?: "unknown error"}" }
+            busy = false
+        }
+    }
+
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { picked: Uri? ->
+        if (picked != null) { tree = picked; result = null; load(picked) }
+    }
+
+    val wanted = filter.trim().trimStart('.').lowercase()
+    val selected = remember(files, wanted) {
+        val inScope = files.filter { wanted.isEmpty() || FileStats.extension(it.name) == wanted }
+        inScope.associateBy { it.name }.let { byName -> BatchRename.naturalOrder(byName.keys.toList()).map { byName.getValue(it) } }
+    }
+    val rules = RenameRules(
+        find, replaceWith, prefix, suffix, numbering, numberName, start.toIntOrNull() ?: 1, digits.toIntOrNull() ?: 2, caseMode,
+    )
+    val plan = remember(selected, find, replaceWith, prefix, suffix, numbering, numberName, start, digits, caseMode) {
+        BatchRename.plan(selected.map { it.name }, rules, files.map { it.name }.toSet() - selected.map { it.name }.toSet())
+    }
+    val changes = plan.filter { it.status != BatchRename.Status.UNCHANGED }
+    val problems = plan.count { it.status == BatchRename.Status.DUPLICATE || it.status == BatchRename.Status.EXISTS || it.status == BatchRename.Status.INVALID }
+
+    ScreenScaffold(title = "Batch Rename", onBack = onBack) { padding ->
+        ToolPage(padding) {
+            Text(
+                "Rename many files in one folder at once. You see every new name before anything changes, and clashes are blocked. Subfolders are not touched.",
+                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(onClick = { picker.launch(null) }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text(if (tree == null) "Choose a folder" else "Choose another folder") }
+            ErrorText(error)
+            result?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
+            if (tree != null && !busy) {
+                Text("${files.size} file${if (files.size == 1) "" else "s"} in the folder, ${selected.size} selected", style = MaterialTheme.typography.titleSmall)
+                com.omnitools.app.ui.components.TextInput("Only files with this extension (optional, e.g. jpg)", filter, { filter = it.take(10) })
+                SectionTitle("Find and replace")
+                com.omnitools.app.ui.components.TextInput("Find in the name", find, { find = it.take(100) })
+                com.omnitools.app.ui.components.TextInput("Replace with", replaceWith, { replaceWith = it.take(100) })
+                SectionTitle("Add text")
+                com.omnitools.app.ui.components.TextInput("Prefix", prefix, { prefix = it.take(100) })
+                com.omnitools.app.ui.components.TextInput("Suffix (before the extension)", suffix, { suffix = it.take(100) })
+                SectionTitle("Numbering")
+                Row(Modifier.fillMaxWidth().clickable { numbering = !numbering }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = numbering, onCheckedChange = { numbering = it })
+                    Text("Add a number to each file")
+                }
+                if (numbering) {
+                    com.omnitools.app.ui.components.TextInput("Name before the number (blank keeps each name)", numberName, { numberName = it.take(100) })
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        com.omnitools.app.ui.components.NumberField("Start at", start, { start = it.filter(Char::isDigit).take(6) }, Modifier.weight(1f))
+                        com.omnitools.app.ui.components.NumberField("Digits", digits, { digits = it.filter(Char::isDigit).take(1) }, Modifier.weight(1f))
+                    }
+                }
+                SectionTitle("Letter case")
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    CaseMode.values().forEach { m ->
+                        androidx.compose.material3.FilterChip(selected = caseMode == m, onClick = { caseMode = m }, label = { Text(m.label, maxLines = 1) })
+                    }
+                }
+                SectionTitle("Preview")
+                if (changes.isEmpty()) {
+                    Text("No names would change yet. Fill in a rule above.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                } else {
+                    if (problems > 0) Text("$problems name${if (problems == 1) "" else "s"} would clash or are invalid. Fix the rules to continue.", color = MaterialTheme.colorScheme.error)
+                    Button(onClick = { confirm = true }, enabled = problems == 0 && !busy, modifier = Modifier.fillMaxWidth()) { Text("Rename ${changes.size} file${if (changes.size == 1) "" else "s"}") }
+                    changes.take(SHOWN).forEach { p ->
+                        val bad = p.status != BatchRename.Status.OK
+                        OmniCard {
+                            Column(Modifier.padding(12.dp)) {
+                                Text(p.old, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("→ " + p.new, style = MaterialTheme.typography.titleSmall, color = if (bad) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface)
+                                if (bad) Text(
+                                    when (p.status) {
+                                        BatchRename.Status.DUPLICATE -> "Another file would get the same name"
+                                        BatchRename.Status.EXISTS -> "A file with this name already exists"
+                                        else -> "Not a valid name"
+                                    },
+                                    style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                    }
+                    if (changes.size > SHOWN) Text("…and ${changes.size - SHOWN} more.", style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
+
+    val t = tree
+    if (confirm && t != null) {
+        AlertDialog(
+            onDismissRequest = { confirm = false },
+            title = { Text("Rename ${changes.size} file${if (changes.size == 1) "" else "s"}?") },
+            text = { Text("The files in this folder will be renamed as shown in the preview. There is no undo button, so check the preview first.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirm = false
+                    val byName = selected.associateBy { it.name }
+                    val todo = changes.filter { it.status == BatchRename.Status.OK }
+                    scope.launch {
+                        busy = true
+                        val ok = withContext(Dispatchers.IO) { todo.count { p -> byName[p.old]?.let { SafWalker.rename(context.contentResolver, t, it.id, p.new) } == true } }
+                        val failed = todo.size - ok
+                        result = "Renamed $ok file${if (ok == 1) "" else "s"}" + if (failed > 0) ". $failed could not be renamed (this folder may not allow it)." else "."
+                        busy = false
+                        find = ""; replaceWith = ""; prefix = ""; suffix = ""; numbering = false; numberName = ""; caseMode = CaseMode.KEEP
+                        load(t)
+                    }
+                }) { Text("Rename") }
+            },
+            dismissButton = { TextButton(onClick = { confirm = false }) { Text("Cancel") } },
+        )
+    }
+}

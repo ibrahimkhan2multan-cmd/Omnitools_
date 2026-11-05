@@ -93,7 +93,10 @@ object Duplicates {
 object SafWalker {
     data class Walk(val entries: List<FileEntry>, val truncated: Boolean)
 
-    fun walk(resolver: ContentResolver, tree: Uri, maxEntries: Int, shouldStop: () -> Boolean, onCount: (Int) -> Unit): Walk {
+    fun walk(
+        resolver: ContentResolver, tree: Uri, maxEntries: Int, shouldStop: () -> Boolean, onCount: (Int) -> Unit,
+        recursive: Boolean = true,
+    ): Walk {
         val out = ArrayList<FileEntry>()
         val stack = ArrayDeque<Pair<String, String>>()
         stack.add(DocumentsContract.getTreeDocumentId(tree) to "")
@@ -112,7 +115,7 @@ object SafWalker {
                     val name = it.getString(1) ?: continue
                     val isDir = it.getString(2) == DocumentsContract.Document.MIME_TYPE_DIR
                     if (isDir) {
-                        stack.add(id to "$prefix$name/")
+                        if (recursive) stack.add(id to "$prefix$name/")
                     } else {
                         if (out.size >= maxEntries) { truncated = true; break }
                         out.add(FileEntry("$prefix$name", name, if (it.isNull(3)) 0L else it.getLong(3), id))
@@ -143,6 +146,9 @@ object SafWalker {
         }
         return digest.digest().joinToString("") { "%02x".format(it.toInt() and 0xFF) }
     }
+
+    fun rename(resolver: ContentResolver, tree: Uri, id: String, newName: String): Boolean =
+        try { DocumentsContract.renameDocument(resolver, documentUri(tree, id), newName) != null } catch (e: Exception) { false }
 
     fun delete(resolver: ContentResolver, tree: Uri, id: String): Boolean =
         try { DocumentsContract.deleteDocument(resolver, documentUri(tree, id)) } catch (e: Exception) { false }
