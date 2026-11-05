@@ -124,6 +124,6 @@ object GameKeys {
     fun script(key: String, code: String, keyCode: Int): String =
         "(function(){function f(t){var e=new KeyboardEvent(t,{key:'$key',code:'$code',bubbles:true,cancelable:true});" +
             "try{Object.defineProperty(e,'keyCode',{get:function(){return $keyCode}});Object.defineProperty(e,'which',{get:function(){return $keyCode}})}catch(x){}" +
-            "[document.activeElement,document,window].forEach(function(n){if(n&&n.dispatchEvent)n.dispatchEvent(e)})}" +
+            "(document.activeElement||document).dispatchEvent(e)}" +
             "f('keydown');setTimeout(function(){f('keyup')},60)})();"
 }
