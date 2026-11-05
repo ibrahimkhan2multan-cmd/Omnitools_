@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,52 +36,72 @@ private const val EXAMPLE_JS = "let n = 0;\nfunction hello() {\n  n++;\n  docume
 
 @Composable
 fun HtmlRunnerScreen(onBack: () -> Unit) {
-    var tab by remember { mutableStateOf(0) } // 0 HTML, 1 CSS, 2 JS, 3 Preview
+    var mode by remember { mutableStateOf(RunnerMode.WEB) }
+    var tab by remember { mutableStateOf(0) } // Web: 0 HTML, 1 CSS, 2 JS, 3 Preview. Other modes: 0 Code, 1 Preview
     var html by remember { mutableStateOf("") }
     var css by remember { mutableStateOf("") }
     var js by remember { mutableStateOf("") }
+    val codes = remember { mutableStateMapOf<RunnerMode, String>() }
     var runId by remember { mutableStateOf(0) }
     var document by remember { mutableStateOf("") }
+    val previewTab = if (mode == RunnerMode.WEB) 3 else 1
 
     fun run() {
-        document = HtmlDocument.build(html, css, js)
+        document = RunnerDocs.build(mode, html, css, js, codes[mode].orEmpty())
         runId++
-        tab = 3
+        tab = previewTab
     }
 
     ScreenScaffold(
-        title = "HTML / JS Runner",
+        title = "Code Runner",
         onBack = onBack,
         actions = { IconButton(onClick = ::run) { Icon(Icons.Filled.PlayArrow, contentDescription = "Run") } },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf("HTML", "CSS", "JavaScript", "Preview").forEachIndexed { i, label ->
-                    FilterChip(selected = tab == i, onClick = { if (i == 3) run() else tab = i }, label = { Text(label) })
+                RunnerMode.values().forEach { m ->
+                    FilterChip(selected = mode == m, onClick = { mode = m; tab = 0 }, label = { Text(m.label) })
                 }
             }
-            if (tab == 3) {
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val labels = if (mode == RunnerMode.WEB) listOf("HTML", "CSS", "JavaScript", "Preview") else listOf("Code", "Preview")
+                labels.forEachIndexed { i, label ->
+                    FilterChip(selected = tab == i, onClick = { if (i == previewTab) run() else tab = i }, label = { Text(label) })
+                }
+            }
+            if (tab == previewTab) {
                 HtmlPreviewPanel(document, runId, Modifier.weight(1f).fillMaxWidth())
             } else {
-                val (value, setValue) = when (tab) {
-                    0 -> html to { v: String -> html = v }
-                    1 -> css to { v: String -> css = v }
-                    else -> js to { v: String -> js = v }
+                val value: String
+                val setValue: (String) -> Unit
+                val label: String
+                if (mode == RunnerMode.WEB) {
+                    when (tab) {
+                        0 -> { value = html; setValue = { html = it }; label = "HTML (a fragment or a whole page)" }
+                        1 -> { value = css; setValue = { css = it }; label = "CSS" }
+                        else -> { value = js; setValue = { js = it }; label = "JavaScript" }
+                    }
+                } else {
+                    value = codes[mode].orEmpty()
+                    setValue = { codes[mode] = it }
+                    label = mode.label
                 }
                 OutlinedTextField(
                     value = value,
                     onValueChange = setValue,
-                    label = { Text(listOf("HTML (a fragment or a whole page)", "CSS", "JavaScript")[tab]) },
+                    label = { Text(label) },
                     textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp),
                     modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
                 )
                 OutlinedButton(
-                    onClick = { html = EXAMPLE_HTML; css = EXAMPLE_CSS; js = EXAMPLE_JS },
+                    onClick = {
+                        if (mode == RunnerMode.WEB) { html = EXAMPLE_HTML; css = EXAMPLE_CSS; js = EXAMPLE_JS } else codes[mode] = mode.example
+                    },
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 ) { Text("Fill in an example") }
                 Text(
                     "Runs on this device in a locked-down page: no internet, no access to your files or to this app. " +
-                        "Tap ▶ to run.",
+                        "Tap \u25B6 to run. Python, Java, C and other compiled languages are not supported.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp),

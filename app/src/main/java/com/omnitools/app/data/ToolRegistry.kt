@@ -315,11 +315,11 @@ object ToolRegistry {
         ),
         Tool(
             id = "html_runner",
-            name = "HTML / JS Runner",
-            description = "Write HTML, CSS and JavaScript and run it right away in a locked-down page with a console.",
+            name = "Code Runner",
+            description = "Run HTML, CSS, JavaScript, Markdown, SVG and JSON in a locked-down page with a console. Touch games work.",
             category = Category.DEV,
             icon = Icons.Filled.Html,
-            keywords = listOf("web", "javascript", "css", "preview", "sandbox", "playground"),
+            keywords = listOf("html", "js", "web", "javascript", "css", "markdown", "svg", "json", "preview", "sandbox", "playground", "game", "canvas", "runner"),
         ),
     )
 

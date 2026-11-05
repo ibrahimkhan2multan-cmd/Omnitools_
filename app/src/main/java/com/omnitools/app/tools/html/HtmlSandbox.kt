@@ -9,7 +9,12 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -76,7 +81,13 @@ object HtmlDocument {
  */
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier, onConsole: (String) -> Unit) {
+fun SandboxedWebView(
+    document: String,
+    runId: Int,
+    modifier: Modifier = Modifier,
+    handle: SandboxHandle? = null,
+    onConsole: (String) -> Unit,
+) {
     // The WebView is created once, so its callbacks must always call the newest onConsole.
     val latestConsole by rememberUpdatedState(onConsole)
     // A brand-new WebView for every run, so a run can never show the page from an earlier run.
@@ -84,7 +95,28 @@ fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier
         modifier = modifier,
         factory = { context ->
             WebView(context).apply {
+                handle?.web = this
+                // Touch games: taps must reach the page. Keep the view focused, stop parents from stealing the
+                // gesture, and turn off pinch / double-tap zoom, which swallows rapid taps.
+                isFocusable = true
+                isFocusableInTouchMode = true
+                overScrollMode = android.view.View.OVER_SCROLL_NEVER
+                setOnTouchListener { v, event ->
+                    when (event.actionMasked) {
+                        android.view.MotionEvent.ACTION_DOWN -> {
+                            v.requestFocus()
+                            v.parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                        android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL ->
+                            v.parent?.requestDisallowInterceptTouchEvent(false)
+                    }
+                    false
+                }
                 with(settings) {
+                    setSupportZoom(false)
+                    builtInZoomControls = false
+                    displayZoomControls = false
+                    mediaPlaybackRequiresUserGesture = false
                     javaScriptEnabled = true
                     allowFileAccess = false
                     allowContentAccess = false
@@ -104,6 +136,8 @@ fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier
                     }
 
                     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean = true
+
+                    override fun onPageFinished(view: WebView, url: String?) { view.requestFocus() }
                 }
                 webChromeClient = object : WebChromeClient() {
                     override fun onConsoleMessage(message: ConsoleMessage): Boolean {
@@ -136,23 +170,34 @@ fun SandboxedWebView(document: String, runId: Int, modifier: Modifier = Modifier
                 web.loadDataWithBaseURL(null, document, "text/html", "utf-8", null)
             }
         },
-        onRelease = { it.destroy() },
+        onRelease = { if (handle?.web === it) handle.web = null; it.destroy() },
     ) }
+}
+
+/** Lets the screen talk to the running page (key presses for games). */
+class SandboxHandle {
+    var web: WebView? = null
+    fun sendKey(key: String, code: String, keyCode: Int) {
+        web?.evaluateJavascript(GameKeys.script(key, code, keyCode), null)
+    }
 }
 
 /** The running page with its console output underneath. */
 @Composable
 fun HtmlPreviewPanel(document: String, runId: Int, modifier: Modifier = Modifier) {
     val console = remember(runId) { mutableStateListOf<String>() }
+    val handle = remember { SandboxHandle() }
     Column(modifier) {
         SandboxedWebView(
             document = document,
             runId = runId,
+            handle = handle,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onConsole = { line ->
                 if (console.size < 300) console.add(line)
             },
         )
+        KeyBar(handle)
         Text(
             "Console (${console.size})",
             style = MaterialTheme.typography.labelMedium,
@@ -171,6 +216,27 @@ fun HtmlPreviewPanel(document: String, runId: Int, modifier: Modifier = Modifier
                     color = if (line.startsWith("error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
             }
+        }
+    }
+}
+
+/** On-screen keys for games that listen for the keyboard instead of touch. */
+@Composable
+private fun KeyBar(handle: SandboxHandle) {
+    val keys = listOf(
+        Triple("Space", " " to "Space", 32), Triple("\u2190", "ArrowLeft" to "ArrowLeft", 37), Triple("\u2191", "ArrowUp" to "ArrowUp", 38),
+        Triple("\u2193", "ArrowDown" to "ArrowDown", 40), Triple("\u2192", "ArrowRight" to "ArrowRight", 39), Triple("Enter", "Enter" to "Enter", 13),
+    )
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        keys.forEach { (label, kc, num) ->
+            OutlinedButton(
+                onClick = { handle.sendKey(kc.first, kc.second, num) },
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                modifier = Modifier.height(34.dp),
+            ) { Text(label, style = MaterialTheme.typography.labelMedium) }
         }
     }
 }
