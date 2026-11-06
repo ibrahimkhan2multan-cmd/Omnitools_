@@ -161,3 +161,51 @@ class DeviceFormatTest {
         assertEquals("Not plugged in", f.plugged(0)); assertEquals("Accelerometer", f.sensorType(1))
     }
 }
+
+class ExtrasTest {
+    @Test fun paletteFindsMainColours() {
+        val red = 0xFFFF0000.toInt(); val blue = 0xFF0000FF.toInt()
+        val px = IntArray(100) { if (it < 70) red else blue }
+        val p = com.omnitools.app.tools.image.Palette.extract(px, 3)
+        assertEquals(2, p.size)
+        assertEquals(0xFF0000, p[0].rgb); assertEquals(0.7, p[0].share, 0.001)
+        assertEquals("#FF0000", com.omnitools.app.tools.image.Palette.hex(p[0].rgb))
+        assertTrue(com.omnitools.app.tools.image.Palette.extract(IntArray(10) { 0 }, 3).isEmpty())
+    }
+    @Test fun sizeFitPicksHighestQualityThatFits() {
+        val fit = com.omnitools.app.tools.image.SizeFit
+        val plan = fit.fit(5000) { q, s -> q * 100 * s / 100 }
+        assertNotNull(plan)
+        assertEquals(50, plan!!.quality); assertEquals(100, plan.scalePercent); assertTrue(plan.bytes <= 5000)
+        val shrunk = fit.fit(1500) { q, s -> q * 100 * s / 100 }!!
+        assertTrue(shrunk.scalePercent < 100 && shrunk.bytes <= 1500)
+        assertNull(fit.fit(10) { q, s -> q * 100 * s / 100 })
+    }
+    @Test fun flashcardsRoundTrip() {
+        val f = com.omnitools.app.tools.notes.Flashcards
+        var cards = f.add(emptyList(), "  Capital of France? ", "Paris \"city\"\nline2", 1)
+        cards = f.add(cards, "2+2", "4", 2)
+        cards = f.mark(cards, 2, true)
+        val back = f.decode(f.encode(cards))
+        assertEquals(cards, back)
+        assertEquals(1, f.studyQueue(back).size)
+        try { f.add(cards, "", "x", 3); fail() } catch (e: IllegalArgumentException) { }
+    }
+    @Test fun flashcardsSurviveGarbage() {
+        val f = com.omnitools.app.tools.notes.Flashcards
+        assertTrue(f.decode("not json").isEmpty()); assertTrue(f.decode("").isEmpty()); assertTrue(f.decode("{}").isEmpty())
+        assertEquals(1, f.decode("""[{"id":1,"f":"a","b":"b","k":false},{"id":"x"},5]""").size)
+    }
+    @Test fun qrSheetParse() {
+        val s = com.omnitools.app.tools.qr.QrSheet
+        assertEquals(listOf("a", "b"), s.parse(" a \n\n b \n"))
+        assertEquals(1, s.pageCount(12)); assertEquals(2, s.pageCount(13))
+        try { s.parse("  \n "); fail() } catch (e: IllegalArgumentException) { }
+        try { s.parse((1..61).joinToString("\n")); fail() } catch (e: IllegalArgumentException) { }
+        try { s.parse("x".repeat(301)); fail() } catch (e: IllegalArgumentException) { }
+    }
+    @Test fun digestKnownValue() {
+        val h = com.omnitools.app.tools.files.FileDigest.sha256("abc".byteInputStream())
+        assertEquals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", h)
+    }
+}
