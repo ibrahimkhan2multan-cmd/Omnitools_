@@ -14,6 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -45,8 +50,8 @@ private fun SecretField(label: String, value: String, show: Boolean, onChange: (
 
 @Composable
 fun PasswordStrengthScreen(onBack: () -> Unit) {
-    var pw by rememberSaveable { mutableStateOf("") }
-    var show by rememberSaveable { mutableStateOf(false) }
+    var pw by remember { mutableStateOf("") }
+    var show by remember { mutableStateOf(false) }
     val r = if (pw.isEmpty()) null else PasswordStrength.evaluate(pw)
     ScreenScaffold(title = "Password Strength", onBack = onBack) { padding ->
         ToolPage(padding) {
@@ -70,8 +75,8 @@ fun PassphraseScreen(onBack: () -> Unit) {
     var sep by rememberSaveable { mutableStateOf(0) }
     var capital by rememberSaveable { mutableStateOf(false) }
     var number by rememberSaveable { mutableStateOf(false) }
-    var result by rememberSaveable { mutableStateOf<String?>(null) }
-    var bits by rememberSaveable { mutableStateOf(0) }
+    var result by remember { mutableStateOf<String?>(null) }
+    var bits by remember { mutableStateOf(0) }
     val separators = listOf("-", " ", ".", "")
     fun make() {
         val r = Passphrase.generate(count.toInt(), separators[sep], capital, number)
@@ -105,12 +110,13 @@ fun PassphraseScreen(onBack: () -> Unit) {
 @Composable
 fun TextCryptoScreen(onBack: () -> Unit) {
     var encryptMode by rememberSaveable { mutableStateOf(true) }
-    var text by rememberSaveable { mutableStateOf("") }
-    var pw by rememberSaveable { mutableStateOf("") }
-    var show by rememberSaveable { mutableStateOf(false) }
-    var output by rememberSaveable { mutableStateOf<String?>(null) }
-    var error by rememberSaveable { mutableStateOf<String?>(null) }
-    var busy by rememberSaveable { mutableStateOf(false) }
+    var text by remember { mutableStateOf("") }
+    var pw by remember { mutableStateOf("") }
+    var show by remember { mutableStateOf(false) }
+    var output by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     ScreenScaffold(title = "Text Encryptor", onBack = onBack) { padding ->
         ToolPage(padding) {
             ChipRow {
@@ -125,11 +131,14 @@ fun TextCryptoScreen(onBack: () -> Unit) {
                 enabled = !busy && text.isNotEmpty(),
                 onClick = {
                     busy = true
-                    try {
-                        output = if (encryptMode) TextCrypto.encrypt(text, pw) else TextCrypto.decrypt(text, pw)
-                        error = null
-                    } catch (e: IllegalArgumentException) { output = null; error = e.message ?: "That did not work." }
-                    busy = false
+                    val enc = encryptMode; val t = text; val p = pw
+                    scope.launch {
+                        try {
+                            output = withContext(Dispatchers.Default) { if (enc) TextCrypto.encrypt(t, p) else TextCrypto.decrypt(t, p) }
+                            error = null
+                        } catch (e: IllegalArgumentException) { output = null; error = e.message ?: "That did not work." }
+                        busy = false
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(if (encryptMode) "Encrypt" else "Decrypt") }
