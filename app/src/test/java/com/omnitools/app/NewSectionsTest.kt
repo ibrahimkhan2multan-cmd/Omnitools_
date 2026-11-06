@@ -209,3 +209,19 @@ class ExtrasTest {
         assertEquals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", h)
     }
 }
+
+class PdfRangeTest {
+    private val r = com.omnitools.app.tools.pdf.PdfRange
+    @Test fun parses() {
+        assertEquals(listOf(0, 1, 2, 4), r.parse("1-3, 5", 10))
+        assertEquals(listOf(7, 8, 9), r.parse("8-", 10))
+        assertEquals(listOf(0, 1), r.parse("-2", 10))
+        assertEquals(listOf(2, 0, 1), r.parse("3,1,2", 3))
+        assertEquals(listOf(0), r.parse("1,1,1", 3))
+    }
+    @Test fun rejects() {
+        for (bad in listOf("", "0", "11", "3-1", "a", "1-2-3", "1,,x", "5-12")) {
+            try { r.parse(bad, 10); fail("accepted '$bad'") } catch (e: IllegalArgumentException) { }
+        }
+    }
+}

@@ -84,6 +84,30 @@ object ToolRegistry {
 
     val all: List<Tool> = listOf(
         Tool(
+            id = "pdf_merge",
+            name = "Merge PDFs",
+            description = "Combine several PDFs into one, in the order you choose.",
+            category = Category.PDF,
+            icon = Icons.Filled.PictureAsPdf,
+            keywords = listOf("join", "combine", "append"),
+        ),
+        Tool(
+            id = "pdf_extract",
+            name = "Extract PDF Pages",
+            description = "Keep, split, delete or reorder pages of a PDF.",
+            category = Category.PDF,
+            icon = Icons.Filled.Description,
+            keywords = listOf("split", "pages", "delete", "reorder", "range"),
+        ),
+        Tool(
+            id = "pdf_to_images",
+            name = "PDF to Images",
+            description = "Save every page of a PDF as a PNG or JPEG picture.",
+            category = Category.PDF,
+            icon = Icons.Filled.Image,
+            keywords = listOf("convert", "export", "png", "jpg", "pages"),
+        ),
+        Tool(
             id = "color_from_image",
             name = "Color Picker",
             description = "Tap a picture to read the exact colour at that spot.",
