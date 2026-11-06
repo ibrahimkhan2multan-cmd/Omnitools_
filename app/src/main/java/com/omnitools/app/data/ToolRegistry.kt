@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.BatteryFull
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
@@ -82,6 +83,38 @@ data class Tool(
 object ToolRegistry {
 
     val all: List<Tool> = listOf(
+        Tool(
+            id = "battery_info",
+            name = "Battery",
+            description = "Level, charging state, health, temperature and voltage.",
+            category = Category.DEVICE,
+            icon = Icons.Filled.BatteryFull,
+            keywords = listOf("charge", "power", "health", "temperature"),
+        ),
+        Tool(
+            id = "storage_memory",
+            name = "Storage & Memory",
+            description = "How much storage and RAM is used and free.",
+            category = Category.DEVICE,
+            icon = Icons.Filled.Storage,
+            keywords = listOf("ram", "space", "free", "disk"),
+        ),
+        Tool(
+            id = "display_info",
+            name = "Display Info",
+            description = "Resolution, density, refresh rate and screen size.",
+            category = Category.DEVICE,
+            icon = Icons.Filled.PhoneAndroid,
+            keywords = listOf("screen", "dpi", "hz", "resolution"),
+        ),
+        Tool(
+            id = "sensors_list",
+            name = "Sensors",
+            description = "List every sensor the phone has, with specs.",
+            category = Category.DEVICE,
+            icon = Icons.Filled.GraphicEq,
+            keywords = listOf("accelerometer", "gyroscope", "light", "proximity"),
+        ),
         Tool(
             id = "subnet_calc",
             name = "Subnet Calculator",

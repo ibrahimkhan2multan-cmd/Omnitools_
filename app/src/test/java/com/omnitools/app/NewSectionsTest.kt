@@ -146,3 +146,18 @@ class NewSectionsTest {
         assertFalse(QrInspector.inspect("tel:+923001234567").fields.isEmpty())
     }
 }
+
+class DeviceFormatTest {
+    @Test fun bytes() {
+        assertEquals("0 B", com.omnitools.app.tools.device.DeviceFormat.bytes(0))
+        assertEquals("1.0 KB", com.omnitools.app.tools.device.DeviceFormat.bytes(1024))
+        assertEquals("1.5 GB", com.omnitools.app.tools.device.DeviceFormat.bytes(1610612736L))
+        assertEquals("unknown", com.omnitools.app.tools.device.DeviceFormat.bytes(-1))
+    }
+    @Test fun percentAndLabels() {
+        val f = com.omnitools.app.tools.device.DeviceFormat
+        assertEquals(50, f.percent(5, 10)); assertEquals(0, f.percent(1, 0)); assertEquals(100, f.percent(20, 10))
+        assertEquals("Charging", f.batteryStatus(2)); assertEquals("USB", f.plugged(2)); assertEquals("AC charger", f.plugged(1))
+        assertEquals("Not plugged in", f.plugged(0)); assertEquals("Accelerometer", f.sensorType(1))
+    }
+}
