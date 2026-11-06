@@ -14,7 +14,7 @@ OmniTools ("the App") is a free utility app by **ibrahimkhan2multan-cmd** ("the 
 
 These are stored only in the App's private storage and are removed when you clear the App's data or uninstall it:
 
-- Notes you write in the Notepad, tasks, and habit-tracker ticks and streaks.
+- Notes you write in the Notepad, flashcards you create, tasks, and habit-tracker ticks and streaks.
 - Favorite tools, recently used tools and your theme choice.
 - QR/barcode scan history (if you keep it enabled; you can delete items or everything).
 - The running timer's end time, so the alarm can still ring if the App is closed.
