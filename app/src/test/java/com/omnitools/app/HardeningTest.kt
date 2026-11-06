@@ -109,11 +109,13 @@ class HardeningTest {
         assertEquals(7L, RandomTools.numbers(7, 7, 1)[0])
     }
 
-    @Test fun catastrophicRegexTimesOutQuickly() {
-        val start = System.nanoTime()
-        val r = RegexTester.run("(a+)+$", "a".repeat(40) + "b", timeoutMs = 300)
+    @Test fun regexTimeoutStopsMatching() {
+        // Newer JVMs cache away most exponential patterns, so test the deadline itself: an expired deadline must stop at once.
+        val r = RegexTester.run("a+b", "a".repeat(5000), timeoutMs = 0)
         assertTrue(r is RegexTester.Result.Error)
-        assertTrue((System.nanoTime() - start) / 1_000_000 < 3000)
+        assertTrue(RegexTester.run("a".repeat(501), "a") is RegexTester.Result.Error)
+        assertTrue(RegexTester.run("a", "a".repeat(RegexTester.MAX_INPUT + 1)) is RegexTester.Result.Error)
+        assertTrue(RegexTester.run("(", "a") is RegexTester.Result.Error)
     }
 
     @Test fun regexEmptyMatchesTerminate() {
