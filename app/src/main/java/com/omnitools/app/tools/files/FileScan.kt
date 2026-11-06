@@ -64,7 +64,9 @@ object Duplicates {
         val result = ArrayList<Group>()
         for ((size, sameSize) in bySize) {
             if (shouldStop()) break
-            val partial = sameSize.groupBy { hash(it, PARTIAL).also { done++; onProgress(done, total * 2) } }.values.filter { it.size > 1 }
+            // Files that fit in the first block are compared completely, so a wrong reported size cannot cause a false match.
+            val firstLimit = if (size <= PARTIAL) null else PARTIAL
+            val partial = sameSize.groupBy { hash(it, firstLimit).also { done++; onProgress(done, total * 2) } }.values.filter { it.size > 1 }
             for (candidates in partial) {
                 if (size <= PARTIAL) {
                     result.add(Group(size, candidates.sortedBy { it.path }))

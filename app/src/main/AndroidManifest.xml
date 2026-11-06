@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
+
+    <!-- OmniTools never uses the network. Libraries (ML Kit) request these, so they are removed on purpose:
+         with no INTERNET permission Android itself blocks every connection from this app. -->
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
     <!-- Camera is requested at runtime, only when the QR scanner is opened. -->
     <uses-permission android:name="android.permission.CAMERA" />

@@ -38,7 +38,7 @@ object UnitConverter {
         ),
         Kind.SPEED to listOf(
             Unit("Metre/second", "m/s", 1.0), Unit("Kilometre/hour", "km/h", 1.0 / 3.6),
-            Unit("Mile/hour", "mph", 0.44704), Unit("Knot", "kn", 0.514444444444),
+            Unit("Mile/hour", "mph", 0.44704), Unit("Knot", "kn", 1852.0 / 3600.0),
         ),
         // Decimal (SI) and binary (IEC) prefixes are listed separately so there is no ambiguity.
         Kind.DATA to listOf(

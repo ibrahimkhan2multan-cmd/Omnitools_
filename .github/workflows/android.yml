@@ -44,6 +44,13 @@ jobs:
           retention-days: 7
 
       # Runs after the APK is uploaded so a failing test never hides the build; the job still turns red.
+      - name: 🔒 Verify no network permission (debug APK)
+        run: |
+          AAPT2=$(ls $ANDROID_HOME/build-tools/*/aapt2 | tail -1)
+          APK=$(ls app/build/outputs/apk/debug/*.apk | head -1)
+          $AAPT2 dump permissions "$APK" | tee perms.txt
+          if grep -Eq "android.permission.(INTERNET|ACCESS_NETWORK_STATE)" perms.txt; then echo "::error::The app must not request network permissions"; exit 1; fi
+
       - name: 🧪 Run Unit Tests
         run: gradle testDebugUnitTest --stacktrace
 
@@ -77,6 +84,13 @@ jobs:
         run: |
           APKSIGNER=$(ls $ANDROID_HOME/build-tools/*/apksigner | tail -1)
           $APKSIGNER verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk
+
+      - name: 🔒 Verify no network permission (release APK)
+        if: github.event_name != 'pull_request'
+        run: |
+          AAPT2=$(ls $ANDROID_HOME/build-tools/*/aapt2 | tail -1)
+          $AAPT2 dump permissions app/build/outputs/apk/release/app-release.apk | tee perms-release.txt
+          if grep -Eq "android.permission.(INTERNET|ACCESS_NETWORK_STATE)" perms-release.txt; then echo "::error::The app must not request network permissions"; exit 1; fi
 
       - name: 📦 Upload Release APK Artifact
         if: github.event_name != 'pull_request'

@@ -102,7 +102,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         composable(ROUTE_CATEGORY) { entry ->
             val category = Category.values().firstOrNull { it.name == entry.arguments?.getString("name") }
             if (category == null) {
-                nav.popBackStack()
+                androidx.compose.runtime.LaunchedEffect(Unit) { nav.popBackStack() }
             } else {
                 CategoryScreen(
                     category = category,

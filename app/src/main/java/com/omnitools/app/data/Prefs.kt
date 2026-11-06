@@ -11,7 +11,11 @@ import kotlinx.coroutines.flow.map
 import org.json.JSONArray
 import org.json.JSONObject
 
-private val Context.dataStore by preferencesDataStore(name = "omnitools_prefs")
+private val Context.dataStore by preferencesDataStore(
+    name = "omnitools_prefs",
+    // A damaged settings file must never stop the app from starting: start fresh instead.
+    corruptionHandler = androidx.datastore.core.handlers.ReplaceFileCorruptionHandler { androidx.datastore.preferences.core.emptyPreferences() },
+)
 
 /** One saved QR / barcode scan. Stored locally only. */
 data class ScanEntry(
@@ -136,7 +140,7 @@ class Prefs(private val context: Context) {
         fun decodeRecents(raw: String?): List<String> =
             raw?.split(",")?.filter { it.isNotBlank() } ?: emptyList()
 
-        private fun encodeScans(list: List<ScanEntry>): String {
+        internal fun encodeScans(list: List<ScanEntry>): String {
             val arr = JSONArray()
             list.forEach {
                 arr.put(JSONObject().put("t", it.timestamp).put("f", it.format).put("x", it.text))
@@ -144,13 +148,18 @@ class Prefs(private val context: Context) {
             return arr.toString()
         }
 
-        private fun decodeScans(raw: String?): List<ScanEntry> {
+        internal fun decodeScans(raw: String?): List<ScanEntry> {
             if (raw.isNullOrBlank()) return emptyList()
             return try {
                 val arr = JSONArray(raw)
-                (0 until arr.length()).map {
-                    val o = arr.getJSONObject(it)
-                    ScanEntry(o.getLong("t"), o.getString("f"), o.getString("x"))
+                // One bad entry is skipped; it must not wipe the whole history.
+                (0 until arr.length()).mapNotNull {
+                    try {
+                        val o = arr.getJSONObject(it)
+                        ScanEntry(o.getLong("t"), o.getString("f"), o.getString("x"))
+                    } catch (e: Exception) {
+                        null
+                    }
                 }
             } catch (e: Exception) {
                 emptyList()

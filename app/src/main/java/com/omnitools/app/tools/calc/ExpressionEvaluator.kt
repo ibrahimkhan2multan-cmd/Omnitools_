@@ -31,7 +31,11 @@ object ExpressionEvaluator {
 
     class EvalException(message: String) : Exception(message)
 
+    const val MAX_LENGTH = 1000
+    private const val MAX_DEPTH = 150
+
     fun evaluate(input: String, degrees: Boolean = true): Double {
+        if (input.length > MAX_LENGTH) throw EvalException("Expression is too long")
         val parser = Parser(input.replace(" ", ""), degrees)
         val result = parser.parseExpression()
         if (!parser.atEnd()) throw EvalException("Unexpected \"${parser.peek()}\"")
@@ -43,6 +47,8 @@ object ExpressionEvaluator {
     /** Formats like a calculator: no trailing ".0", up to 12 significant digits, scientific notation when extreme. */
     fun format(value: Double): String {
         if (value == 0.0) return "0"
+        if (value.isNaN()) return "Not a number"
+        if (value.isInfinite()) return if (value > 0) "Too large" else "Too small"
         val abs = abs(value)
         if (abs >= 1e15 || abs < 1e-9) return String.format(java.util.Locale.ROOT, "%.9E", value).replace(Regex("\\.?0+E"), "E")
         val bd = java.math.BigDecimal(value).round(java.math.MathContext(12))
@@ -51,6 +57,13 @@ object ExpressionEvaluator {
 
     private class Parser(val s: String, val degrees: Boolean) {
         var i = 0
+        private var depth = 0
+
+        /** Guards the recursion so a very deeply nested input becomes an error, not a crash. */
+        private inline fun <T> nested(block: () -> T): T {
+            if (++depth > MAX_DEPTH) throw EvalException("Expression is too deeply nested")
+            try { return block() } finally { depth-- }
+        }
 
         fun atEnd() = i >= s.length
         fun peek(): Char = if (atEnd()) '\u0000' else s[i]
@@ -89,10 +102,12 @@ object ExpressionEvaluator {
             }
         }
 
-        private fun parseUnary(): Double = when {
-            consume('-') -> -parseUnary()
-            consume('+') -> parseUnary()
-            else -> parsePower()
+        private fun parseUnary(): Double = nested {
+            when {
+                consume('-') -> -parseUnary()
+                consume('+') -> parseUnary()
+                else -> parsePower()
+            }
         }
 
         private fun parsePower(): Double {
@@ -121,7 +136,7 @@ object ExpressionEvaluator {
 
         private fun parsePrimary(): Double {
             if (consume('(')) {
-                val v = parseExpression()
+                val v = nested { parseExpression() }
                 if (!consume(')')) throw EvalException("Missing closing bracket")
                 return v
             }
@@ -165,16 +180,16 @@ object ExpressionEvaluator {
                 "e" -> return Math.E
             }
             if (!consume('(')) throw EvalException("Unknown name \"$name\"")
-            val arg = parseExpression()
+            val arg = nested { parseExpression() }
             if (!consume(')')) throw EvalException("Missing closing bracket")
             val rad = if (degrees) Math.toRadians(arg) else arg
             return when (name) {
                 "sqrt" -> if (arg < 0) throw EvalException("Square root of a negative number") else sqrt(arg)
                 "cbrt" -> cbrt(arg)
                 "abs" -> abs(arg)
-                "sin" -> sin(rad)
-                "cos" -> cos(rad)
-                "tan" -> tan(rad)
+                "sin" -> snap(sin(rad))
+                "cos" -> snap(cos(rad))
+                "tan" -> snap(tan(rad))
                 "asin" -> if (arg !in -1.0..1.0) throw EvalException("asin needs a value from -1 to 1") else fromRad(asin(arg))
                 "acos" -> if (arg !in -1.0..1.0) throw EvalException("acos needs a value from -1 to 1") else fromRad(acos(arg))
                 "atan" -> fromRad(atan(arg))
@@ -184,6 +199,9 @@ object ExpressionEvaluator {
                 else -> throw EvalException("Unknown function \"$name\"")
             }
         }
+
+        /** sin(180°) is 1.2e-16 in floating point; show the 0 a person expects. */
+        private fun snap(v: Double) = if (abs(v) < 1e-14) 0.0 else v
 
         private fun fromRad(v: Double) = if (degrees) Math.toDegrees(v) else v
     }

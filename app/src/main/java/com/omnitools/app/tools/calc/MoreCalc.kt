@@ -1,7 +1,6 @@
 package com.omnitools.app.tools.calc
 
 import kotlin.math.ceil
-import kotlin.math.pow
 
 /** Loan / EMI maths. Fixed-rate loan repaid in equal monthly payments. */
 object LoanCalc {
@@ -10,14 +9,16 @@ object LoanCalc {
 
     fun emi(principal: Double, annualRatePercent: Double, months: Int): Result {
         require(principal > 0.0) { "Loan amount must be more than 0." }
+        require(principal <= 1e12) { "Loan amount is too large." }
         require(months in 1..1200) { "The term must be between 1 month and 100 years." }
         require(annualRatePercent in 0.0..200.0) { "The interest rate must be between 0% and 200%." }
         val r = annualRatePercent / 1200.0
         val payment = if (r == 0.0) {
             principal / months
         } else {
-            val growth = (1 + r).pow(months)
-            principal * r * growth / (growth - 1)
+            // expm1/ln1p stay accurate for tiny rates, where (1 + r)^n - 1 would round to zero.
+            val growthMinusOne = Math.expm1(months * Math.log1p(r))
+            principal * r * (growthMinusOne + 1) / growthMinusOne
         }
         val total = payment * months
         return Result(payment, total, total - principal)

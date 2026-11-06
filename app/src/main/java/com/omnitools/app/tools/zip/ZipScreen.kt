@@ -100,6 +100,10 @@ private fun ExtractTab() {
                     } else {
                         "This file is not a valid ZIP, or it is damaged."
                     }
+                } catch (e: java.io.IOException) {
+                    name = null
+                    entries = emptyList()
+                    error = "Could not read or copy that file: ${e.message ?: "there may not be enough free space"}"
                 } catch (e: Exception) {
                     name = null
                     entries = emptyList()
