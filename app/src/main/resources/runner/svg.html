@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+html,body{margin:0;background:#fff}
+#bar{position:sticky;top:0;left:0;z-index:2;display:flex;gap:6px;align-items:center;padding:6px 8px;background:#0e1220;font-family:sans-serif;font-size:13px;color:#b4bad4;width:100vw;box-sizing:border-box}
+#bar button{font:inherit;color:#e8ebf7;background:#1f2540;border:1px solid #3a4163;border-radius:8px;padding:6px 12px;min-width:40px}
+#bar span{margin-left:auto;padding-right:4px}
+#stage{padding:12px;display:inline-block;min-width:0}
+#msg{font-family:sans-serif;padding:16px;color:#b00020}
+svg{display:block;max-width:none}
+</style></head><body>
+<div id="bar"><button id="fit">Fit</button><button id="one">100%</button><button id="out">&minus;</button><button id="in">+</button><span id="pct"></span></div>
+<div id="stage"><!--SVG--></div>
+<script>
+(function () {
+  var svg = document.querySelector('#stage svg');
+  var stage = document.getElementById('stage');
+  var pct = document.getElementById('pct');
+  if (!svg) {
+    var m = document.createElement('div'); m.id = 'msg';
+    m.textContent = 'No <svg> element found. The code should start with <svg ...> and end with </svg>.';
+    stage.appendChild(m); document.getElementById('bar').style.display = 'none'; return;
+  }
+  var UNITS = { '': 1, px: 1, pt: 4 / 3, pc: 16, mm: 96 / 25.4, cm: 96 / 2.54, 'in': 96 };
+  function size(v) {
+    if (v == null) return null;
+    var m = /^\s*([0-9]*\.?[0-9]+(?:e[+-]?[0-9]+)?)\s*([a-z%]*)\s*$/i.exec(v);
+    if (!m || !(m[2].toLowerCase() in UNITS)) return null;
+    var n = parseFloat(m[1]) * UNITS[m[2].toLowerCase()];
+    return n > 0 && isFinite(n) ? n : null;
+  }
+  // Work out the drawing's own size, then give it a viewBox so it can be scaled without cutting anything off.
+  var w = null, h = null, vb = svg.viewBox && svg.viewBox.baseVal;
+  if (vb && vb.width > 0 && vb.height > 0) { w = vb.width; h = vb.height; }
+  else {
+    w = size(svg.getAttribute('width')); h = size(svg.getAttribute('height'));
+    if (!w || !h) {
+      try { var b = svg.getBBox(); if (!w) w = Math.ceil(b.x + b.width); if (!h) h = Math.ceil(b.y + b.height); } catch (e) {}
+    }
+    if (!w || !(w > 0)) w = 300;
+    if (!h || !(h > 0)) h = 150;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+  }
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  var MIN = 0.02, MAX = 40, scale = 1, fitMode = true;
+  function avail() { return Math.max(60, document.documentElement.clientWidth - 24); }
+  function clamp(s) { return Math.min(MAX, Math.max(MIN, s)); }
+  function apply() {
+    if (fitMode) scale = Math.min(MAX, avail() / w);
+    // Never let a huge zoom create a drawing too large for the WebView.
+    var cap = Math.min(MAX, 16000 / Math.max(w, h));
+    scale = Math.min(scale, cap);
+    svg.style.width = (w * scale) + 'px';
+    svg.style.height = (h * scale) + 'px';
+    pct.textContent = Math.round(scale * 100) + '%' + (fitMode ? ' (fit)' : '');
+  }
+  document.getElementById('fit').onclick = function () { fitMode = true; apply(); window.scrollTo(0, 0); };
+  document.getElementById('one').onclick = function () { fitMode = false; scale = 1; apply(); };
+  document.getElementById('in').onclick = function () { fitMode = false; scale = clamp(scale * 1.25); apply(); };
+  document.getElementById('out').onclick = function () { fitMode = false; scale = clamp(scale / 1.25); apply(); };
+  window.addEventListener('resize', function () { if (fitMode) apply(); });
+  apply();
+})();
+</script></body></html>

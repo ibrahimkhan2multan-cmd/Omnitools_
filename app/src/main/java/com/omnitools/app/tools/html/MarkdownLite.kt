@@ -124,6 +124,13 @@ object RunnerDocs {
         return placeholder.replace(t) { if (it.groupValues[1] == "CODE") codeLit else stdinLit }
     }
 
+    /** The SVG preview page: scales the drawing to the screen, with Fit, 100%, zoom buttons and normal scrolling. */
+    private fun svgPage(code: String): String {
+        val t = template("svg.html")
+            ?: return HtmlDocument.build(code, "body{margin:0;padding:16px;background:#fff}svg{max-width:100%;height:auto}", "")
+        return t.replaceFirst("<!--SVG-->", code)
+    }
+
     fun build(mode: RunnerMode, html: String, css: String, js: String, code: String, stdin: String = ""): String = when (mode) {
         RunnerMode.TYPESCRIPT -> fromTemplate("typescript.html", code, stdin)
         RunnerMode.PYTHON -> fromTemplate("python.html", code, stdin)
@@ -132,7 +139,7 @@ object RunnerDocs {
         RunnerMode.WEB -> HtmlDocument.build(html, css, js)
         RunnerMode.JS -> HtmlDocument.build("<pre id=\"out\"></pre>", DARK, MIRROR + code.replace("</script", "<\\/script"))
         RunnerMode.MARKDOWN -> HtmlDocument.build(MarkdownLite.toHtml(code), DARK, "")
-        RunnerMode.SVG -> HtmlDocument.build(code, "body{margin:0;padding:16px;background:#fff;text-align:center}svg{max-width:100%;height:auto}", "")
+        RunnerMode.SVG -> svgPage(code)
         RunnerMode.JSON -> HtmlDocument.build(
             "<pre id=\"out\"></pre>", DARK,
             "var t=${jsLiteral(code)};try{var v=JSON.parse(t);document.getElementById('out').textContent=JSON.stringify(v,null,2);" +

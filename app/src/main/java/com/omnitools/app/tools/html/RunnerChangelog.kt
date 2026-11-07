@@ -6,6 +6,14 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 48", "7 Nov 2026", "Code Runner: SVG preview fixed",
+            listOf(
+                "SVG drawings now scale to fit the phone screen instead of being cut off on the right and bottom, including SVGs that only have a width and height and no viewBox.",
+                "New Fit, 100%, zoom out and zoom in buttons above the preview, with the current zoom shown. Zoom in and scroll in any direction to see every part.",
+                "Checked with 21 different SVG shapes and sizes (tiny icons, very tall, very wide, centimetres, percentages, no size at all) on four screen sizes.",
+            ),
+        ),
+        Entry(
             "Build 46", "7 Nov 2026", "Code Runner: Python, TypeScript, SQL and Lua",
             listOf(
                 "Python 3.14 runs fully offline, with the standard library (math, random, json, re, collections, itertools, datetime, asyncio, sqlite3 and more).",

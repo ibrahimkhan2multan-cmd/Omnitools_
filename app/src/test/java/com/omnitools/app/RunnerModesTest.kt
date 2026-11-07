@@ -106,7 +106,31 @@ class RunnerLanguagesTest {
         assertTrue(t.contains("Not supported"))
         assertTrue(t.contains("Gaming & Modding") && t.contains("28 new tools") && t.contains("Subnet Calculator"))
         val log = com.omnitools.app.tools.html.RunnerChangelog.entries
-        assertEquals("Build 46", log.first().version)
+        assertEquals("Build 48", log.first().version)
         assertTrue(log.all { it.items.isNotEmpty() && it.title.isNotBlank() })
+    }
+}
+
+class SvgPreviewTest {
+    private fun template() = javaClass.classLoader!!.getResourceAsStream("runner/svg.html")!!.use { it.readBytes().toString(Charsets.UTF_8) }
+
+    @Test fun templateUsesTheSameSecurityPolicyAsEveryOtherPage() {
+        val t = template()
+        assertTrue(t.contains("content=\"${com.omnitools.app.tools.html.HtmlDocument.POLICY}\""))
+        assertEquals(1, Regex("<!--SVG-->").findAll(t).count())
+    }
+
+    @Test fun userSvgIsInsertedOnceAndNeverReprocessed() {
+        val code = "<svg viewBox=\"0 0 10 10\"><rect width=\"10\" height=\"10\"/><!--SVG--></svg>"
+        val doc = RunnerDocs.build(RunnerMode.SVG, "", "", "", code)
+        assertEquals(1, Regex(Regex.escape(code)).findAll(doc).count())
+        assertEquals(1, Regex("<!--SVG-->").findAll(doc).count())
+        assertTrue(doc.contains("Content-Security-Policy"))
+    }
+
+    @Test fun pageHasFitAndZoomControls() {
+        val doc = RunnerDocs.build(RunnerMode.SVG, "", "", "", RunnerMode.SVG.example)
+        for (id in listOf("fit", "one", "in", "out")) assertTrue(id, doc.contains("id=\"$id\""))
+        assertTrue(doc.contains("viewBox"))
     }
 }
