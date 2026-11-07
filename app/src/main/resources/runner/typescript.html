@@ -1,0 +1,34 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' https://omnitools.local; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{font-family:sans-serif;margin:0;padding:16px;background:#0e1220;color:#e8ebf7}pre{white-space:pre-wrap;word-break:break-word;font-family:monospace;font-size:14px;margin:0}.err{color:#ff8a8a}</style>
+</head><body><pre id="out"></pre>
+<script src="https://omnitools.local/rt/sucrase.js"></script>
+<script>
+(function () {
+  var CODE = /*CODE*/;
+  var out = document.getElementById('out');
+  function add(text, cls) { var s = document.createElement('span'); if (cls) s.className = cls; s.textContent = text; out.appendChild(s); }
+  function show(a) { try { return typeof a === 'string' ? a : (a instanceof Error ? a.stack || String(a) : (function () { var c = JSON.stringify(a); return c !== undefined && c.length <= 80 ? c : JSON.stringify(a, null, 2); })()); } catch (e) { return String(a); } }
+  ['log', 'info', 'warn', 'error', 'debug'].forEach(function (k) {
+    console[k] = function () {
+      var s = Array.prototype.map.call(arguments, show).join(' ');
+      add((k === 'log' || k === 'info' || k === 'debug' ? '' : k + ': ') + s + '\n', k === 'error' ? 'err' : '');
+    };
+  });
+  window.addEventListener('error', function (e) { add('error: ' + e.message + '\n', 'err'); });
+  window.addEventListener('unhandledrejection', function (e) { add('error: ' + (e.reason && e.reason.message ? e.reason.message : e.reason) + '\n', 'err'); });
+  if (typeof sucrase === 'undefined') { add('TypeScript is not included in this build of the app.\n', 'err'); return; }
+  var js;
+  try {
+    js = sucrase.transform(CODE, { transforms: ['typescript', 'imports'] }).code;
+  } catch (e) { add('TypeScript error: ' + (e && e.message ? e.message : e) + '\n', 'err'); return; }
+  try {
+    var exportsObj = {}, moduleObj = { exports: exportsObj };
+    var requireFn = function (name) { throw new Error("Cannot import '" + name + "': no modules are available here."); };
+    var run = new Function('exports', 'module', 'require', 'return (async function () {\n' + js + '\n})();');
+    var p = run(exportsObj, moduleObj, requireFn);
+    if (p && p.catch) p.catch(function (e) { add('error: ' + (e && e.message ? e.message : e) + '\n', 'err'); });
+  } catch (e) { add('error: ' + (e && e.message ? e.message : e) + '\n', 'err'); }
+})();
+</script></body></html>

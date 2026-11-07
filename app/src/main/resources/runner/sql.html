@@ -1,0 +1,46 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://omnitools.local; connect-src https://omnitools.local; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; form-action 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{font-family:sans-serif;margin:0;padding:16px;background:#0e1220;color:#e8ebf7}pre{white-space:pre-wrap;word-break:break-word;font-family:monospace;font-size:14px;margin:0 0 8px}.err{color:#ff8a8a}.dim{color:#8f97b8}.wrap{overflow-x:auto;margin:0 0 14px}table{border-collapse:collapse;font-size:13px}th,td{border:1px solid #3a4163;padding:4px 8px;text-align:left;white-space:pre-wrap}th{background:#1f2540}</style>
+</head><body><div id="out"></div>
+<script src="https://omnitools.local/rt/sql-wasm.js"></script>
+<script>
+(function () {
+  var CODE = /*CODE*/;
+  var out = document.getElementById('out');
+  function line(text, cls) { var p = document.createElement('pre'); if (cls) p.className = cls; p.textContent = text; out.appendChild(p); }
+  if (typeof initSqlJs !== 'function') { line('SQL is not included in this build of the app.', 'err'); return; }
+  line('Starting SQLite...', 'dim');
+  initSqlJs({ locateFile: function (f) { return 'https://omnitools.local/rt/' + f; } }).then(function (SQL) {
+    out.textContent = '';
+    var db = new SQL.Database();
+    var shown = 0, ran = 0;
+    function table(cols, rows) {
+      var wrap = document.createElement('div'); wrap.className = 'wrap';
+      var t = document.createElement('table'), head = document.createElement('tr');
+      cols.forEach(function (c) { var th = document.createElement('th'); th.textContent = c; head.appendChild(th); });
+      t.appendChild(head);
+      rows.slice(0, 500).forEach(function (row) {
+        var tr = document.createElement('tr');
+        row.forEach(function (v) { var td = document.createElement('td'); td.textContent = v === null ? 'NULL' : String(v); tr.appendChild(td); });
+        t.appendChild(tr);
+      });
+      wrap.appendChild(t); out.appendChild(wrap);
+      line(rows.length + ' row' + (rows.length === 1 ? '' : 's') + (rows.length > 500 ? ' (first 500 shown)' : ''), 'dim');
+    }
+    try {
+      // One statement at a time, so results before an error are still shown.
+      for (var stmt of db.iterateStatements(CODE)) {
+        ran++;
+        var cols = stmt.getColumnNames(), rows = [];
+        while (stmt.step()) { if (rows.length < 5000) rows.push(stmt.get()); }
+        stmt.free();
+        if (cols.length) { table(cols, rows); shown++; }
+      }
+      if (!shown) line(ran ? 'Done. ' + ran + ' statement' + (ran === 1 ? '' : 's') + ' ran without returning rows.' : 'There is nothing to run.', 'dim');
+    } catch (e) {
+      line('SQL error in statement ' + (ran + 1) + ': ' + (e && e.message ? e.message : e), 'err');
+    }
+  }).catch(function (e) { out.textContent = ''; line('SQLite could not start: ' + (e && e.message ? e.message : e), 'err'); });
+})();
+</script></body></html>

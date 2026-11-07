@@ -33,6 +33,9 @@ jobs:
           # AGP 8.7.x needs Gradle 8.9 or newer.
           gradle-version: '8.9'
 
+      - name: 🧰 Fetch offline language runtimes (Python, SQL, Lua, TypeScript)
+        run: bash scripts/fetch-runtimes.sh
+
       - name: 🏗️ Build Debug APK
         run: gradle assembleDebug --stacktrace
 

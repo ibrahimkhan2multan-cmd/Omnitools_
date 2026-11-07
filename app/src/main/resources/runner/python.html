@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://omnitools.local; connect-src https://omnitools.local; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; form-action 'none'; base-uri 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>body{font-family:sans-serif;margin:0;padding:16px;background:#0e1220;color:#e8ebf7}pre{white-space:pre-wrap;word-break:break-word;font-family:monospace;font-size:14px;margin:0}.err{color:#ff8a8a}.dim{color:#8f97b8}</style>
+</head><body><pre id="out"></pre>
+<script src="https://omnitools.local/rt/pyodide.js"></script>
+<script>
+(function () {
+  var CODE = /*CODE*/;
+  var STDIN = /*STDIN*/;
+  var out = document.getElementById('out');
+  function add(text, cls) {
+    var s = document.createElement('span');
+    if (cls) s.className = cls;
+    s.textContent = text;
+    out.appendChild(s);
+  }
+  // Hides the runner's own frames so only the user's lines remain in an error.
+  function clean(m) {
+    var i = m.indexOf('Traceback');
+    if (i < 0) return m.replace(/\n$/, '');
+    var res = [], skip = false, L = m.slice(i).replace(/\n$/, '').split('\n');
+    for (var k = 0; k < L.length; k++) {
+      var l = L[k];
+      if (/^  File /.test(l)) skip = l.indexOf('/_pyodide/') >= 0;
+      else if (!/^    /.test(l)) skip = false;
+      if (!skip) res.push(l.replace('"<exec>"', '"main.py"'));
+    }
+    return res.join('\n');
+  }
+  add('Starting Python... the first start can take a few seconds.\n', 'dim');
+  if (typeof loadPyodide !== 'function') {
+    out.textContent = '';
+    add('Python is not included in this build of the app.\n', 'err');
+    return;
+  }
+  var lines = STDIN.length ? STDIN.split('\n') : [];
+  loadPyodide({
+    indexURL: 'https://omnitools.local/rt/',
+    stdout: function (t) { add(t + '\n'); },
+    stderr: function (t) { add(t + '\n', 'err'); },
+    stdin: function () { return lines.length ? lines.shift() : null; }
+  }).then(function (py) {
+    out.textContent = '';
+    return py.runPythonAsync(CODE).then(function (result) {
+      if (result !== undefined && result !== null && typeof result !== 'object') add(String(result) + '\n', 'dim');
+    }).catch(function (e) {
+      add(clean(String(e && e.message ? e.message : e)) + '\n', 'err');
+    });
+  }).catch(function (e) {
+    out.textContent = '';
+    add('Python could not start: ' + (e && e.message ? e.message : e) + '\n', 'err');
+  });
+})();
+</script></body></html>

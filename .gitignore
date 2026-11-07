@@ -203,3 +203,6 @@ SIGNING_KEY_ALIAS
 SIGNING_KEY_PASSWORD
 SIGNING_KEY_STORE_BASE64
 SIGNING_STORE_PASSWORD
+
+# Offline language runtimes for the Code Runner are downloaded by scripts/fetch-runtimes.sh
+/app/src/main/assets/rt/

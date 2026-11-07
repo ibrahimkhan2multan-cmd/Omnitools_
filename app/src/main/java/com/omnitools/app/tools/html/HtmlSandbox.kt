@@ -74,6 +74,32 @@ object HtmlDocument {
     }
 }
 
+/** The language runtimes that ship inside the app (see scripts/fetch-runtimes.sh) and how they are served to the page. */
+object RuntimeAssets {
+    const val ORIGIN = "https://omnitools.local"
+    const val PREFIX = "$ORIGIN/rt/"
+    const val PAGE_BASE = "$ORIGIN/page/"
+
+    /** Only these exact files can be requested; anything else is refused. */
+    val files: Set<String> = setOf(
+        "pyodide.js", "pyodide.asm.mjs", "pyodide.asm.wasm", "python_stdlib.zip", "pyodide-lock.json",
+        "sql-wasm.js", "sql-wasm.wasm", "fengari-web.js", "sucrase.js",
+    )
+
+    fun nameOf(url: String): String? =
+        if (url.startsWith(PREFIX)) url.removePrefix(PREFIX).substringBefore('?').substringBefore('#').takeIf { it in files } else null
+
+    fun mime(name: String): String = when (name.substringAfterLast('.')) {
+        "js", "mjs" -> "text/javascript"
+        "wasm" -> "application/wasm"
+        "json" -> "application/json"
+        "zip" -> "application/zip"
+        else -> "application/octet-stream"
+    }
+
+    fun isText(name: String): Boolean = name.substringAfterLast('.') in setOf("js", "mjs", "json")
+}
+
 /**
  * A WebView with no way to reach the app or the network: JavaScript runs, but there is no Java bridge, file and
  * content access are off, every request is answered with 403, links cannot navigate away, and the page carries a
@@ -86,6 +112,7 @@ fun SandboxedWebView(
     runId: Int,
     modifier: Modifier = Modifier,
     handle: SandboxHandle? = null,
+    runtime: Boolean = false,
     onConsole: (String) -> Unit,
 ) {
     // The WebView is created once, so its callbacks must always call the newest onConsole.
@@ -132,6 +159,20 @@ fun SandboxedWebView(
                     override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
                         val url = request.url.toString()
                         if (url.startsWith("data:") || url.startsWith("blob:") || url == "about:blank") return null
+                        // Language pages may load the bundled runtimes, and nothing else.
+                        if (runtime) {
+                            val name = RuntimeAssets.nameOf(url)
+                            if (name != null) {
+                                return try {
+                                    WebResourceResponse(
+                                        RuntimeAssets.mime(name), if (RuntimeAssets.isText(name)) "utf-8" else null, 200, "OK",
+                                        mapOf("Cache-Control" to "no-store"), view.context.assets.open("rt/$name"),
+                                    )
+                                } catch (e: java.io.IOException) {
+                                    WebResourceResponse("text/plain", "utf-8", 404, "Not found", emptyMap(), ByteArrayInputStream(ByteArray(0)))
+                                }
+                            }
+                        }
                         return WebResourceResponse("text/plain", "utf-8", 403, "Blocked", emptyMap(), ByteArrayInputStream(ByteArray(0)))
                     }
 
@@ -167,7 +208,7 @@ fun SandboxedWebView(
                 web.stopLoading()
                 web.clearCache(true)
                 web.clearHistory()
-                web.loadDataWithBaseURL(null, document, "text/html", "utf-8", null)
+                web.loadDataWithBaseURL(if (runtime) RuntimeAssets.PAGE_BASE else null, document, "text/html", "utf-8", null)
             }
         },
         onRelease = { if (handle?.web === it) handle.web = null; it.destroy() },
@@ -184,7 +225,7 @@ class SandboxHandle {
 
 /** The running page with its console output underneath. */
 @Composable
-fun HtmlPreviewPanel(document: String, runId: Int, modifier: Modifier = Modifier) {
+fun HtmlPreviewPanel(document: String, runId: Int, modifier: Modifier = Modifier, runtime: Boolean = false) {
     val console = remember(runId) { mutableStateListOf<String>() }
     val handle = remember { SandboxHandle() }
     Column(modifier) {
@@ -192,6 +233,7 @@ fun HtmlPreviewPanel(document: String, runId: Int, modifier: Modifier = Modifier
             document = document,
             runId = runId,
             handle = handle,
+            runtime = runtime,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             onConsole = { line ->
                 if (console.size < 300) console.add(line)

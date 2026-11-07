@@ -6,6 +6,7 @@ import com.omnitools.app.tools.html.RunnerDocs
 import com.omnitools.app.tools.html.RunnerMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -55,5 +56,54 @@ class RunnerModesTest {
     @Test fun gameKeyScriptMentionsKey() {
         val s = GameKeys.script(" ", "Space", 32)
         assertTrue(s.contains("keydown") && s.contains("32") && s.contains("Space"))
+    }
+}
+
+class RunnerLanguagesTest {
+    private val required = com.omnitools.app.tools.html.RuntimeAssets.files
+
+    @Test fun languageModesFillTheirTemplatesSafely() {
+        val evil = "print('</script><b>')  /*CODE*/ /*STDIN*/"
+        for (m in listOf(RunnerMode.PYTHON, RunnerMode.TYPESCRIPT, RunnerMode.SQL, RunnerMode.LUA)) {
+            val doc = RunnerDocs.build(m, "", "", "", evil, "a\nb")
+            assertFalse(m.name, doc.contains("This language is missing"))
+            assertEquals(m.name, 1, Regex("</script>").findAll(doc).count() - Regex("<script src=").findAll(doc).count() )
+            assertTrue(m.name, doc.contains("default-src 'none'"))
+            assertTrue(m.name, doc.contains(RunnerDocs.jsLiteral(evil)))
+            assertFalse(m.name, doc.contains("<script>/*CODE*/"))
+        }
+    }
+
+    @Test fun onlyKnownRuntimeFilesAreReferenced() {
+        for (name in listOf("python.html", "sql.html", "lua.html", "typescript.html")) {
+            val text = javaClass.classLoader!!.getResourceAsStream("runner/$name")!!.use { it.readBytes().toString(Charsets.UTF_8) }
+            Regex("https://omnitools\\.local/rt/([A-Za-z0-9._-]+)").findAll(text).forEach { assertTrue("$name -> ${it.groupValues[1]}", it.groupValues[1] in required) }
+            assertFalse(name, Regex("https?://(?!omnitools\\.local)").containsMatchIn(text.replace("http://www.w3.org", "")))
+            assertTrue(name, text.contains("/*CODE*/"))
+        }
+    }
+
+    @Test fun runtimeUrlsAreAllowListed() {
+        val a = com.omnitools.app.tools.html.RuntimeAssets
+        assertEquals("pyodide.js", a.nameOf("https://omnitools.local/rt/pyodide.js"))
+        assertEquals("sql-wasm.wasm", a.nameOf("https://omnitools.local/rt/sql-wasm.wasm?x=1"))
+        for (bad in listOf("https://omnitools.local/rt/../secret", "https://omnitools.local/rt/AndroidManifest.xml", "https://evil.com/rt/pyodide.js", "https://omnitools.local/rt/", "https://omnitools.local/rt/%2e%2e/x")) {
+            assertNull(bad, a.nameOf(bad))
+        }
+        assertEquals("application/wasm", a.mime("pyodide.asm.wasm")); assertEquals("text/javascript", a.mime("pyodide.asm.mjs"))
+    }
+
+    @Test fun languageModesHaveExamplesAndRuntimeFlag() {
+        for (m in listOf(RunnerMode.PYTHON, RunnerMode.TYPESCRIPT, RunnerMode.SQL, RunnerMode.LUA)) {
+            assertTrue(m.name, m.runtime); assertTrue(m.name, m.example.isNotBlank())
+        }
+        assertFalse(RunnerMode.JS.runtime); assertFalse(RunnerMode.WEB.runtime)
+    }
+
+    @Test fun changelogIsCopyable() {
+        val t = com.omnitools.app.tools.html.RunnerChangelog.asText()
+        assertTrue(t.contains("Python") && t.contains("TypeScript") && t.contains("SQL") && t.contains("Lua"))
+        assertTrue(t.contains("Not supported"))
+        assertTrue(com.omnitools.app.tools.html.RunnerChangelog.entries.first().version == "2.0")
     }
 }

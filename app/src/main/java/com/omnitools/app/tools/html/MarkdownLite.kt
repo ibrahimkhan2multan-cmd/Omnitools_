@@ -68,12 +68,17 @@ object MarkdownLite {
 }
 
 /** What kind of code is being run. Every mode ends up as a page in the same locked-down sandbox. */
-enum class RunnerMode(val label: String) {
-    WEB("HTML+CSS+JS"), JS("JavaScript"), MARKDOWN("Markdown"), SVG("SVG"), JSON("JSON");
+enum class RunnerMode(val label: String, val runtime: Boolean = false) {
+    WEB("HTML+CSS+JS"), JS("JavaScript"), TYPESCRIPT("TypeScript", true), PYTHON("Python", true), SQL("SQL", true), LUA("Lua", true),
+    MARKDOWN("Markdown"), SVG("SVG"), JSON("JSON");
 
     val example: String get() = when (this) {
         WEB -> ""
         JS -> "const nums = [1, 2, 3, 4, 5];\nconst squares = nums.map(n => n * n);\nconsole.log('squares:', squares);\nconsole.log('sum:', squares.reduce((a, b) => a + b, 0));"
+        TYPESCRIPT -> "interface Item { name: string; price: number }\n\nconst cart: Item[] = [\n  { name: 'Tea', price: 3.5 },\n  { name: 'Cake', price: 4.25 },\n];\n\nconst total: number = cart.reduce((sum, i) => sum + i.price, 0);\nconsole.log('Items:', cart.length, 'Total:', total.toFixed(2));\nconsole.log(cart);"
+        PYTHON -> "from collections import Counter\n\nwords = 'the quick brown fox jumps over the lazy dog the end'.split()\nfor word, n in Counter(words).most_common(3):\n    print(word, n)\n\nprint([x * x for x in range(1, 6)])\n\ndef fib(n):\n    a, b = 0, 1\n    for _ in range(n):\n        a, b = b, a + b\n    return a\n\nprint('fib(30) =', fib(30))"
+        SQL -> "CREATE TABLE players (id INTEGER PRIMARY KEY, name TEXT, score INTEGER);\nINSERT INTO players (name, score) VALUES ('Ali', 120), ('Sara', 340), ('Omar', 275);\n\nSELECT name, score FROM players ORDER BY score DESC;\nSELECT COUNT(*) AS players, AVG(score) AS average FROM players;"
+        LUA -> "local squares = {}\nfor i = 1, 5 do squares[#squares + 1] = i * i end\nprint('squares:', table.concat(squares, ', '))\n\nlocal function fib(n)\n  if n < 2 then return n end\n  return fib(n - 1) + fib(n - 2)\nend\nprint('fib(20) =', fib(20))"
         MARKDOWN -> "# Hello\n\nSome **bold**, some *italic* and `code`.\n\n- first\n- second\n\n> A quote\n\n```\nfun main() {}\n```"
         SVG -> "<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\">\n  <circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"#4f8cff\"/>\n  <rect x=\"30\" y=\"30\" width=\"40\" height=\"40\" fill=\"#fff\" opacity=\"0.8\"/>\n</svg>"
         JSON -> "{\"name\":\"OmniTools\",\"tools\":[1,2,3],\"offline\":true}"
@@ -104,9 +109,26 @@ object RunnerDocs {
     private const val MIRROR = "(function(){var o=document.getElementById('out');['log','info','warn','error'].forEach(function(k){var f=console[k];" +
         "console[k]=function(){var s=Array.prototype.map.call(arguments,function(a){try{return typeof a==='string'?a:JSON.stringify(a)}catch(e){return String(a)}}).join(' ');" +
         "o.textContent+=(k==='log'?'':k+': ')+s+'\\n';f.apply(console,arguments)}});" +
-        "window.addEventListener('error',function(e){o.textContent+='error: '+e.message+'\\n'})})();\n"
+        "window.addEventListener('error',function(e){o.textContent+='error: '+e.message+'\\n'});" +
+        "window.addEventListener('unhandledrejection',function(e){o.textContent+='error: '+(e.reason&&e.reason.message?e.reason.message:e.reason)+'\\n'})})();\n"
 
-    fun build(mode: RunnerMode, html: String, css: String, js: String, code: String): String = when (mode) {
+    private fun template(name: String): String? =
+        RunnerDocs::class.java.classLoader?.getResourceAsStream("runner/$name")?.use { it.readBytes().toString(Charsets.UTF_8) }
+
+    private val placeholder = Regex("/\\*(CODE|STDIN)\\*/")
+
+    /** Fills a page template in one pass, so the user's text can never be mistaken for a placeholder. */
+    private fun fromTemplate(name: String, code: String, stdin: String): String {
+        val t = template(name) ?: return HtmlDocument.build("<pre id=\"out\">This language is missing from the app.</pre>", DARK, "")
+        val codeLit = jsLiteral(code); val stdinLit = jsLiteral(stdin)
+        return placeholder.replace(t) { if (it.groupValues[1] == "CODE") codeLit else stdinLit }
+    }
+
+    fun build(mode: RunnerMode, html: String, css: String, js: String, code: String, stdin: String = ""): String = when (mode) {
+        RunnerMode.TYPESCRIPT -> fromTemplate("typescript.html", code, stdin)
+        RunnerMode.PYTHON -> fromTemplate("python.html", code, stdin)
+        RunnerMode.SQL -> fromTemplate("sql.html", code, stdin)
+        RunnerMode.LUA -> fromTemplate("lua.html", code, stdin)
         RunnerMode.WEB -> HtmlDocument.build(html, css, js)
         RunnerMode.JS -> HtmlDocument.build("<pre id=\"out\"></pre>", DARK, MIRROR + code.replace("</script", "<\\/script"))
         RunnerMode.MARKDOWN -> HtmlDocument.build(MarkdownLite.toHtml(code), DARK, "")
