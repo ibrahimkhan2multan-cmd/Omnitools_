@@ -50,6 +50,11 @@ import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.BatteryFull
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Explore
+import androidx.compose.material.icons.filled.FormatColorText
+import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
@@ -65,6 +70,7 @@ enum class Category(val title: String, val icon: ImageVector) {
     SECURITY("Security & Privacy", Icons.Filled.Security),
     NETWORK("Network Utilities", Icons.Filled.Wifi),
     ADVANCED("Advanced Tools", Icons.Filled.Construction),
+    GAMING("Gaming & Modding", Icons.Filled.SportsEsports),
 }
 
 /**
@@ -83,6 +89,46 @@ data class Tool(
 object ToolRegistry {
 
     val all: List<Tool> = listOf(
+        Tool(
+            id = "uuid_gen",
+            name = "UUID Generator",
+            description = "Random UUIDs for add-on packs and mods, in the format you need.",
+            category = Category.GAMING,
+            icon = Icons.Filled.Tag,
+            keywords = listOf("guid", "id", "minecraft", "manifest", "unique"),
+        ),
+        Tool(
+            id = "addon_manifest",
+            name = "Add-on Manifest Builder",
+            description = "Create a Minecraft Bedrock manifest.json for a behavior or resource pack.",
+            category = Category.GAMING,
+            icon = Icons.Filled.DataObject,
+            keywords = listOf("minecraft", "bedrock", "json", "pack", "mod", "addon"),
+        ),
+        Tool(
+            id = "mc_colors",
+            name = "Color Code Preview",
+            description = "Preview Minecraft colour and style codes and convert & to the game's section sign.",
+            category = Category.GAMING,
+            icon = Icons.Filled.FormatColorText,
+            keywords = listOf("minecraft", "motd", "chat", "format", "section"),
+        ),
+        Tool(
+            id = "mc_coords",
+            name = "Coordinates & Chunks",
+            description = "Nether and Overworld conversion, chunk, region file and distance.",
+            category = Category.GAMING,
+            icon = Icons.Filled.Explore,
+            keywords = listOf("minecraft", "nether", "chunk", "region", "xyz"),
+        ),
+        Tool(
+            id = "pack_builder",
+            name = "Pack Builder",
+            description = "Zip a pack folder into .mcpack, .mcaddon or .zip and check its manifest.",
+            category = Category.GAMING,
+            icon = Icons.Filled.Inventory2,
+            keywords = listOf("minecraft", "mcpack", "mcaddon", "zip", "package"),
+        ),
         Tool(
             id = "pdf_merge",
             name = "Merge PDFs",
