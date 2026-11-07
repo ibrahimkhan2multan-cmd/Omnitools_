@@ -62,7 +62,7 @@ private const val MAX_UNDO = 50
 @Composable
 fun TextToolsScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    var value by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue("")) }
+    var value by rememberSaveable(stateSaver = com.omnitools.app.ui.components.BoundedTextFieldValueSaver) { mutableStateOf(TextFieldValue("")) }
     val undo = remember { mutableStateListOf<TextFieldValue>() }
     val redo = remember { mutableStateListOf<TextFieldValue>() }
     var tab by rememberSaveable { mutableStateOf(0) }

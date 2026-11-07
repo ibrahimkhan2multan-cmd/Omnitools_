@@ -24,13 +24,12 @@ object Palette {
         val chosen = ArrayList<Swatch>()
         val rgbs = ArrayList<Int>()
         for (k in order) {
-            if (chosen.size >= count) break
             val r = (sr[k] / n[k]).toInt(); val g = (sg[k] / n[k]).toInt(); val b = (sb[k] / n[k]).toInt()
             val rgb = (r shl 16) or (g shl 8) or b
             val similar = rgbs.indexOfFirst { distance(it, rgb) < 48 }
             if (similar >= 0) {
                 chosen[similar] = chosen[similar].copy(share = chosen[similar].share + n[k].toDouble() / total)
-            } else {
+            } else if (chosen.size < count) {
                 rgbs.add(rgb); chosen.add(Swatch(rgb, n[k].toDouble() / total))
             }
         }

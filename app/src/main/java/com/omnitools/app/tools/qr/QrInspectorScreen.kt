@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import com.omnitools.app.ui.components.rememberText
 import androidx.compose.runtime.setValue
 import com.omnitools.app.ui.components.CopyShareRow
 import com.omnitools.app.ui.components.ResultCard
@@ -15,7 +15,7 @@ import com.omnitools.app.ui.components.ToolPage
 
 @Composable
 fun QrInspectorScreen(onBack: () -> Unit) {
-    var raw by rememberSaveable { mutableStateOf("") }
+    var raw by rememberText()
     val info = if (raw.isBlank()) null else QrInspector.inspect(raw.trim())
     ScreenScaffold(title = "QR Content Inspector", onBack = onBack) { padding ->
         ToolPage(padding) {

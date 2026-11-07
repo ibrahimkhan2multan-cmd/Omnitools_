@@ -45,7 +45,8 @@ object QrInspector {
             lower.startsWith("tel:") -> Info("Phone number", listOf("Number" to text.substring(4)), emptyList())
             lower.startsWith("smsto:") || lower.startsWith("sms:") -> {
                 val body = text.substringAfter(':')
-                Info("Text message", listOf("To" to body.substringBefore(':').substringBefore('?'), "Message" to if (':' in body) body.substringAfter(':') else ""), listOf("Check the number: premium-rate numbers can cost money."))
+                val message = if (':' in body) body.substringAfter(':') else queryFields("?" + body.substringAfter('?', "")).firstOrNull { it.first.equals("body", true) }?.second.orEmpty()
+                Info("Text message", listOf("To" to body.substringBefore(':').substringBefore('?'), "Message" to message), listOf("Check the number: premium-rate numbers can cost money."))
             }
             lower.startsWith("geo:") -> Info("Location", listOf("Coordinates" to text.substring(4).substringBefore('?')), emptyList())
             lower.startsWith("http://") || lower.startsWith("https://") -> {

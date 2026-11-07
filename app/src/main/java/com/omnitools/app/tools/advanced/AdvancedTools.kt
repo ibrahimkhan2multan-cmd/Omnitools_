@@ -30,6 +30,8 @@ object Json {
         return v
     }
 
+    private val NUMBER = Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?")
+
     private class P(val s: String) {
         var i = 0
         fun end() = i >= s.length
@@ -62,7 +64,7 @@ object Json {
         }
 
         fun num(): Node {
-            val m = Regex("-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?").matchAt(s, i) ?: throw fail("Invalid number")
+            val m = NUMBER.matchAt(s, i) ?: throw fail("Invalid number")
             i += m.value.length
             return Node.Num(m.value)
         }
@@ -82,7 +84,7 @@ object Json {
                             'b' -> sb.append('\b'); 'f' -> sb.append('\u000C'); 'n' -> sb.append('\n')
                             'r' -> sb.append('\r'); 't' -> sb.append('\t')
                             'u' -> {
-                                if (i + 4 > s.length || !s.substring(i, i + 4).all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }) throw fail("Invalid \\u escape")
+                                if (i + 4 > s.length || !s.substring(i, i + 4).all { it in '0'..'9' || it.lowercaseChar() in 'a'..'f' }) throw fail("Invalid \\u escape")
                                 sb.append(s.substring(i, i + 4).toInt(16).toChar()); i += 4
                             }
                             else -> throw fail("Invalid escape \\$e")
@@ -291,10 +293,17 @@ object CsvJson {
     }
 
     fun csvToJson(text: String, delimiter: Char = ','): String {
-        val rows = parseCsv(text, delimiter)
+        val rows = parseCsv(text.removePrefix("\uFEFF"), delimiter)
         require(rows.isNotEmpty()) { "Enter some CSV with a header row." }
-        val header = rows[0].map { it.trim() }
-        require(header.all { it.isNotEmpty() }) { "Every column in the header row needs a name." }
+        val rawHeader = rows[0].map { it.trim() }
+        require(rawHeader.all { it.isNotEmpty() }) { "Every column in the header row needs a name." }
+        val seen = HashMap<String, Int>()
+        val header = rawHeader.map { h ->
+            val n = (seen[h] ?: 0) + 1
+            seen[h] = n
+            if (n == 1) h else "${h}_$n"
+        }
+        rows.drop(1).forEachIndexed { k, r -> require(r.size <= header.size || r.drop(header.size).all { it.isBlank() }) { "Row ${k + 2} has ${r.size} values but the header has only ${header.size} columns." } }
         val objs = rows.drop(1).map { r -> Json.Node.Obj(header.mapIndexed { k, h -> h to (Json.Node.Str(r.getOrElse(k) { "" }) as Json.Node) }) }
         return Json.print(Json.Node.Arr(objs))
     }
@@ -317,6 +326,7 @@ object CsvJson {
         val objs = arr.items.map { it as? Json.Node.Obj ?: throw IllegalArgumentException("Every item in the array must be an object.") }
         val columns = LinkedHashSet<String>()
         objs.forEach { o -> o.entries.forEach { columns.add(it.first) } }
+        require(columns.isNotEmpty()) { "The objects have no fields to turn into columns." }
         val sb = StringBuilder()
         sb.append(columns.joinToString(delimiter.toString()) { quoteCell(it, delimiter) })
         for (o in objs) {

@@ -10,6 +10,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -36,3 +41,17 @@ fun ChipRow(content: @Composable RowScope.() -> Unit) {
 fun Choice(selected: Boolean, label: String, onClick: () -> Unit) {
     FilterChip(selected = selected, onClick = onClick, label = { Text(label) })
 }
+
+private const val SAVE_LIMIT = 100_000
+
+/** Keeps long pasted text out of the saved-state bundle (Android crashes the app when it grows past about 1 MB). */
+private val BoundedStringSaver: Saver<String, Any> = Saver(save = { if (it.length <= SAVE_LIMIT) it else null }, restore = { it as String })
+
+val BoundedTextFieldValueSaver: Saver<TextFieldValue, Any> = Saver(
+    save = { if (it.text.length <= SAVE_LIMIT) with(TextFieldValue.Saver) { save(it) } else null },
+    restore = { TextFieldValue.Saver.restore(it) },
+)
+
+/** Like rememberSaveable { mutableStateOf("") } but long text is simply not saved. */
+@Composable
+fun rememberText(initial: String = ""): MutableState<String> = rememberSaveable(stateSaver = BoundedStringSaver) { mutableStateOf(initial) }

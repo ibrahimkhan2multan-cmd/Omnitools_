@@ -39,6 +39,12 @@ object PasswordStrength {
             return Result(8.0, "Very weak", "instantly", listOf("This is one of the most common passwords. Never use it."))
         }
         var bits = password.length * ln(poolSize(password).coerceAtLeast(2).toDouble()) / ln(2.0)
+        // Words glued together (like "bookfishmoon") are far easier to guess than random characters of that length.
+        val glued = Passphrase.splitIntoWords(lower)
+        if (glued != null) {
+            bits = minOf(bits, glued.size * Passphrase.bitsPerWord())
+            tips.add("Words from a list are easier to guess than random characters. Add more words or mix in digits and symbols.")
+        }
         // Penalties for patterns that make guessing easier.
         val repeats = Regex("(.)\\1{2,}").findAll(password).sumOf { it.value.length - 1 }
         if (repeats > 0) { bits -= repeats * 3.0; tips.add("Avoid repeating the same character.") }
@@ -60,16 +66,18 @@ object PasswordStrength {
         return Result(bits, rating, crackTime(bits), tips.distinct())
     }
 
+    private fun unit(n: Long, word: String) = "$n $word" + if (n == 1L) "" else "s"
+
     /** Time to try half of all possibilities at 10 billion guesses per second (a fast offline attack). */
     fun crackTime(bits: Double): String {
         val seconds = 2.0.pow(bits - 1) / 1e10
         return when {
             seconds < 1 -> "less than a second"
-            seconds < 60 -> "${seconds.toLong()} seconds"
-            seconds < 3600 -> "${(seconds / 60).toLong()} minutes"
-            seconds < 86400 -> "${(seconds / 3600).toLong()} hours"
-            seconds < 86400 * 365 -> "${(seconds / 86400).toLong()} days"
-            seconds < 86400.0 * 365 * 1000 -> "${(seconds / 86400 / 365).toLong()} years"
+            seconds < 60 -> unit(seconds.toLong(), "second")
+            seconds < 3600 -> unit((seconds / 60).toLong(), "minute")
+            seconds < 86400 -> unit((seconds / 3600).toLong(), "hour")
+            seconds < 86400 * 365 -> unit((seconds / 86400).toLong(), "day")
+            seconds < 86400.0 * 365 * 1000 -> unit((seconds / 86400 / 365).toLong(), "year")
             seconds < 86400.0 * 365 * 1e9 -> "thousands to millions of years"
             else -> "longer than the age of the universe"
         }
@@ -85,6 +93,15 @@ object Passphrase {
     val words: List<String> = raw.distinct()
 
     fun bitsPerWord(): Double = ln(words.size.toDouble()) / ln(2.0)
+
+    private val wordSet: Set<String> = words.toSet()
+
+    /** If [lower] is made only of list words stuck together (4 letters each), returns them; otherwise null. */
+    fun splitIntoWords(lower: String): List<String>? {
+        if (lower.length < 8 || lower.length % 4 != 0) return null
+        val parts = lower.chunked(4)
+        return if (parts.all { it in wordSet }) parts else null
+    }
 
     const val MIN_WORDS = 3
     const val MAX_WORDS = 12

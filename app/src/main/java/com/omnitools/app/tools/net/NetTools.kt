@@ -9,7 +9,7 @@ object Ipv4 {
         if (parts.size != 4) return null
         var v = 0L
         for (p in parts) {
-            if (p.isEmpty() || p.length > 3 || !p.all { it.isDigit() }) return null
+            if (p.isEmpty() || p.length > 3 || !p.all { it in '0'..'9' }) return null
             val n = p.toInt()
             if (n > 255) return null
             v = v * 256 + n
@@ -43,7 +43,7 @@ object Ipv4 {
         if ('/' in text) {
             addrText = text.substringBefore('/').trim()
             val p = text.substringAfter('/').trim()
-            require(p.isNotEmpty() && p.length <= 2 && p.all { it.isDigit() } && p.toInt() in 0..32) { "The prefix after / must be 0 to 32." }
+            require(p.isNotEmpty() && p.length <= 2 && p.all { it in '0'..'9' } && p.toInt() in 0..32) { "The prefix after / must be 0 to 32." }
             prefix = p.toInt()
         } else if (text.contains(' ')) {
             addrText = text.substringBefore(' ')
@@ -110,7 +110,7 @@ object Ipv6 {
         if (dbl >= 0 && s.indexOf("::", dbl + 1) >= 0) return null
         fun groups(part: String): List<Int>? {
             if (part.isEmpty()) return emptyList()
-            return part.split(':').map { g -> if (g.isEmpty() || g.length > 4) return null else g.toInt(16) }
+            return part.split(':').map { g -> if (g.isEmpty() || g.length > 4) return null else (g.toIntOrNull(16) ?: return null) }
         }
         val result: List<Int> = if (dbl >= 0) {
             val head = groups(s.substring(0, dbl)) ?: return null
@@ -167,13 +167,13 @@ object IpConvert {
         }
         val v4 = Ipv4.parse(s)
         if (v4 != null) return v4Rows(v4)
-        if (s.all { it.isDigit() } && s.length <= 10) {
+        if (s.all { it in '0'..'9' } && s.length <= 10) {
             val n = s.toLong()
             require(n <= 0xFFFFFFFFL) { "An IPv4 number cannot be larger than 4294967295." }
             return v4Rows(n)
         }
         val hex = s.removePrefix("0x").removePrefix("0X")
-        if (s.startsWith("0x", true) && hex.isNotEmpty() && hex.length <= 8 && hex.all { it.isDigit() || it.lowercaseChar() in 'a'..'f' }) return v4Rows(hex.toLong(16))
+        if (s.startsWith("0x", true) && hex.isNotEmpty() && hex.length <= 8 && hex.all { it in '0'..'9' || it.lowercaseChar() in 'a'..'f' }) return v4Rows(hex.toLong(16))
         throw IllegalArgumentException("Enter an IPv4 address (1.2.3.4), an IPv6 address, or a number from 0 to 4294967295.")
     }
 
@@ -229,7 +229,7 @@ object UrlParts {
 
     private fun portOf(s: String): Int? {
         if (s.isEmpty()) return null
-        require(s.all { it.isDigit() } && s.length <= 5 && s.toInt() in 0..65535) { "The port must be a number from 0 to 65535." }
+        require(s.all { it in '0'..'9' } && s.length <= 5 && s.toInt() in 0..65535) { "The port must be a number from 0 to 65535." }
         return s.toInt()
     }
 }

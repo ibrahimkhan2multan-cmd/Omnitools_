@@ -259,13 +259,17 @@ fun CompressToSizeScreen(onBack: () -> Unit) {
                         val limit = (target.toIntOrNull() ?: 0) * 1024
                         busy = true; message = null; result = null; plan = null
                         scope.launch {
-                            val p = withContext(Dispatchers.Default) {
-                                try { SizeFit.fit(limit) { q, s -> ImageOps.encode(bmp, format, q, s).size } } catch (e: Exception) { null }
-                            }
-                            if (p == null) message = "It could not be made that small. Try a larger limit."
-                            else {
-                                result = withContext(Dispatchers.Default) { ImageOps.encode(bmp, format, p.quality, p.scalePercent) }
-                                plan = p
+                            try {
+                                val p = withContext(Dispatchers.Default) { SizeFit.fit(limit) { q, s -> ImageOps.encode(bmp, format, q, s).size } }
+                                if (p == null) message = "It could not be made that small. Try a larger limit."
+                                else {
+                                    result = withContext(Dispatchers.Default) { ImageOps.encode(bmp, format, p.quality, p.scalePercent) }
+                                    plan = p
+                                }
+                            } catch (e: OutOfMemoryError) {
+                                message = "Not enough memory for this picture. Try a smaller picture."
+                            } catch (e: Exception) {
+                                message = "That did not work: ${e.message ?: "unknown error"}"
                             }
                             busy = false
                         }

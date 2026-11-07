@@ -100,7 +100,9 @@ fun DisplayScreen(onBack: () -> Unit) {
     val w = dm.widthPixels; val h = dm.heightPixels
     val inchesW = w / dm.xdpi.toDouble(); val inchesH = h / dm.ydpi.toDouble()
     val diag = Math.sqrt(inchesW * inchesW + inchesH * inchesH)
-    val refresh = runCatching { context.display?.refreshRate }.getOrNull() ?: 0f
+    val refresh = runCatching { context.display?.refreshRate }.getOrNull()
+        ?: runCatching { @Suppress("DEPRECATION") (context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager).defaultDisplay.refreshRate }.getOrNull()
+        ?: 0f
     val rows = listOf(
         "Resolution" to "$w × $h px",
         "Density" to "${dm.densityDpi} dpi (${String.format(Locale.US, "%.2f", dm.density)}x)",

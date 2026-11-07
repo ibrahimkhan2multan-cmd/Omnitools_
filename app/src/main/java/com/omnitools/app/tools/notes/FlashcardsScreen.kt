@@ -29,7 +29,6 @@ import com.omnitools.app.ui.components.TextInput
 import com.omnitools.app.ui.components.ToolPage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -45,20 +44,34 @@ fun FlashcardsScreen(onBack: () -> Unit) {
     var showAnswer by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        cards = withContext(Dispatchers.IO) { try { if (file.exists()) Flashcards.decode(file.readText()) else emptyList() } catch (e: Exception) { emptyList() } }
+        cards = withContext(Dispatchers.IO) {
+            try {
+                if (!file.exists()) emptyList() else {
+                    val text = file.readText()
+                    val parsed = Flashcards.decode(text)
+                    // Unreadable but non-empty data is kept as a backup instead of being overwritten.
+                    if (parsed.isEmpty() && text.isNotBlank() && text.trim() != "[]") file.copyTo(File(file.parentFile, "flashcards.json.bak"), overwrite = true)
+                    parsed
+                }
+            } catch (e: Exception) { emptyList() }
+        }
         loaded = true
     }
-    suspend fun persist(list: List<Flashcards.Card>) {
-        withContext(Dispatchers.IO) {
-            try {
-                val tmp = File(file.parentFile, "flashcards.json.tmp")
-                tmp.writeText(Flashcards.encode(list))
-                if (!tmp.renameTo(file)) { file.writeText(Flashcards.encode(list)); tmp.delete() }
-            } catch (e: Exception) { /* storage full: cards stay in memory this session */ }
+    // Every change is saved right away. NonCancellable so leaving the screen cannot drop the last change.
+    LaunchedEffect(cards, loaded) {
+        if (!loaded) return@LaunchedEffect
+        val snapshot = cards
+        withContext(Dispatchers.IO + kotlinx.coroutines.NonCancellable) {
+            synchronized(FlashcardsFileLock) {
+                try {
+                    val tmp = File(file.parentFile, "flashcards.json.tmp")
+                    tmp.writeText(Flashcards.encode(snapshot))
+                    if (!tmp.renameTo(file)) { file.writeText(Flashcards.encode(snapshot)); tmp.delete() }
+                } catch (e: Exception) { /* storage full: cards stay in memory this session */ }
+            }
         }
     }
-    val scope = androidx.compose.runtime.rememberCoroutineScope()
-    fun update(list: List<Flashcards.Card>) { cards = list; scope.launch { persist(list) } }
+    fun update(list: List<Flashcards.Card>) { cards = list }
 
     val q = queue
     ScreenScaffold(title = "Flashcards", onBack = { if (q != null) queue = null else onBack() }) { padding ->
@@ -114,3 +127,5 @@ fun FlashcardsScreen(onBack: () -> Unit) {
     }
 }
 
+
+private object FlashcardsFileLock

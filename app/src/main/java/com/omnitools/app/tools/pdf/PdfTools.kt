@@ -40,8 +40,8 @@ object PdfRange {
 
 /** Rebuilds PDFs by drawing each source page as a picture. Text in the result is no longer selectable. */
 object PdfRebuild {
-    const val MAX_PAGES = 300
-    const val RENDER_WIDTH = 1240
+    const val MAX_PAGES = 60
+    const val RENDER_WIDTH = 1000
 
     /** [pages] null means every page. */
     class Part(val uri: Uri, val pages: List<Int>?)

@@ -13,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.omnitools.app.ui.components.rememberText
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,17 +37,18 @@ private fun Note(text: String) = Text(text, style = MaterialTheme.typography.bod
 
 @Composable
 fun JsonScreen(onBack: () -> Unit) {
-    var input by rememberSaveable { mutableStateOf("") }
+    var input by rememberText()
     var mode by rememberSaveable { mutableStateOf(0) } // 0 pretty, 1 compact
     var sort by rememberSaveable { mutableStateOf(false) }
-    var output: String? = null
-    var error: String? = null
-    if (input.isNotBlank()) {
-        try { output = Json.format(input, if (mode == 0) 2 else 0, sort) } catch (e: Json.JsonException) { error = e.message }
+    val computed = remember<Pair<String?, String?>>(input, mode, sort) {
+        if (input.isBlank()) null to null
+        else try { Json.format(input, if (mode == 0) 2 else 0, sort) to null } catch (e: Json.JsonException) { null to e.message }
     }
+    val output = computed.first
+    val error = computed.second
     ScreenScaffold(title = "JSON Formatter", onBack = onBack) { padding ->
         ToolPage(padding) {
-            TextInput("Paste JSON", input, { input = it.take(Json.MAX_LENGTH) }, singleLine = false, minLines = 6)
+            TextInput("Paste JSON", input, { input = it.take(300_000) }, singleLine = false, minLines = 6)
             ChipRow {
                 Choice(mode == 0, "Pretty") { mode = 0 }
                 Choice(mode == 1, "Compact") { mode = 1 }
@@ -63,15 +66,16 @@ fun JsonScreen(onBack: () -> Unit) {
 
 @Composable
 fun DiffScreen(onBack: () -> Unit) {
-    var a by rememberSaveable { mutableStateOf("") }
-    var b by rememberSaveable { mutableStateOf("") }
+    var a by rememberText()
+    var b by rememberText()
     var ignoreCase by rememberSaveable { mutableStateOf(false) }
     var ignoreSpace by rememberSaveable { mutableStateOf(false) }
-    var result: TextDiff.Result? = null
-    var error: String? = null
-    if (a.isNotEmpty() || b.isNotEmpty()) {
-        try { result = TextDiff.diff(a, b, ignoreCase, ignoreSpace) } catch (e: IllegalArgumentException) { error = e.message }
+    val computed = remember<Pair<TextDiff.Result?, String?>>(a, b, ignoreCase, ignoreSpace) {
+        if (a.isEmpty() && b.isEmpty()) null to null
+        else try { TextDiff.diff(a, b, ignoreCase, ignoreSpace) to null } catch (e: IllegalArgumentException) { null to e.message }
     }
+    val result = computed.first
+    val error = computed.second
     ScreenScaffold(title = "Text Compare", onBack = onBack) { padding ->
         ToolPage(padding) {
             TextInput("Original text", a, { a = it.take(200_000) }, singleLine = false, minLines = 4)
@@ -107,7 +111,7 @@ fun DiffScreen(onBack: () -> Unit) {
 
 @Composable
 fun JwtScreen(onBack: () -> Unit) {
-    var input by rememberSaveable { mutableStateOf("") }
+    var input by rememberText()
     var d: Jwt.Decoded? = null
     var error: String? = null
     if (input.isNotBlank()) { try { d = Jwt.decode(input) } catch (e: IllegalArgumentException) { error = e.message } }
@@ -128,16 +132,17 @@ fun JwtScreen(onBack: () -> Unit) {
 
 @Composable
 fun CsvJsonScreen(onBack: () -> Unit) {
-    var input by rememberSaveable { mutableStateOf("") }
+    var input by rememberText()
     var toJson by rememberSaveable { mutableStateOf(true) }
     var delim by rememberSaveable { mutableStateOf(0) }
     val d = charArrayOf(',', ';', '\t')[delim]
-    var output: String? = null
-    var error: String? = null
-    if (input.isNotBlank()) {
-        try { output = if (toJson) CsvJson.csvToJson(input, d) else CsvJson.jsonToCsv(input, d) }
-        catch (e: IllegalArgumentException) { error = e.message } catch (e: Json.JsonException) { error = e.message }
+    val computed = remember<Pair<String?, String?>>(input, toJson, delim) {
+        if (input.isBlank()) null to null
+        else try { (if (toJson) CsvJson.csvToJson(input, d) else CsvJson.jsonToCsv(input, d)) to null }
+        catch (e: IllegalArgumentException) { null to e.message } catch (e: Json.JsonException) { null to e.message }
     }
+    val output = computed.first
+    val error = computed.second
     ScreenScaffold(title = "CSV ⇄ JSON", onBack = onBack) { padding ->
         ToolPage(padding) {
             ChipRow {
@@ -149,7 +154,7 @@ fun CsvJsonScreen(onBack: () -> Unit) {
                 Choice(delim == 1, "Semicolon") { delim = 1 }
                 Choice(delim == 2, "Tab") { delim = 2 }
             }
-            TextInput(if (toJson) "CSV (first row = column names)" else "JSON array of objects", input, { input = it.take(500_000) }, singleLine = false, minLines = 6)
+            TextInput(if (toJson) "CSV (first row = column names)" else "JSON array of objects", input, { input = it.take(300_000) }, singleLine = false, minLines = 6)
             ErrorText(error)
             output?.let {
                 ResultCard("Result", if (it.length > 20000) it.take(20000) + "\n… (shortened here; Copy gives everything)" else it)

@@ -225,3 +225,47 @@ class PdfRangeTest {
         }
     }
 }
+
+class ReviewFixesTest {
+    @Test fun ipv6RejectsOddGroupsWithoutThrowing() {
+        assertNull(Ipv6.parse("1.2::3:4.5.6.7"))
+        assertNull(Ipv6.parse("1::2.3"))
+        assertNotNull(Ipv6.parse("::ffff:192.168.1.1"))
+    }
+    @Test fun ipv4OnlyAsciiDigits() {
+        assertNull(Ipv4.parse("١٢٣.1.1.1"))
+        try { Ipv4.subnet("1.1.1.1/٢٤"); fail() } catch (e: IllegalArgumentException) { }
+    }
+    @Test fun csvBomDuplicateHeadersAndRagged() {
+        val j = CsvJson.csvToJson("﻿name,name\nA,B")
+        assertTrue(j.contains("\"name\"") && j.contains("\"name_2\""))
+        assertFalse(j.contains("﻿"))
+        assertTrue(CsvJson.csvToJson("a,b\n1,2,\n").contains("\"a\""))
+        try { CsvJson.csvToJson("a,b\n1,2,3\n"); fail() } catch (e: IllegalArgumentException) { }
+        try { CsvJson.jsonToCsv("[{},{}]"); fail() } catch (e: IllegalArgumentException) { }
+    }
+    @Test fun gluedWordsAreNotVeryStrong() {
+        val r = PasswordStrength.evaluate("bookfishmoonstar")
+        assertTrue("bits=${r.bits}", r.bits < 40)
+        assertTrue(PasswordStrength.evaluate("k9#Lm2\$vQx8!zP4w").bits > 60)
+    }
+    @Test fun crackTimeUsesSingularWhenOne() {
+        var b = 30.0
+        while (b < 60.0) {
+            val t = PasswordStrength.crackTime(b)
+            assertFalse(t, Regex("\\b1 (second|minute|hour|day|year)s").containsMatchIn(t))
+            b += 0.05
+        }
+    }
+    @Test fun smsBodyFromQuery() {
+        val i = QrInspector.inspect("sms:+923001234567?body=hello")
+        assertEquals("hello", i.fields.first { it.first == "Message" }.second)
+        assertEquals("+923001234567", i.fields.first { it.first == "To" }.second)
+    }
+    @Test fun paletteSharesIncludeMergedColours() {
+        val px = IntArray(100) { when { it < 60 -> 0xFFFF0000.toInt(); it < 90 -> 0xFFE10000.toInt(); else -> 0xFF0000FF.toInt() } }
+        val p = com.omnitools.app.tools.image.Palette.extract(px, 2)
+        assertEquals(2, p.size)
+        assertEquals(0.9, p[0].share, 0.001)
+    }
+}
