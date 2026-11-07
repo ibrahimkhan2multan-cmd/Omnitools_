@@ -131,7 +131,7 @@ fun HtmlRunnerScreen(onBack: () -> Unit) {
 private fun UpdatesPanel(modifier: Modifier = Modifier) {
     val text = remember { RunnerChangelog.asText() }
     Column(modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        CopyShareRow(text, "Code Runner updates")
+        CopyShareRow(text, "OmniTools update log")
         RunnerChangelog.entries.forEach { e ->
             Text("${e.version}  \u00B7  ${e.date}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             Text(e.title, style = MaterialTheme.typography.titleMedium)

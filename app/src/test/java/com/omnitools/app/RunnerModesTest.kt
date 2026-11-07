@@ -104,6 +104,9 @@ class RunnerLanguagesTest {
         val t = com.omnitools.app.tools.html.RunnerChangelog.asText()
         assertTrue(t.contains("Python") && t.contains("TypeScript") && t.contains("SQL") && t.contains("Lua"))
         assertTrue(t.contains("Not supported"))
-        assertTrue(com.omnitools.app.tools.html.RunnerChangelog.entries.first().version == "2.0")
+        assertTrue(t.contains("Gaming & Modding") && t.contains("28 new tools") && t.contains("Subnet Calculator"))
+        val log = com.omnitools.app.tools.html.RunnerChangelog.entries
+        assertEquals("Build 46", log.first().version)
+        assertTrue(log.all { it.items.isNotEmpty() && it.title.isNotBlank() })
     }
 }
