@@ -93,7 +93,7 @@ object MusicController {
         index = if (wasCurrent) i.coerceAtMost(newQueue.lastIndex) else QueueLogic.indexAfterRemoval(index, i)
         order = QueueLogic.order(queue.size, index, shuffle)
         if (wasCurrent) {
-            if (wasActive) prepareCurrent() else setState(MusicState.STOPPED)
+            if (wasActive) prepareCurrent() else moveTo(MusicState.STOPPED)
         }
     }
 
@@ -105,7 +105,7 @@ object MusicController {
         index = 0
         durationMs = 0
         error = null
-        setState(MusicState.EMPTY)
+        moveTo(MusicState.EMPTY)
     }
 
     // ---- playback -----------------------------------------------------------------------------------------
@@ -116,7 +116,7 @@ object MusicController {
         freePlayer()
         val gen = ++generation
         durationMs = 0
-        setState(MusicState.LOADING)
+        moveTo(MusicState.LOADING)
         val p = MediaPlayer()
         player = p
         try {
@@ -141,10 +141,10 @@ object MusicController {
 
     private fun startPlayback() {
         val p = player ?: return
-        if (!requestFocus()) { setState(MusicState.PAUSED); return }
+        if (!requestFocus()) { moveTo(MusicState.PAUSED); return }
         try {
             p.start()
-            setState(MusicState.PLAYING)
+            moveTo(MusicState.PLAYING)
         } catch (_: IllegalStateException) {
             fail("Playback could not start.")
         }
@@ -156,7 +156,7 @@ object MusicController {
             // End of the queue: free the player and get ready to start again from the top.
             freePlayer()
             index = order.firstOrNull() ?: 0
-            setState(MusicState.STOPPED)
+            moveTo(MusicState.STOPPED)
         } else {
             index = next
             prepareCurrent()
@@ -195,7 +195,7 @@ object MusicController {
     fun pause() {
         if (state != MusicState.PLAYING) return
         try { player?.pause() } catch (_: IllegalStateException) {}
-        setState(MusicState.PAUSED)
+        moveTo(MusicState.PAUSED)
     }
 
     fun togglePlayPause() { if (state == MusicState.PLAYING || state == MusicState.LOADING) pause() else play() }
@@ -204,7 +204,7 @@ object MusicController {
     fun stop() {
         if (state == MusicState.EMPTY) return
         freePlayer()
-        setState(if (queue.isNotEmpty()) MusicState.STOPPED else MusicState.EMPTY)
+        moveTo(if (queue.isNotEmpty()) MusicState.STOPPED else MusicState.EMPTY)
     }
 
     fun next() {
@@ -250,7 +250,7 @@ object MusicController {
 
     // ---- internals ----------------------------------------------------------------------------------------
 
-    private fun setState(s: MusicState) {
+    private fun moveTo(s: MusicState) {
         state = s
         changed()
     }
@@ -275,7 +275,7 @@ object MusicController {
     private fun fail(message: String) {
         freePlayer()
         error = message
-        setState(MusicState.ERROR)
+        moveTo(MusicState.ERROR)
     }
 
     private fun requestFocus(): Boolean {
