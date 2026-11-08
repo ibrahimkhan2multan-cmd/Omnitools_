@@ -30,6 +30,8 @@ import com.omnitools.app.ui.settings.ThemeChoiceScreen
 import com.omnitools.app.ui.settings.PrivacyGateScreen
 import com.omnitools.app.ui.theme.OmniToolsTheme
 import com.omnitools.app.ui.tools.ToolHost
+import com.omnitools.app.ui.feedback.Feedback
+import com.omnitools.app.ui.feedback.WithClickSounds
 import kotlinx.coroutines.launch
 
 private const val ROUTE_HOME = "home"
@@ -54,7 +56,12 @@ fun OmniApp(prefs: Prefs) {
         return
     }
 
+    val sounds by prefs.sounds.collectAsStateWithLifecycle(initialValue = true)
+    val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
+    androidx.compose.runtime.SideEffect { Feedback.soundOn = sounds; Feedback.hapticsOn = haptics }
+
     OmniToolsTheme(themeMode = mode) {
+      WithClickSounds {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             if (!accepted) {
                 PrivacyGateScreen(onAccept = { scope.launch { prefs.acceptPrivacy() } })
@@ -64,6 +71,7 @@ fun OmniApp(prefs: Prefs) {
                 AppNav(prefs, mode)
             }
         }
+      }
     }
 }
 

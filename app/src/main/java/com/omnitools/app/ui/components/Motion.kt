@@ -28,7 +28,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.vector.PathParser
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.withTransform
+import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Dp
@@ -78,57 +81,58 @@ fun Entrance(key: String, index: Int, modifier: Modifier = Modifier, content: @C
 }
 
 /**
- * The OmniTools mark, drawn in code: four petals that spring in one after another, then a hub that gently pulses.
- * Same shapes and colors as the launcher icon.
+ * The OmniTools mark, drawn in code: six colour blades that spin and spring in one after another around a hub that
+ * gently pulses. Same shapes and colours as the launcher icon.
  */
 @Composable
 fun OmniLogo(size: Dp, modifier: Modifier = Modifier) {
-    val petals = remember { List(4) { Animatable(0f) } }
+    val blades = remember { List(6) { Animatable(0f) } }
+    val spin = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         // Skip the intro on later visits so the logo is not replayed every time Home opens.
         if (EntranceMemory.seen.add("logo")) {
-            for (i in 0..3) {
-                delay(i * 90L)
-                petals[i].animateTo(1f, spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow))
+            launch { spin.animateTo(1f, tween(900, easing = FastOutSlowInEasing)) }
+            for (i in 0..5) {
+                delay(i * 70L)
+                launch { blades[i].animateTo(1f, spring(dampingRatio = 0.55f, stiffness = Spring.StiffnessLow)) }
             }
         } else {
-            petals.forEach { it.snapTo(1f) }
+            spin.snapTo(1f)
+            blades.forEach { it.snapTo(1f) }
         }
     }
     val pulse = rememberInfiniteTransition(label = "hub").animateFloat(
-        initialValue = 0.85f, targetValue = 1.2f,
+        initialValue = 0.9f, targetValue = 1.15f,
         animationSpec = infiniteRepeatable(tween(1600, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "hub pulse",
     )
+    val bladePath = remember { PathParser().parsePathString("M54,54 C61,47 63,36 54,25 C68,26 79,38 73,52 C70,58 62,58 54,54 Z").toPath() }
+    val colors = remember {
+        listOf(0xFF4F8CFF to 0xFF22D3EE, 0xFF22D3EE to 0xFF34D399, 0xFF34D399 to 0xFFFACC15,
+            0xFFFFA94D to 0xFFFF5C8A, 0xFFFF5C8A to 0xFFC084FC, 0xFFC084FC to 0xFF4F8CFF)
+    }
 
     Canvas(modifier.size(size)) {
-        // Icon coordinates run 33.5..74.5; map that square onto the whole canvas.
-        val unit = this.size.minDimension / 41f
-        fun px(v: Float) = (v - 33.5f) * unit
-
-        fun petal(x: Float, y: Float, tl: Float, tr: Float, br: Float, bl: Float): Path = Path().apply {
-            addRoundRect(
-                RoundRect(
-                    left = px(x), top = px(y), right = px(x + 18f), bottom = px(y + 18f),
-                    topLeftCornerRadius = CornerRadius(tl * unit), topRightCornerRadius = CornerRadius(tr * unit),
-                    bottomRightCornerRadius = CornerRadius(br * unit), bottomLeftCornerRadius = CornerRadius(bl * unit),
-                ),
-            )
-        }
-
-        data class Spec(val path: Path, val a: Color, val b: Color, val cx: Float, val cy: Float)
-        val specs = listOf(
-            Spec(petal(33.5f, 33.5f, 9f, 3f, 3f, 3f), Color(0xFF4F8CFF), Color(0xFF22D3EE), 42.5f, 42.5f),
-            Spec(petal(56.5f, 33.5f, 3f, 9f, 3f, 3f), Color(0xFF8B6CFF), Color(0xFFC084FC), 65.5f, 42.5f),
-            Spec(petal(56.5f, 56.5f, 3f, 3f, 9f, 3f), Color(0xFFFFA94D), Color(0xFFFF5C8A), 65.5f, 65.5f),
-            Spec(petal(33.5f, 56.5f, 3f, 3f, 3f, 9f), Color(0xFF34D399), Color(0xFF22D3EE), 42.5f, 65.5f),
-        )
-        specs.forEachIndexed { i, s ->
-            val p = petals[i].value.coerceAtLeast(0f)
-            scale(scale = p, pivot = Offset(px(s.cx), px(s.cy))) {
-                drawPath(s.path, Brush.linearGradient(listOf(s.a, s.b), Offset(px(s.cx - 9f), px(s.cy - 9f)), Offset(px(s.cx + 9f), px(s.cy + 9f))))
+        // Blade geometry spans roughly 25..79 in a 108 box; map that onto the whole canvas.
+        val unit = this.size.minDimension / 56f
+        val center = Offset(this.size.width / 2f, this.size.height / 2f)
+        withTransform({
+            translate(center.x - 54f * unit, center.y - 52f * unit)
+            scale(unit, unit, pivot = Offset.Zero)
+        }) {
+            rotate(degrees = (1f - spin.value) * -120f, pivot = Offset(54f, 54f)) {
+                colors.forEachIndexed { i, (a, b) ->
+                    val p = blades[i].value.coerceAtLeast(0f)
+                    rotate(degrees = i * 60f, pivot = Offset(54f, 54f)) {
+                        scale(scale = p, pivot = Offset(54f, 54f)) {
+                            drawPath(bladePath, Brush.linearGradient(listOf(Color(a), Color(b)), Offset(54f, 56f), Offset(70f, 30f)))
+                        }
+                    }
+                }
             }
+            val hub = blades[5].value.coerceIn(0f, 1f)
+            drawCircle(Color(0xFF0A0F24), radius = 7.5f * hub, center = Offset(54f, 54f))
+            drawCircle(Color.White, radius = 5f * pulse.value * hub, center = Offset(54f, 54f))
         }
-        drawCircle(Color.White, radius = 4.2f * unit * pulse.value * petals[3].value.coerceIn(0f, 1f), center = Offset(px(54f), px(54f)))
     }
 }

@@ -62,6 +62,7 @@ fun HtmlRunnerScreen(onBack: () -> Unit) {
         runtimeRun = mode.runtime
         runId++
         tab = previewTab
+        com.omnitools.app.ui.feedback.Feedback.play(com.omnitools.app.ui.feedback.Cue.RUN)
     }
 
     ScreenScaffold(

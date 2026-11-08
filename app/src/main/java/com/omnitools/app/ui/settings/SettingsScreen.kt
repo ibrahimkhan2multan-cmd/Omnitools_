@@ -19,6 +19,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
+import com.omnitools.app.ui.feedback.Cue
+import com.omnitools.app.ui.feedback.Feedback
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -59,6 +61,8 @@ fun SettingsScreen(
     val saveScans by prefs.saveScans.collectAsStateWithLifecycle(initialValue = true)
     val showRecents by prefs.showRecents.collectAsStateWithLifecycle(initialValue = true)
     val calcDegrees by prefs.calcDegrees.collectAsStateWithLifecycle(initialValue = true)
+    val sounds by prefs.sounds.collectAsStateWithLifecycle(initialValue = true)
+    val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
 
     ScreenScaffold(title = "Settings", onBack = onBack) { padding ->
         Column(
@@ -92,6 +96,20 @@ fun SettingsScreen(
                 FilterChip(selected = calcDegrees, onClick = { scope.launch { prefs.setCalcDegrees(true) } }, label = { Text("Degrees") })
                 FilterChip(selected = !calcDegrees, onClick = { scope.launch { prefs.setCalcDegrees(false) } }, label = { Text("Radians") })
             }
+
+            SectionTitle("Sound & touch")
+            SwitchRow(
+                title = "Sounds",
+                subtitle = "Soft click when you tap, and tones when code runs or something is copied.",
+                checked = sounds,
+                onChange = { scope.launch { prefs.setSounds(it) }; if (it) { Feedback.soundOn = true; Feedback.play(Cue.TOGGLE) } },
+            )
+            SwitchRow(
+                title = "Vibration",
+                subtitle = "A tiny tick on taps.",
+                checked = haptics,
+                onChange = { scope.launch { prefs.setHaptics(it) } },
+            )
 
             SectionTitle("History & privacy")
             SwitchRow(

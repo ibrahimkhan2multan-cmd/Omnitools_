@@ -1,6 +1,7 @@
 package com.omnitools.app.ui.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -158,7 +159,14 @@ fun HomeScreen(
 @Composable
 private fun Header(onOpenSettings: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, end = 8.dp, top = 12.dp, bottom = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                androidx.compose.ui.graphics.Brush.verticalGradient(
+                    listOf(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), androidx.compose.ui.graphics.Color.Transparent),
+                ),
+            )
+            .padding(start = 20.dp, end = 8.dp, top = 16.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OmniLogo(size = 46.dp, modifier = Modifier.padding(start = 2.dp))

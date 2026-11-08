@@ -25,7 +25,7 @@ import com.omnitools.app.util.Actions
 fun CopyShareRow(text: String, label: String = "Result") {
     val context = LocalContext.current
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-        OutlinedButton(onClick = { Actions.copy(context, label, text) }, modifier = Modifier.weight(1f)) { Text("Copy") }
+        OutlinedButton(onClick = { Actions.copy(context, label, text); com.omnitools.app.ui.feedback.Feedback.play(com.omnitools.app.ui.feedback.Cue.SUCCESS) }, modifier = Modifier.weight(1f)) { Text("Copy") }
         OutlinedButton(onClick = { Actions.shareText(context, text) }, modifier = Modifier.weight(1f)) { Text("Share") }
     }
 }

@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 49", "8 Nov 2026", "New icon, sounds and animations",
+            listOf(
+                "New app icon: a six-colour pinwheel on a glowing dark background. The logo inside the app spins in to match.",
+                "Sounds: a soft click on every tap, a rising tone when code runs, a chime when you copy, all made by the app itself. Switch them off in Settings > Sound & touch.",
+                "A tiny vibration tick on taps (also switchable).",
+                "Home screen header now has a soft colour glow.",
+            ),
+        ),
+        Entry(
             "Build 48", "7 Nov 2026", "Code Runner: SVG preview fixed",
             listOf(
                 "SVG drawings now scale to fit the phone screen instead of being cut off on the right and bottom, including SVGs that only have a width and height and no viewBox.",

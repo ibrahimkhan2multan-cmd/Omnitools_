@@ -37,6 +37,8 @@ class Prefs(private val context: Context) {
         val saveScans = booleanPreferencesKey("save_scans")
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
+        val sounds = booleanPreferencesKey("sounds")
+        val haptics = booleanPreferencesKey("haptics")
     }
 
     private val store get() = context.dataStore
@@ -65,6 +67,15 @@ class Prefs(private val context: Context) {
 
     /** Default calculator angle unit: true = degrees, false = radians. */
     val calcDegrees: Flow<Boolean> = store.data.map { it[Keys.calcDegrees] ?: true }
+
+    /** Button sounds (default on). */
+    val sounds: Flow<Boolean> = store.data.map { it[Keys.sounds] ?: true }
+
+    /** Small vibration on taps (default on). */
+    val haptics: Flow<Boolean> = store.data.map { it[Keys.haptics] ?: true }
+
+    suspend fun setSounds(value: Boolean) { store.edit { it[Keys.sounds] = value } }
+    suspend fun setHaptics(value: Boolean) { store.edit { it[Keys.haptics] = value } }
 
     /** Stores the first-run choice and marks onboarding as done in one write. */
     suspend fun completeOnboarding(themeMode: String) {
