@@ -75,7 +75,7 @@ private class SoundIndication(private val base: IndicationNodeFactory) : Indicat
     override fun equals(other: Any?) = other is SoundIndication && other.base == base
     override fun hashCode() = base.hashCode()
 
-    private class Node(private val source: InteractionSource, inner: DelegatableNode) : DelegatingNode() {
+    private class Node(private val source: InteractionSource, inner: DelegatableNode) : DelegatingNode(), androidx.compose.ui.node.CompositionLocalConsumerModifierNode {
         init { delegate(inner) }
         override fun onAttach() {
             val view: View = currentValueOf(LocalView)
