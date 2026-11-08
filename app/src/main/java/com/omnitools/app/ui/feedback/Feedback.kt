@@ -7,6 +7,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.IndicationNodeFactory
+import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.material3.ripple
@@ -77,8 +78,11 @@ private class SoundIndication(private val base: IndicationNodeFactory) : Indicat
     private class Node(private val source: InteractionSource, inner: DelegatableNode) : DelegatingNode() {
         init { delegate(inner) }
         override fun onAttach() {
+            val view: View = currentValueOf(LocalView)
             coroutineScope.launch {
-                source.interactions.collect { if (it is PressInteraction.Release) Feedback.click(this@Node.currentValueOf(LocalView)) }
+                source.interactions.collect { interaction: Interaction ->
+                    if (interaction is PressInteraction.Release) Feedback.click(view)
+                }
             }
         }
     }
