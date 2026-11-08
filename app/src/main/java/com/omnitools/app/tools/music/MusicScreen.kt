@@ -180,7 +180,7 @@ fun MusicScreen(onBack: () -> Unit) {
                         }
                     }
                     FilledTonalIconButton(
-                        onClick = { MusicController.setRepeat(!MusicController.repeat) },
+                        onClick = { MusicController.updateRepeat(!MusicController.repeat) },
                         colors = if (MusicController.repeat) IconButtonDefaults.filledTonalIconButtonColors() else IconButtonDefaults.iconButtonColors(),
                     ) { Icon(Icons.Filled.Repeat, contentDescription = if (MusicController.repeat) "Repeat on" else "Repeat off") }
                 }

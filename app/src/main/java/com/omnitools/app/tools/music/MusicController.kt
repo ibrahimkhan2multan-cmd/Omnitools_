@@ -137,7 +137,7 @@ object MusicController {
         seekToFraction(MusicFormat.fraction(position() + deltaMs, durationMs))
     }
 
-    fun setRepeat(on: Boolean) {
+    fun updateRepeat(on: Boolean) {
         repeat = on
         try { player?.isLooping = on } catch (_: IllegalStateException) {}
     }
