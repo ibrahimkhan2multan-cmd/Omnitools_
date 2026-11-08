@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 51", "8 Nov 2026", "Music Player: plays outside the app, with playlists",
+            listOf(
+                "Music now keeps playing when you leave OmniTools or turn the screen off. A notification (and the lock screen) has Previous, Play/Pause, Next and Stop buttons. Headset buttons work, and unplugging headphones pauses.",
+                "Pick many songs at once. They form a queue with Next, Previous, Shuffle and Repeat (off, all, one). Songs that cannot be played are skipped with a message.",
+                "Playlists: create, rename and delete them, add songs, reorder, remove, and play or shuffle a playlist. Playlists are saved on this device only. Save the current queue as a playlist.",
+                "Android 13 and newer will ask once to allow notifications; music still plays if you say no, but the controls will not show.",
+            ),
+        ),
+        Entry(
             "Build 50", "8 Nov 2026", "New tool: Music Player",
             listOf(
                 "Pick an MP3, M4A, WAV, OGG or FLAC file from your phone with the system file picker and play it offline. Nothing is downloaded or streamed.",

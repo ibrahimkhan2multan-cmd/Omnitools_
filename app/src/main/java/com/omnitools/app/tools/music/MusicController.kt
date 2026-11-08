@@ -15,23 +15,27 @@ import androidx.compose.runtime.setValue
 enum class MusicState { EMPTY, LOADING, PLAYING, PAUSED, STOPPED, ERROR }
 
 /**
- * Plays one local audio file. It is an object (not tied to a screen), so the music keeps playing while the
- * user opens other tools. Nothing is downloaded or streamed: the file is read from the phone through the system picker.
- * All calls are made on the main thread.
+ * Plays a queue of local audio files. It is an object (not tied to a screen) and is kept alive by [MusicService],
+ * so music keeps playing when other tools are open and when the app is in the background.
+ * Nothing is downloaded or streamed: files are read from the phone. All calls are made on the main thread.
  */
 object MusicController {
     var state by mutableStateOf(MusicState.EMPTY); private set
-    var fileName by mutableStateOf<String?>(null); private set
+    var queue by mutableStateOf<List<Track>>(emptyList()); private set
+    var index by mutableIntStateOf(0); private set
     var durationMs by mutableIntStateOf(0); private set
     var error by mutableStateOf<String?>(null); private set
-    var repeat by mutableStateOf(false); private set
+    var repeat by mutableStateOf(RepeatMode.OFF); private set
+    var shuffle by mutableStateOf(false); private set
+
+    val current: Track? get() = queue.getOrNull(index)
+    val fileName: String? get() = current?.name
 
     private var player: MediaPlayer? = null
-    private var uri: Uri? = null
     private var appContext: Context? = null
     private var generation = 0          // ignores callbacks from a player that has already been replaced
-    private var startWhenReady = false
-    private var resumeAt = 0
+    private var failStreak = 0
+    private var order: List<Int> = emptyList()
     private var focus: AudioFocusRequest? = null
 
     /** Current position in ms. Cheap enough to poll a few times a second. */
@@ -42,70 +46,148 @@ object MusicController {
         }
     } catch (_: IllegalStateException) { 0 }
 
-    /** Loads the chosen file and starts playing it. Any earlier song is released first. */
-    fun open(context: Context, picked: Uri) {
-        val ctx = context.applicationContext
-        appContext = ctx
-        release()
-        uri = picked
-        fileName = MusicFormat.title(queryName(ctx, picked))
+    // ---- building the queue -------------------------------------------------------------------------------
+
+    /** Replaces the queue with [tracks] and starts playing at [start]. */
+    fun playQueue(context: Context, tracks: List<Track>, start: Int = 0, shuffleOn: Boolean = shuffle) {
+        if (tracks.isEmpty()) return
+        appContext = context.applicationContext
+        freePlayer()
+        queue = tracks
+        shuffle = shuffleOn
+        index = start.coerceIn(0, tracks.lastIndex)
+        order = QueueLogic.order(tracks.size, index, shuffle)
         error = null
-        durationMs = 0
-        resumeAt = 0
-        prepare(autoPlay = true)
+        failStreak = 0
+        prepareCurrent()
     }
 
-    private fun prepare(autoPlay: Boolean) {
+    /** Adds [tracks] to the end of the queue. If nothing was queued, starts playing them. */
+    fun addToQueue(context: Context, tracks: List<Track>) {
+        if (tracks.isEmpty()) return
+        if (queue.isEmpty()) { playQueue(context, tracks); return }
+        appContext = context.applicationContext
+        queue = queue + tracks
+        order = QueueLogic.order(queue.size, index, shuffle)
+    }
+
+    /** Jumps to the song at [i] in the queue. */
+    fun playIndex(i: Int) {
+        if (i !in queue.indices) return
+        freePlayer()
+        index = i
+        order = QueueLogic.order(queue.size, index, shuffle)
+        error = null
+        failStreak = 0
+        prepareCurrent()
+    }
+
+    fun removeFromQueue(i: Int) {
+        if (i !in queue.indices) return
+        val wasCurrent = i == index
+        val wasActive = state == MusicState.PLAYING || state == MusicState.LOADING
+        val newQueue = queue.filterIndexed { n, _ -> n != i }
+        if (newQueue.isEmpty()) { clear(); return }
+        if (wasCurrent) freePlayer()
+        queue = newQueue
+        index = if (wasCurrent) i.coerceAtMost(newQueue.lastIndex) else QueueLogic.indexAfterRemoval(index, i)
+        order = QueueLogic.order(queue.size, index, shuffle)
+        if (wasCurrent) {
+            if (wasActive) prepareCurrent() else setState(MusicState.STOPPED)
+        }
+    }
+
+    /** Stops, frees everything and empties the queue. */
+    fun clear() {
+        freePlayer()
+        queue = emptyList()
+        order = emptyList()
+        index = 0
+        durationMs = 0
+        error = null
+        setState(MusicState.EMPTY)
+    }
+
+    // ---- playback -----------------------------------------------------------------------------------------
+
+    private fun prepareCurrent() {
         val ctx = appContext ?: return
-        val u = uri ?: return
+        val track = current ?: return
+        freePlayer()
         val gen = ++generation
-        state = MusicState.LOADING
-        startWhenReady = autoPlay
+        durationMs = 0
+        setState(MusicState.LOADING)
         val p = MediaPlayer()
         player = p
         try {
             p.setAudioAttributes(
                 AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
             )
-            p.setDataSource(ctx, u)
-            p.isLooping = repeat
+            p.setWakeMode(ctx, android.os.PowerManager.PARTIAL_WAKE_LOCK)   // keeps the CPU awake while the screen is off
+            p.setDataSource(ctx, Uri.parse(track.uri))
             p.setOnPreparedListener {
                 if (gen != generation) return@setOnPreparedListener
+                failStreak = 0
                 durationMs = it.duration.coerceAtLeast(0)
-                if (resumeAt > 0 && resumeAt < durationMs) it.seekTo(resumeAt)
-                resumeAt = 0
-                if (startWhenReady) startPlayback() else state = MusicState.PAUSED
+                startPlayback()
             }
-            p.setOnCompletionListener {
-                if (gen != generation) return@setOnCompletionListener
-                stop()
-            }
-            p.setOnErrorListener { _, _, _ ->
-                if (gen == generation) fail("This file could not be played. It may be damaged or in a format this phone does not support.")
-                true
-            }
+            p.setOnCompletionListener { if (gen == generation) onTrackEnded() }
+            p.setOnErrorListener { _, _, _ -> onTrackFailed(gen); true }
             p.prepareAsync()
         } catch (e: Exception) {
-            if (gen == generation) fail("This file could not be opened. Pick an audio file such as MP3, M4A, WAV, OGG or FLAC.")
+            onTrackFailed(gen)
         }
     }
 
     private fun startPlayback() {
         val p = player ?: return
-        if (!requestFocus()) { state = MusicState.PAUSED; return }
+        if (!requestFocus()) { setState(MusicState.PAUSED); return }
         try {
             p.start()
-            state = MusicState.PLAYING
+            setState(MusicState.PLAYING)
         } catch (_: IllegalStateException) {
             fail("Playback could not start.")
         }
     }
 
+    private fun onTrackEnded() {
+        val next = QueueLogic.next(order, index, repeat, auto = true)
+        if (next == null) {
+            // End of the queue: free the player and get ready to start again from the top.
+            freePlayer()
+            index = order.firstOrNull() ?: 0
+            setState(MusicState.STOPPED)
+        } else {
+            index = next
+            prepareCurrent()
+        }
+    }
+
+    private fun onTrackFailed(gen: Int) {
+        if (gen != generation) return
+        val bad = current?.name.orEmpty()
+        failStreak++
+        freePlayer()
+        if (queue.size > 1 && failStreak < queue.size) {
+            val next = QueueLogic.next(order, index, if (repeat == RepeatMode.OFF) RepeatMode.OFF else RepeatMode.ALL, auto = false)
+            if (next != null) {
+                error = "Skipped \"$bad\": it could not be played."
+                index = next
+                prepareCurrent()
+                return
+            }
+        }
+        failStreak = 0
+        fail(
+            if (queue.size > 1) "None of the remaining songs could be played. They may be moved, deleted or in an unsupported format."
+            else "This file could not be played. It may be damaged, moved, or in a format this phone does not support.",
+        )
+    }
+
     fun play() {
         when (state) {
             MusicState.PAUSED -> startPlayback()
-            MusicState.STOPPED -> prepare(autoPlay = true)   // Stop freed the player, so load the file again
-            MusicState.ERROR -> if (uri != null) { error = null; prepare(autoPlay = true) }
+            MusicState.STOPPED, MusicState.ERROR -> if (current != null) { error = null; failStreak = 0; prepareCurrent() }
             else -> {}
         }
     }
@@ -113,43 +195,69 @@ object MusicController {
     fun pause() {
         if (state != MusicState.PLAYING) return
         try { player?.pause() } catch (_: IllegalStateException) {}
-        state = MusicState.PAUSED
+        setState(MusicState.PAUSED)
     }
 
-    fun togglePlayPause() { if (state == MusicState.PLAYING) pause() else play() }
+    fun togglePlayPause() { if (state == MusicState.PLAYING || state == MusicState.LOADING) pause() else play() }
 
-    /** Stops playback and frees the player. The file stays chosen, so Play can start it again from the beginning. */
+    /** Stops playback and frees the player. The queue stays, so Play starts the current song again from the beginning. */
     fun stop() {
         if (state == MusicState.EMPTY) return
         freePlayer()
-        resumeAt = 0
-        state = if (uri != null) MusicState.STOPPED else MusicState.EMPTY
+        setState(if (queue.isNotEmpty()) MusicState.STOPPED else MusicState.EMPTY)
+    }
+
+    fun next() {
+        if (queue.isEmpty()) return
+        val n = QueueLogic.next(order, index, if (repeat == RepeatMode.ONE) RepeatMode.ALL else repeat, auto = false) ?: return
+        index = n; error = null; failStreak = 0
+        prepareCurrent()
+    }
+
+    /** Restarts the song if it has played for more than 3 seconds, otherwise goes to the one before. */
+    fun previous() {
+        if (queue.isEmpty()) return
+        if (position() > 3000) { seekToFraction(0f); return }
+        val n = QueueLogic.previous(order, index, repeat)
+        if (n == null) { seekToFraction(0f); return }
+        index = n; error = null; failStreak = 0
+        prepareCurrent()
     }
 
     fun seekToFraction(fraction: Float) {
         val p = player ?: return
         if (state != MusicState.PLAYING && state != MusicState.PAUSED) return
         try { p.seekTo(MusicFormat.seekTarget(fraction, durationMs)) } catch (_: IllegalStateException) {}
+        changed()
     }
+
+    fun seekToMs(ms: Long) { if (durationMs > 0) seekToFraction(MusicFormat.fraction(ms.toInt(), durationMs)) }
 
     fun skip(deltaMs: Int) {
         if (durationMs <= 0) return
         seekToFraction(MusicFormat.fraction(position() + deltaMs, durationMs))
     }
 
-    fun updateRepeat(on: Boolean) {
-        repeat = on
-        try { player?.isLooping = on } catch (_: IllegalStateException) {}
+    fun cycleRepeat() { repeat = repeat.next() }
+
+    fun toggleShuffle() {
+        shuffle = !shuffle
+        order = QueueLogic.order(queue.size, index, shuffle)
     }
 
-    /** Frees everything (used when the app closes or a new song replaces the old one). */
-    fun release() {
-        freePlayer()
-        uri = null
-        fileName = null
-        durationMs = 0
-        error = null
-        state = MusicState.EMPTY
+    /** Frees everything (used when the service is destroyed). */
+    fun release() = clear()
+
+    // ---- internals ----------------------------------------------------------------------------------------
+
+    private fun setState(s: MusicState) {
+        state = s
+        changed()
+    }
+
+    private fun changed() {
+        val ctx = appContext ?: return
+        MusicService.onControllerChanged(ctx)
     }
 
     private fun freePlayer() {
@@ -167,7 +275,7 @@ object MusicController {
     private fun fail(message: String) {
         freePlayer()
         error = message
-        state = MusicState.ERROR
+        setState(MusicState.ERROR)
     }
 
     private fun requestFocus(): Boolean {
@@ -188,7 +296,8 @@ object MusicController {
         focus = null
     }
 
-    private fun queryName(ctx: Context, u: Uri): String? = try {
+    /** The display name of a picked file, or null if the provider does not give one. */
+    fun queryName(ctx: Context, u: Uri): String? = try {
         ctx.contentResolver.query(u, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
             if (c.moveToFirst()) c.getString(0) else null
         } ?: u.lastPathSegment?.substringAfterLast('/')

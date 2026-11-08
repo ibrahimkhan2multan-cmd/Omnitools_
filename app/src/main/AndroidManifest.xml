@@ -58,6 +58,12 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!-- Keeps the Music Player playing outside the app, with notification controls. -->
+        <service
+            android:name=".tools.music.MusicService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <receiver
             android:name=".tools.timer.alarm.AlarmReceiver"
             android:exported="false" />

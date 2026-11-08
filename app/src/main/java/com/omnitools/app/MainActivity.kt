@@ -14,10 +14,4 @@ class MainActivity : ComponentActivity() {
         val prefs = com.omnitools.app.data.Prefs(applicationContext)
         setContent { OmniApp(prefs) }
     }
-
-    override fun onDestroy() {
-        // Free the player when the app is really closing (not on a rotation, where the music should carry on).
-        if (isFinishing) com.omnitools.app.tools.music.MusicController.release()
-        super.onDestroy()
-    }
 }

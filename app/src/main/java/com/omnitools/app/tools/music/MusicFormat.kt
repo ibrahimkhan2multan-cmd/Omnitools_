@@ -28,4 +28,15 @@ object MusicFormat {
         val dot = t.lastIndexOf('.')
         return if (dot > 0 && t.length - dot <= 6) t.substring(0, dot) else t
     }
+
+    private val audioExtensions = setOf("mp3", "m4a", "aac", "wav", "ogg", "oga", "opus", "flac", "amr", "3gp", "mid", "midi", "wma", "mka", "weba")
+
+    /** True when a picked file looks like audio, by its type or (when the type is unknown) its extension. */
+    fun looksLikeAudio(mime: String?, fileName: String?): Boolean {
+        val m = mime?.lowercase().orEmpty()
+        if (m.startsWith("audio/") || m == "application/ogg") return true
+        val ext = fileName?.substringAfterLast('.', "")?.lowercase().orEmpty()
+        val unknownType = m.isEmpty() || m == "application/octet-stream"
+        return unknownType && ext in audioExtensions
+    }
 }
