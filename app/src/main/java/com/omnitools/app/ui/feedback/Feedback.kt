@@ -78,7 +78,7 @@ private class SoundIndication(private val base: IndicationNodeFactory) : Indicat
         init { delegate(inner) }
         override fun onAttach() {
             coroutineScope.launch {
-                source.interactions.collect { if (it is PressInteraction.Release) Feedback.click(currentValueOf(LocalView)) }
+                source.interactions.collect { if (it is PressInteraction.Release) Feedback.click(this@Node.currentValueOf(LocalView)) }
             }
         }
     }
