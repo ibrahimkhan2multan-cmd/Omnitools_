@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 50", "8 Nov 2026", "New tool: Music Player",
+            listOf(
+                "Pick an MP3, M4A, WAV, OGG or FLAC file from your phone with the system file picker and play it offline. Nothing is downloaded or streamed.",
+                "Play, Pause, Stop, a seek bar, 10-second skip buttons and repeat. The song name is shown above the controls.",
+                "The music keeps playing while you open other tools. It stops when you close the app, and pauses if another app (like a call) needs the sound.",
+                "Cancelling the picker changes nothing; a file that cannot be played shows a clear message instead of crashing.",
+            ),
+        ),
+        Entry(
             "Build 49", "8 Nov 2026", "New icon, sounds and animations",
             listOf(
                 "New app icon: a six-colour pinwheel on a glowing dark background. The logo inside the app spins in to match.",

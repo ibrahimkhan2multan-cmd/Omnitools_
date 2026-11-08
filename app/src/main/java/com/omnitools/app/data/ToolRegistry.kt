@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Description
@@ -432,6 +433,14 @@ object ToolRegistry {
             category = Category.CALC,
             icon = Icons.Filled.Event,
             keywords = listOf("birthday", "difference", "calendar", "days", "weeks"),
+        ),
+        Tool(
+            id = "music_player",
+            name = "Music Player",
+            description = "Play an MP3 or other audio file from your phone, offline. Keeps playing while you use other tools.",
+            category = Category.PRODUCTIVITY,
+            icon = Icons.Filled.MusicNote,
+            keywords = listOf("mp3", "audio", "song", "play", "player", "sound", "m4a", "wav"),
         ),
         Tool(
             id = "stopwatch",
