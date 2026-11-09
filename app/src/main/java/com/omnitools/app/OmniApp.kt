@@ -10,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -98,7 +100,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     androidx.compose.foundation.layout.Column(Modifier.fillMaxSize()) {
     Box(
         Modifier.weight(1f).then(
-            if (showMini) Modifier.consumeWindowInsets(androidx.compose.foundation.layout.WindowInsets.navigationBars) else Modifier,
+            if (showMini) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier,
         ),
     ) {
     NavHost(
