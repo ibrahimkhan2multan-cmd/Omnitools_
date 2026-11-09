@@ -2,6 +2,7 @@ package com.omnitools.app
 
 import com.omnitools.app.tools.music.MusicFormat
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MusicFormatTest {
@@ -119,7 +120,8 @@ class MusicDesignTest {
 
 class MusicQueueInvariantTest {
     private val Q = com.omnitools.app.tools.music.QueueLogic
-    private val R = com.omnitools.app.tools.music.RepeatMode
+    private val OFF = com.omnitools.app.tools.music.RepeatMode.OFF
+    private val ALL = com.omnitools.app.tools.music.RepeatMode.ALL
 
     /** Walking "next" from the start must visit every song exactly once, shuffled or not, then stop (repeat off). */
     @Test fun walkingNextVisitsEverySongOnce() {
@@ -127,7 +129,7 @@ class MusicQueueInvariantTest {
             val order = Q.order(size, 0, shuffle, java.util.Random(seed.toLong()))
             val seen = ArrayList<Int>()
             var cur: Int? = order.first()
-            while (cur != null) { seen.add(cur); cur = Q.next(order, cur, R.OFF, true) }
+            while (cur != null) { seen.add(cur); cur = Q.next(order, cur, OFF, true) }
             assertEquals(size, seen.size)
             assertEquals((0 until size).toList(), seen.sorted())
         }
@@ -136,7 +138,7 @@ class MusicQueueInvariantTest {
     @Test fun repeatAllNeverEnds() {
         val order = Q.order(5, 2, true, java.util.Random(7))
         var cur = order.first()
-        repeat(40) { cur = Q.next(order, cur, R.ALL, true)!! }
+        repeat(40) { cur = Q.next(order, cur, ALL, true)!! }
         assertTrue(cur in 0..4)
     }
 
@@ -144,8 +146,8 @@ class MusicQueueInvariantTest {
         val order = Q.order(6, 0, true, java.util.Random(3))
         var cur = order.first()
         val forward = ArrayList<Int>()
-        repeat(5) { cur = Q.next(order, cur, R.OFF, false)!!; forward.add(cur) }
-        for (expected in forward.dropLast(1).reversed()) { cur = Q.previous(order, cur, R.OFF)!!; assertEquals(expected, cur) }
+        repeat(5) { cur = Q.next(order, cur, OFF, false)!!; forward.add(cur) }
+        for (expected in forward.dropLast(1).reversed()) { cur = Q.previous(order, cur, OFF)!!; assertEquals(expected, cur) }
     }
 
     @Test fun appendKeepsPlayedHistory() {
