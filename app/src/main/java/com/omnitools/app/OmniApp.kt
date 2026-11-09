@@ -92,10 +92,11 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         nav.navigate("tool/$id")
     }
 
-    val design by prefs.musicDesign.collectAsStateWithLifecycle(initialValue = com.omnitools.app.tools.music.MusicDesign())
+    val designOrNull by prefs.musicDesign.collectAsStateWithLifecycle<com.omnitools.app.tools.music.MusicDesign?>(initialValue = null)
+    val design = designOrNull ?: com.omnitools.app.tools.music.MusicDesign()
     val backEntry by nav.currentBackStackEntryAsState()
     val onMusicScreen = backEntry?.destination?.route == ROUTE_TOOL && backEntry?.arguments?.getString("id") == "music_player"
-    val showMini = design.miniPlayer && com.omnitools.app.tools.music.MusicController.state != com.omnitools.app.tools.music.MusicState.EMPTY && !onMusicScreen
+    val showMini = designOrNull != null && design.miniPlayer && com.omnitools.app.tools.music.MusicController.state != com.omnitools.app.tools.music.MusicState.EMPTY && !onMusicScreen
 
     androidx.compose.foundation.layout.Column(Modifier.fillMaxSize()) {
     Box(
@@ -156,7 +157,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         enter = androidx.compose.animation.slideInVertically(tween(260)) { it } + fadeIn(tween(200)),
         exit = androidx.compose.animation.slideOutVertically(tween(220)) { it } + fadeOut(tween(160)),
     ) {
-        com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { nav.navigate("tool/music_player") { launchSingleTop = true } })
+        com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { nav.navigate("tool/music_player") })
     }
     }
 }

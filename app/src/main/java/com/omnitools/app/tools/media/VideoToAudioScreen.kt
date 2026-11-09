@@ -66,6 +66,17 @@ private fun listLibrary(context: android.content.Context): List<File> =
 
 private fun mimeFor(f: File): String = Container.values().firstOrNull { it.ext == f.extension.lowercase() }?.mime ?: "audio/*"
 
+/** "Save as" with the real audio type and a suggested file name (the stock contract only takes a fixed type). */
+private class CreateAudioDocument : androidx.activity.result.contract.ActivityResultContract<Pair<String, String>, Uri?>() {
+    override fun createIntent(context: android.content.Context, input: Pair<String, String>) =
+        android.content.Intent(android.content.Intent.ACTION_CREATE_DOCUMENT)
+            .addCategory(android.content.Intent.CATEGORY_OPENABLE)
+            .setType(input.second)
+            .putExtra(android.content.Intent.EXTRA_TITLE, input.first)
+    override fun parseResult(resultCode: Int, intent: android.content.Intent?): Uri? =
+        if (resultCode == android.app.Activity.RESULT_OK) intent?.data else null
+}
+
 @Composable
 fun VideoToAudioScreen(onBack: () -> Unit) {
     val context = LocalContext.current
@@ -83,7 +94,13 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
     var toSave by remember { mutableStateOf<File?>(null) }
     val cancelFlag = remember { java.util.concurrent.atomic.AtomicBoolean(false) }
 
-    LaunchedEffect(Unit) { library = withContext(Dispatchers.IO) { listLibrary(context) } }
+    LaunchedEffect(Unit) {
+        library = withContext(Dispatchers.IO) {
+            // Remove half-written files left behind if the app was closed during an extraction.
+            libraryDir(context).listFiles { f -> f.name.startsWith(".working-") && System.currentTimeMillis() - f.lastModified() > 10 * 60_000 }?.forEach { it.delete() }
+            listLibrary(context)
+        }
+    }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         // Cancelling gives null: nothing changes.
@@ -101,7 +118,7 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
         }
     }
 
-    val saver = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("audio/*")) { dest: Uri? ->
+    val saver = rememberLauncherForActivityResult(CreateAudioDocument()) { dest: Uri? ->
         val src = toSave
         toSave = null
         if (dest != null && src != null) scope.launch {
@@ -247,7 +264,7 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
                                 MusicController.addToQueue(context, listOf(Track(Uri.fromFile(f).toString(), f.name)))
                                 message = "Added to the Music Player queue."; isError = false
                             }) { Icon(Icons.Filled.PlaylistAdd, contentDescription = "Add ${f.name} to the music queue") }
-                            IconButton(onClick = { toSave = f; saver.launch(f.name) }) { Icon(Icons.Filled.SaveAlt, contentDescription = "Save a copy of ${f.name} to your phone") }
+                            IconButton(onClick = { toSave = f; saver.launch(f.name to mimeFor(f)) }) { Icon(Icons.Filled.SaveAlt, contentDescription = "Save a copy of ${f.name} to your phone") }
                             Spacer(Modifier.weight(1f))
                             IconButton(onClick = { toDelete = f }) { Icon(Icons.Filled.Delete, contentDescription = "Delete ${f.name}") }
                         }

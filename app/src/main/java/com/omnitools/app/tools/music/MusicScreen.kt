@@ -103,19 +103,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private class Picked(val tracks: List<Track>, val skipped: Int)
+private class Picked(val tracks: List<Track>, val skipped: Int, val notRemembered: Int)
 
 /** Reads the picked files: keeps access to them after a restart and drops anything that is not audio. */
 private fun readPicked(context: Context, uris: List<Uri>): Picked {
     val tracks = ArrayList<Track>()
     var skipped = 0
+    var notRemembered = 0
     for (u in uris) {
-        try { context.contentResolver.takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: Exception) {}
+        // Android only lets an app remember a limited number of picked files (and some folders refuse): count the ones it won't.
+        try { context.contentResolver.takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION) } catch (_: Exception) { notRemembered++ }
         val name = MusicController.queryName(context, u)
         val mime = try { context.contentResolver.getType(u) } catch (_: Exception) { null }
         if (MusicFormat.looksLikeAudio(mime, name)) tracks.add(Track(u.toString(), MusicFormat.title(name))) else skipped++
     }
-    return Picked(tracks, skipped)
+    return Picked(tracks, skipped, notRemembered)
 }
 
 @Composable
@@ -156,6 +158,7 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
             delay(250)
         }
         position = 0
+        dragging = false   // never leave the seek bar stuck mid-drag if playback ended
     }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris: List<Uri> ->
@@ -170,6 +173,8 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
             notice = when {
                 picked.tracks.isEmpty() -> "None of the selected files are audio files."
                 picked.skipped > 0 -> "${picked.skipped} file${if (picked.skipped == 1) "" else "s"} skipped: not audio."
+                target != null && picked.notRemembered > 0 ->
+                    "${picked.notRemembered} song${if (picked.notRemembered == 1) "" else "s"} may not be remembered after you restart the app (Android limits how many files an app can keep)."
                 else -> null
             }
         }
@@ -186,7 +191,8 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
     }
 
     val playlist = MusicLibrary.find(openId)
-    if (openId != null && playlist == null && MusicLibrary.loaded) openId = null
+    // A playlist that no longer exists (deleted) sends the user back to the list.
+    LaunchedEffect(openId, playlist, MusicLibrary.loaded) { if (openId != null && playlist == null && MusicLibrary.loaded) openId = null }
 
     val playerBlock: @Composable () -> Unit = {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -457,10 +463,10 @@ private fun PlayerCard(
                 IconButton(onClick = { MusicController.previous() }, enabled = hasSong) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song", tint = c.fg) }
                 FilledIconButton(
                     onClick = { MusicController.togglePlayPause() },
-                    enabled = hasSong && state != MusicState.LOADING, modifier = Modifier.size(68.dp),
+                    enabled = hasSong, modifier = Modifier.size(68.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(containerColor = c.buttonBg, contentColor = c.buttonFg, disabledContainerColor = c.sub.copy(alpha = 0.25f)),
                 ) {
-                    val playing = state == MusicState.PLAYING
+                    val playing = MusicController.showsPause
                     Icon(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (playing) "Pause" else "Play", modifier = Modifier.size(36.dp))
                 }
                 FilledTonalIconButton(

@@ -86,11 +86,13 @@ fun Entrance(key: String, index: Int, modifier: Modifier = Modifier, content: @C
  */
 @Composable
 fun OmniLogo(size: Dp, modifier: Modifier = Modifier) {
-    val blades = remember { List(6) { Animatable(0f) } }
-    val spin = remember { Animatable(0f) }
+    // Decided before the first frame, so later visits never draw an empty logo for a moment.
+    val firstTime = remember { "logo" !in EntranceMemory.seen }
+    val blades = remember { List(6) { Animatable(if (firstTime) 0f else 1f) } }
+    val spin = remember { Animatable(if (firstTime) 0f else 1f) }
     LaunchedEffect(Unit) {
         // Skip the intro on later visits so the logo is not replayed every time Home opens.
-        if (EntranceMemory.seen.add("logo")) {
+        if (firstTime && EntranceMemory.seen.add("logo")) {
             launch { spin.animateTo(1f, tween(900, easing = FastOutSlowInEasing)) }
             for (i in 0..5) {
                 delay(i * 70L)
@@ -114,10 +116,10 @@ fun OmniLogo(size: Dp, modifier: Modifier = Modifier) {
 
     Canvas(modifier.size(size)) {
         // Blade geometry spans roughly 25..79 in a 108 box; map that onto the whole canvas.
-        val unit = this.size.minDimension / 56f
+        val unit = this.size.minDimension / 62f
         val center = Offset(this.size.width / 2f, this.size.height / 2f)
         withTransform({
-            translate(center.x - 54f * unit, center.y - 52f * unit)
+            translate(center.x - 54f * unit, center.y - 54f * unit)
             scale(unit, unit, pivot = Offset.Zero)
         }) {
             rotate(degrees = (1f - spin.value) * -120f, pivot = Offset(54f, 54f)) {

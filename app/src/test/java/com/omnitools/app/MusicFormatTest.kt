@@ -96,6 +96,8 @@ class MusicQueueTest {
         assertEquals(true, MusicFormat.looksLikeAudio("audio/mpeg", "a.bin"))
         assertEquals(true, MusicFormat.looksLikeAudio(null, "Song.MP3"))
         assertEquals(true, MusicFormat.looksLikeAudio("application/octet-stream", "x.flac"))
+        assertEquals(true, MusicFormat.looksLikeAudio("video/mp4", "song.m4a"))
+        assertEquals(false, MusicFormat.looksLikeAudio("video/mp4", "clip.mp4"))
         assertEquals(false, MusicFormat.looksLikeAudio("image/png", "x.mp3"))
         assertEquals(false, MusicFormat.looksLikeAudio(null, "notes.txt"))
         assertEquals(false, MusicFormat.looksLikeAudio(null, null))
@@ -112,5 +114,70 @@ class MusicDesignTest {
         assertEquals(0, a.coerce(-4))
         assertEquals(a.names.lastIndex, a.coerce(99))
         assertEquals(true, com.omnitools.app.tools.music.MusicDesign().miniPlayer)
+    }
+}
+
+class MusicQueueInvariantTest {
+    private val Q = com.omnitools.app.tools.music.QueueLogic
+    private val R = com.omnitools.app.tools.music.RepeatMode
+
+    /** Walking "next" from the start must visit every song exactly once, shuffled or not, then stop (repeat off). */
+    @Test fun walkingNextVisitsEverySongOnce() {
+        for (size in 1..12) for (shuffle in listOf(false, true)) for (seed in 1..10) {
+            val order = Q.order(size, 0, shuffle, java.util.Random(seed.toLong()))
+            val seen = ArrayList<Int>()
+            var cur: Int? = order.first()
+            while (cur != null) { seen.add(cur); cur = Q.next(order, cur, R.OFF, true) }
+            assertEquals(size, seen.size)
+            assertEquals((0 until size).toList(), seen.sorted())
+        }
+    }
+
+    @Test fun repeatAllNeverEnds() {
+        val order = Q.order(5, 2, true, java.util.Random(7))
+        var cur = order.first()
+        repeat(40) { cur = Q.next(order, cur, R.ALL, true)!! }
+        assertTrue(cur in 0..4)
+    }
+
+    @Test fun previousUndoesNext() {
+        val order = Q.order(6, 0, true, java.util.Random(3))
+        var cur = order.first()
+        val forward = ArrayList<Int>()
+        repeat(5) { cur = Q.next(order, cur, R.OFF, false)!!; forward.add(cur) }
+        for (expected in forward.dropLast(1).reversed()) { cur = Q.previous(order, cur, R.OFF)!!; assertEquals(expected, cur) }
+    }
+
+    @Test fun appendKeepsPlayedHistory() {
+        val order = Q.order(4, 1, true, java.util.Random(5))
+        val grown = Q.orderAfterAppend(order, 4, 3, true, java.util.Random(9))
+        assertEquals(order, grown.take(4))
+        assertEquals((0 until 7).toList(), grown.sorted())
+        assertEquals((0 until 5).toList(), Q.orderAfterAppend((0 until 3).toList(), 3, 2, false))
+    }
+
+    @Test fun removalRemapsOrder() {
+        val order = listOf(2, 0, 3, 1)
+        assertEquals(listOf(1, 0, 2), Q.orderAfterRemoval(order, 1))
+        assertEquals(listOf(0, 1, 2), Q.orderAfterRemoval(listOf(0, 1, 2, 3), 3))
+        assertEquals(2, Q.indexAfterRemoval(2, 2, 3))      // removed the current, last of 3 left -> stays at 2
+        assertEquals(1, Q.indexAfterRemoval(2, 2, 2))      // removed the current at the end -> clamp
+        assertEquals(1, Q.indexAfterRemoval(2, 0, 3))      // removed earlier song -> shifts down
+        assertEquals(2, Q.indexAfterRemoval(2, 3, 3))      // removed later song -> unchanged
+    }
+
+    @Test fun codecSurvivesRandomText() {
+        val c = com.omnitools.app.tools.music.PlaylistCodec
+        val rnd = java.util.Random(42)
+        val chars = "ab \t\n\r\\\\:/é日😀0"
+        fun word() = String(CharArray(rnd.nextInt(12)) { chars[rnd.nextInt(chars.length)] })
+        repeat(300) {
+            val lists = List(rnd.nextInt(4)) {
+                com.omnitools.app.tools.music.Playlist("id${rnd.nextInt(1000)}", word(), List(rnd.nextInt(4)) {
+                    com.omnitools.app.tools.music.Track(word(), word())
+                })
+            }
+            assertEquals(lists, c.decode(c.encode(lists)))
+        }
     }
 }

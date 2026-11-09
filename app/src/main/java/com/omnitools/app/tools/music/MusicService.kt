@@ -70,7 +70,7 @@ class MusicService : Service() {
     }
 
     override fun onDestroy() {
-        instance = null
+        if (instance === this) instance = null
         try { unregisterReceiver(noisy) } catch (_: Exception) {}
         session?.release()
         session = null
@@ -80,9 +80,14 @@ class MusicService : Service() {
     }
 
     private fun postForeground(n: Notification) {
-        if (Build.VERSION.SDK_INT >= 29) startForeground(ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
-        else startForeground(ID, n)
-        foreground = true
+        try {
+            if (Build.VERSION.SDK_INT >= 29) startForeground(ID, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            else startForeground(ID, n)
+            foreground = true
+        } catch (e: Exception) {
+            // Android refused to make it a foreground service from here: just show the notification and keep playing.
+            try { getSystemService(NotificationManager::class.java).notify(ID, n) } catch (_: Exception) {}
+        }
     }
 
     /** Brings the notification and media session in line with the controller. Stops the service when nothing is playing. */
@@ -96,6 +101,8 @@ class MusicService : Service() {
                 try { nm.notify(ID, buildNotification()) } catch (_: Exception) {}
             }
             else -> {
+                // Forget this service first, so a Play pressed a moment later starts a fresh one instead of using this dying one.
+                if (instance === this) instance = null
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 foreground = false
                 nm.cancel(ID)
@@ -142,7 +149,7 @@ class MusicService : Service() {
 
     private fun buildNotification(): Notification {
         val c = MusicController
-        val playing = c.state == MusicState.PLAYING || c.state == MusicState.LOADING
+        val playing = c.showsPause
         val open = PendingIntent.getActivity(
             this, 0, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,

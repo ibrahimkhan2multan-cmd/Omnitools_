@@ -119,6 +119,8 @@ object AudioExtractor {
         }
         val muxer = MediaMuxer(out.absolutePath, fmt)
         var started = false
+        var finished = false
+        var written = 0
         try {
             val idx = muxer.addTrack(format)
             muxer.start(); started = true
@@ -135,12 +137,16 @@ object AudioExtractor {
                 if (t >= 0) {
                     info.set(0, n, t, if (ex.sampleFlags and MediaExtractor.SAMPLE_FLAG_SYNC != 0) MediaCodec.BUFFER_FLAG_KEY_FRAME else 0)
                     muxer.writeSampleData(idx, buf, info)
+                    written++
                     if (durationUs > 0 && count++ % 20 == 0) onProgress((t.toFloat() / durationUs).coerceIn(0f, 0.99f))
                 }
                 ex.advance()
             }
+            if (written == 0) throw Problem("No sound data found.")
+            muxer.stop()          // a failure here must surface, so the caller falls back to WAV instead of keeping a broken file
+            finished = true
         } finally {
-            try { if (started) muxer.stop() } catch (_: Exception) {}
+            if (started && !finished) try { muxer.stop() } catch (_: Exception) {}
             try { muxer.release() } catch (_: Exception) {}
         }
     }

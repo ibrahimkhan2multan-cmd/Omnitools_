@@ -51,6 +51,21 @@ object QueueLogic {
         }
     }
 
+    /** Keeps the existing play order when [added] songs are appended to a queue that had [oldSize]; new ones go last, shuffled. */
+    fun orderAfterAppend(order: List<Int>, oldSize: Int, added: Int, shuffle: Boolean, random: Random = Random()): List<Int> {
+        val fresh = (oldSize until oldSize + added).toMutableList()
+        if (shuffle) java.util.Collections.shuffle(fresh, random)
+        return order + fresh
+    }
+
+    /** Keeps the existing play order when the song at [removed] leaves the queue. */
+    fun orderAfterRemoval(order: List<Int>, removed: Int): List<Int> =
+        order.filter { it != removed }.map { if (it > removed) it - 1 else it }
+
+    /** Which song is current after [removed] leaves a queue now holding [newSize] songs. */
+    fun indexAfterRemoval(current: Int, removed: Int, newSize: Int): Int =
+        if (removed == current) removed.coerceAtMost((newSize - 1).coerceAtLeast(0)) else indexAfterRemoval(current, removed)
+
     /** Where the current song sits after the song at [removed] is taken out. */
     fun indexAfterRemoval(current: Int, removed: Int): Int = if (removed < current) current - 1 else current
 

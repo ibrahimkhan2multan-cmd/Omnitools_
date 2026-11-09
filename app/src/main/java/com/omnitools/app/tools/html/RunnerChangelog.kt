@@ -6,6 +6,20 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 54", "9 Nov 2026", "Full code review: Music Player, Video to Audio and sounds",
+            listOf(
+                "Fixed: pressing Play right after Stop could make the music cut out again.",
+                "Fixed: Pause pressed while a song is still loading now works, and the buttons show the right icon.",
+                "Music now carries on by itself after a short interruption (a call, an alarm) and turns down for short notification sounds, instead of staying paused.",
+                "Shuffle keeps its order when you add or remove songs, so Previous and already-played songs behave properly.",
+                "Songs that cannot be played are skipped safely even in long queues, and Android's focus is kept between songs.",
+                "Video to Audio: a failed save at the very end now falls back to WAV instead of leaving a broken file; leftover half-written files are cleaned up; Save a copy now uses the real audio type.",
+                ".m4a and .ogg files that the phone labels as video are now accepted in the Music Player.",
+                "The app logo no longer flashes empty on later visits, and its blade tips are no longer clipped. Smoother record animation. Fewer odd flashes of the mini player at startup.",
+                "Privacy policy updated for the music notification.",
+            ),
+        ),
+        Entry(
             "Build 53", "9 Nov 2026", "New tool: Video to Audio",
             listOf(
                 "Pick a video from your phone and extract its sound. Nothing is uploaded; it all happens on the phone.",

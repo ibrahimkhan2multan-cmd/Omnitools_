@@ -26,8 +26,8 @@ Generated passwords and UUIDs are created on your device and are not saved.
 | Permission | Purpose |
 |---|---|
 | Camera | Only when you open the QR/barcode scanner. Frames are analysed on-device with Google ML Kit's bundled model; nothing is saved or sent. |
-| Notifications | To show the "Time's up" alarm notification for the timer. |
-| Foreground service (media playback), Wake lock, Vibrate | To play the alarm sound and vibrate while the timer rings, even when the App is closed. |
+| Notifications | To show the "Time's up" alarm notification for the timer, and the playback controls (previous, play/pause, next, stop) while the Music Player is playing. |
+| Foreground service (media playback), Wake lock, Vibrate | To play the alarm sound and vibrate while the timer rings, and to keep the Music Player playing when the App is in the background. Vibrate is also used for the optional tap feedback, which can be turned off in Settings. |
 | Full-screen intent | To show the "Time's up" screen over the lock screen when a timer you set finishes. |
 | Receive boot completed | To re-arm a running timer after the phone restarts. |
 

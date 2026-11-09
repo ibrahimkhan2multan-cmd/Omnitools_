@@ -37,6 +37,14 @@ object MusicController {
     private var failStreak = 0
     private var order: List<Int> = emptyList()
     private var focus: AudioFocusRequest? = null
+    private var resumeOnGain = false
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /** Set when the user pressed Pause while the song was still loading. */
+    var pauseWhenReady by mutableStateOf(false); private set
+
+    /** True when the controls should show "pause" (playing, or loading and about to play). */
+    val showsPause: Boolean get() = state == MusicState.PLAYING || (state == MusicState.LOADING && !pauseWhenReady)
 
     /** Current position in ms. Cheap enough to poll a few times a second. */
     fun position(): Int = try {
@@ -52,7 +60,6 @@ object MusicController {
     fun playQueue(context: Context, tracks: List<Track>, start: Int = 0, shuffleOn: Boolean = shuffle) {
         if (tracks.isEmpty()) return
         appContext = context.applicationContext
-        freePlayer()
         queue = tracks
         shuffle = shuffleOn
         index = start.coerceIn(0, tracks.lastIndex)
@@ -67,16 +74,16 @@ object MusicController {
         if (tracks.isEmpty()) return
         if (queue.isEmpty()) { playQueue(context, tracks); return }
         appContext = context.applicationContext
+        val oldSize = queue.size
         queue = queue + tracks
-        order = QueueLogic.order(queue.size, index, shuffle)
+        order = QueueLogic.orderAfterAppend(order, oldSize, tracks.size, shuffle)
     }
 
     /** Jumps to the song at [i] in the queue. */
     fun playIndex(i: Int) {
         if (i !in queue.indices) return
-        freePlayer()
         index = i
-        order = QueueLogic.order(queue.size, index, shuffle)
+        if (shuffle) order = QueueLogic.order(queue.size, index, true)
         error = null
         failStreak = 0
         prepareCurrent()
@@ -90,8 +97,8 @@ object MusicController {
         if (newQueue.isEmpty()) { clear(); return }
         if (wasCurrent) freePlayer()
         queue = newQueue
-        index = if (wasCurrent) i.coerceAtMost(newQueue.lastIndex) else QueueLogic.indexAfterRemoval(index, i)
-        order = QueueLogic.order(queue.size, index, shuffle)
+        index = QueueLogic.indexAfterRemoval(index, i, newQueue.size)
+        order = QueueLogic.orderAfterRemoval(order, i)
         if (wasCurrent) {
             if (wasActive) prepareCurrent() else moveTo(MusicState.STOPPED)
         }
@@ -113,9 +120,10 @@ object MusicController {
     private fun prepareCurrent() {
         val ctx = appContext ?: return
         val track = current ?: return
-        freePlayer()
+        freePlayer(keepFocus = true)   // keep audio focus between songs so other apps cannot grab it in the gap
         val gen = ++generation
         durationMs = 0
+        pauseWhenReady = false
         moveTo(MusicState.LOADING)
         val p = MediaPlayer()
         player = p
@@ -129,7 +137,7 @@ object MusicController {
                 if (gen != generation) return@setOnPreparedListener
                 failStreak = 0
                 durationMs = it.duration.coerceAtLeast(0)
-                startPlayback()
+                if (pauseWhenReady) { pauseWhenReady = false; moveTo(MusicState.PAUSED) } else startPlayback()
             }
             p.setOnCompletionListener { if (gen == generation) onTrackEnded() }
             p.setOnErrorListener { _, _, _ -> onTrackFailed(gen); true }
@@ -151,6 +159,7 @@ object MusicController {
     }
 
     private fun onTrackEnded() {
+        error = null
         val next = QueueLogic.next(order, index, repeat, auto = true)
         if (next == null) {
             // End of the queue: free the player and get ready to start again from the top.
@@ -173,7 +182,9 @@ object MusicController {
             if (next != null) {
                 error = "Skipped \"$bad\": it could not be played."
                 index = next
-                prepareCurrent()
+                // Posted, not called directly, so a long run of missing files cannot pile up on the call stack.
+                val g = generation
+                handler.post { if (g == generation) prepareCurrent() }
                 return
             }
         }
@@ -193,12 +204,19 @@ object MusicController {
     }
 
     fun pause() {
+        resumeOnGain = false
         if (state != MusicState.PLAYING) return
         try { player?.pause() } catch (_: IllegalStateException) {}
         moveTo(MusicState.PAUSED)
     }
 
-    fun togglePlayPause() { if (state == MusicState.PLAYING || state == MusicState.LOADING) pause() else play() }
+    fun togglePlayPause() {
+        when (state) {
+            MusicState.PLAYING -> pause()
+            MusicState.LOADING -> pauseWhenReady = !pauseWhenReady
+            else -> play()
+        }
+    }
 
     /** Stops playback and frees the player. The queue stays, so Play starts the current song again from the beginning. */
     fun stop() {
@@ -242,7 +260,7 @@ object MusicController {
 
     fun toggleShuffle() {
         shuffle = !shuffle
-        order = QueueLogic.order(queue.size, index, shuffle)
+        order = QueueLogic.order(queue.size, index, shuffle)   // a fresh shuffle (or back to normal order) starting at this song
     }
 
     /** Frees everything (used when the service is destroyed). */
@@ -260,11 +278,12 @@ object MusicController {
         MusicService.onControllerChanged(ctx)
     }
 
-    private fun freePlayer() {
+    private fun freePlayer(keepFocus: Boolean = false) {
         generation++
         val p = player
         player = null
-        abandonFocus()
+        resumeOnGain = false
+        if (!keepFocus) abandonFocus()
         if (p != null) {
             try { p.setOnPreparedListener(null); p.setOnCompletionListener(null); p.setOnErrorListener(null) } catch (_: Exception) {}
             try { p.reset() } catch (_: Exception) {}
@@ -283,8 +302,18 @@ object MusicController {
         val req = focus ?: AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
             .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
             .setOnAudioFocusChangeListener { change ->
-                // Another app (a call, another player) took the sound: pause instead of talking over it.
-                if (change == AudioManager.AUDIOFOCUS_LOSS || change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) pause()
+                when (change) {
+                    // A call or another player took the sound for good: pause and stay paused.
+                    AudioManager.AUDIOFOCUS_LOSS -> pause()
+                    // Taken for a moment (a call, an alarm): pause now, carry on by ourselves when it is given back.
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> { val was = state == MusicState.PLAYING; pause(); resumeOnGain = was }
+                    // A short notification sound: just turn down.
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> try { player?.setVolume(0.25f, 0.25f) } catch (_: Exception) {}
+                    AudioManager.AUDIOFOCUS_GAIN -> {
+                        try { player?.setVolume(1f, 1f) } catch (_: Exception) {}
+                        if (resumeOnGain) { resumeOnGain = false; if (state == MusicState.PAUSED) startPlayback() }
+                    }
+                }
             }
             .build().also { focus = it }
         return am.requestAudioFocus(req) != AudioManager.AUDIOFOCUS_REQUEST_FAILED

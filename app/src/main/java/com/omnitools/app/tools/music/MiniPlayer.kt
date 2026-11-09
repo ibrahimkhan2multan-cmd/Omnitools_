@@ -98,7 +98,7 @@ fun MiniPlayer(design: MusicDesign, onOpen: () -> Unit, modifier: Modifier = Mod
                 }
                 IconButton(onClick = { MusicController.previous() }) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song", tint = fg) }
                 IconButton(onClick = { MusicController.togglePlayPause() }) {
-                    val playing = state == MusicState.PLAYING
+                    val playing = MusicController.showsPause
                     Icon(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (playing) "Pause" else "Play", tint = fg, modifier = Modifier.size(30.dp))
                 }
                 IconButton(onClick = { MusicController.next() }) { Icon(Icons.Filled.SkipNext, contentDescription = "Next song", tint = fg) }

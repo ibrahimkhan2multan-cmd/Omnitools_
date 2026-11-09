@@ -19,7 +19,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -71,7 +71,7 @@ fun Artwork(design: MusicDesign, playing: Boolean, loading: Boolean, size: Dp) {
                     }
                 }
             }
-            Box(Modifier.size(size).rotate(angle), contentAlignment = Alignment.Center) {
+            Box(Modifier.size(size).graphicsLayer { rotationZ = angle }, contentAlignment = Alignment.Center) {
                 Canvas(Modifier.size(size)) {
                     val r = this.size.minDimension / 2f
                     drawCircle(Color(0xFF0B0C10), r)

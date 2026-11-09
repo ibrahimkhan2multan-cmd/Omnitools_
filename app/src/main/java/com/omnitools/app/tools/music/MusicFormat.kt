@@ -36,7 +36,8 @@ object MusicFormat {
         val m = mime?.lowercase().orEmpty()
         if (m.startsWith("audio/") || m == "application/ogg") return true
         val ext = fileName?.substringAfterLast('.', "")?.lowercase().orEmpty()
-        val unknownType = m.isEmpty() || m == "application/octet-stream"
-        return unknownType && ext in audioExtensions
+        // Some phones label .m4a / .ogg / .3gp files as video/*, so the extension decides there too.
+        val ambiguousType = m.isEmpty() || m == "application/octet-stream" || m.startsWith("video/")
+        return ambiguousType && ext in audioExtensions
     }
 }
