@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 52", "9 Nov 2026", "Music Player: mini player, landscape and designs",
+            listOf(
+                "A slim mini player now sits at the bottom of every screen while music is loaded, in portrait and landscape: play/pause, previous, next and close, a progress line, and a long song name that scrolls. Tap it to open the full player.",
+                "The Music Player has a landscape layout: controls on the left, queue and playlists on the right.",
+                "Song names are shown in full (wrapped onto more lines) instead of being cut with dots.",
+                "Customize player design: four styles (Classic, Gradient, Vinyl with a spinning record, Minimal) and six colours. The mini player can be turned off. Your choice is saved.",
+            ),
+        ),
+        Entry(
             "Build 51", "8 Nov 2026", "Music Player: plays outside the app, with playlists",
             listOf(
                 "Music now keeps playing when you leave OmniTools or turn the screen off. A notification (and the lock screen) has Previous, Play/Pause, Next and Stop buttons. Headset buttons work, and unplugging headphones pauses.",

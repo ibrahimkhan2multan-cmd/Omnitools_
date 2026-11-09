@@ -64,6 +64,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -87,6 +96,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omnitools.app.ui.components.ScreenScaffold
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -109,9 +119,12 @@ private fun readPicked(context: Context, uris: List<Uri>): Picked {
 }
 
 @Composable
-fun MusicScreen(onBack: () -> Unit) {
+fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val design by prefs.musicDesign.collectAsStateWithLifecycle(initialValue = MusicDesign())
+    val landscape = androidx.compose.ui.platform.LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    var customize by rememberSaveable { mutableStateOf(false) }
     val state = MusicController.state
     val duration = MusicController.durationMs
     var position by remember { mutableIntStateOf(MusicController.position()) }
@@ -175,9 +188,32 @@ fun MusicScreen(onBack: () -> Unit) {
     val playlist = MusicLibrary.find(openId)
     if (openId != null && playlist == null && MusicLibrary.loaded) openId = null
 
-    ScreenScaffold(title = "Music Player", onBack = onBack) { padding ->
+    val playerBlock: @Composable () -> Unit = {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            PlayerCard(design, state, duration, position, dragging, dragFraction,
+                onDrag = { dragging = true; dragFraction = it },
+                onDragDone = {
+                    MusicController.seekToFraction(dragFraction)
+                    position = MusicFormat.seekTarget(dragFraction, duration)
+                    dragging = false
+                })
+            Button(onClick = { pick(null) }, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(16.dp)) {
+                Icon(Icons.Filled.PlaylistAdd, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (MusicController.queue.isEmpty()) "Choose songs" else "Add songs to queue")
+            }
+            TextButton(onClick = { customize = !customize }, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Filled.Palette, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text(if (customize) "Hide player design" else "Customize player design")
+            }
+            if (customize) DesignPanel(design, prefs)
+        }
+    }
+
+    val listPane: @Composable (Modifier) -> Unit = { mod ->
         LazyColumn(
-            modifier = Modifier.padding(padding).fillMaxWidth(),
+            modifier = mod,
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -191,22 +227,7 @@ fun MusicScreen(onBack: () -> Unit) {
             if (message != null) item { Text(message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyMedium) }
 
             if (section == 0) {
-                item {
-                    PlayerCard(state, duration, position, dragging, dragFraction,
-                        onDrag = { dragging = true; dragFraction = it },
-                        onDragDone = {
-                            MusicController.seekToFraction(dragFraction)
-                            position = MusicFormat.seekTarget(dragFraction, duration)
-                            dragging = false
-                        })
-                }
-                item {
-                    Button(onClick = { pick(null) }, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(16.dp)) {
-                        Icon(Icons.Filled.PlaylistAdd, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(if (MusicController.queue.isEmpty()) "Choose songs" else "Add songs to queue")
-                    }
-                }
+                if (!landscape) item { playerBlock() }
                 if (MusicController.queue.isNotEmpty()) {
                     item {
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -256,7 +277,7 @@ fun MusicScreen(onBack: () -> Unit) {
                             com.omnitools.app.ui.components.IconBadge(Icons.Filled.LibraryMusic, size = 40)
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
-                                Text(p.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                Text(p.name, style = MaterialTheme.typography.titleSmall)
                                 Text("${p.tracks.size} song${if (p.tracks.size == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             IconButton(onClick = { playTracks(p.tracks, 0, false) }, enabled = p.tracks.isNotEmpty()) {
@@ -275,7 +296,7 @@ fun MusicScreen(onBack: () -> Unit) {
                     }
                 }
                 item {
-                    Text(playlist.name, style = MaterialTheme.typography.headlineSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(playlist.name, style = MaterialTheme.typography.headlineSmall)
                     Text("${playlist.tracks.size} song${if (playlist.tracks.size == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 item {
@@ -305,6 +326,17 @@ fun MusicScreen(onBack: () -> Unit) {
                     item { Text("This playlist is empty. Tap Add songs.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 }
             }
+        }
+    }
+
+    ScreenScaffold(title = "Music Player", onBack = onBack) { padding ->
+        if (landscape) {
+            Row(Modifier.padding(padding).fillMaxWidth()) {
+                Column(Modifier.weight(0.46f).verticalScroll(rememberScrollState()).padding(start = 16.dp, end = 8.dp, top = 12.dp, bottom = 12.dp)) { playerBlock() }
+                listPane(Modifier.weight(0.54f))
+            }
+        } else {
+            listPane(Modifier.padding(padding).fillMaxWidth())
         }
     }
 
@@ -358,30 +390,35 @@ private fun TrackRow(number: Int, name: String, highlighted: Boolean, onClick: (
         if (highlighted) Icon(Icons.Filled.MusicNote, contentDescription = "Now playing", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         else Text("$number", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(20.dp))
         Spacer(Modifier.width(10.dp))
-        Text(MusicFormat.titleNoExtension(name), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        Text(MusicFormat.titleNoExtension(name), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 10.dp))
         actions()
     }
 }
 
 @Composable
 private fun PlayerCard(
-    state: MusicState, duration: Int, position: Int, dragging: Boolean, dragFraction: Float,
+    design: MusicDesign, state: MusicState, duration: Int, position: Int, dragging: Boolean, dragFraction: Float,
     onDrag: (Float) -> Unit, onDragDone: () -> Unit,
 ) {
     val ready = state == MusicState.PLAYING || state == MusicState.PAUSED
     val hasSong = MusicController.queue.isNotEmpty()
+    val c = playerColors(design)
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = com.omnitools.app.ui.components.cardBorder(),
+        colors = CardDefaults.cardColors(containerColor = c.container),
+        border = if (c.brush == null && design.style != PlayerStyle.VINYL) com.omnitools.app.ui.components.cardBorder() else null,
         shape = RoundedCornerShape(24.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Disc(spinning = state == MusicState.PLAYING, loading = state == MusicState.LOADING)
+        Column(
+            Modifier.fillMaxWidth().then(if (c.brush != null) Modifier.background(c.brush) else Modifier).padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Artwork(design, playing = state == MusicState.PLAYING, loading = state == MusicState.LOADING, size = if (design.style == PlayerStyle.VINYL) 150.dp else 110.dp)
             val name = MusicController.fileName
             Text(
-                if (name == null) "No song selected" else MusicFormat.titleNoExtension(name),
-                style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                if (name == null) "No song selected" else MusicFormat.titleNoExtension(name),   // shown in full, never cut with "..."
+                style = if (design.style == PlayerStyle.MINIMAL) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleLarge,
+                color = c.fg, textAlign = TextAlign.Center,
                 modifier = Modifier.semantics { contentDescription = "Song: ${name ?: "none"}" },
             )
             val count = MusicController.queue.size
@@ -394,69 +431,104 @@ private fun PlayerCard(
                     MusicState.STOPPED -> "Stopped · press play to start again"
                     MusicState.ERROR -> "Can't play this file"
                 },
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall, color = c.sub, textAlign = TextAlign.Center,
             )
             val shown = if (dragging) dragFraction else MusicFormat.fraction(position, duration)
             Column(Modifier.fillMaxWidth()) {
                 Slider(
                     value = if (ready) shown else 0f, onValueChange = onDrag, onValueChangeFinished = onDragDone,
                     enabled = ready && duration > 0, modifier = Modifier.semantics { contentDescription = "Seek bar" },
+                    colors = SliderDefaults.colors(
+                        thumbColor = if (c.brush != null) Color.White else c.accentA,
+                        activeTrackColor = if (c.brush != null) Color.White else c.accentA,
+                        inactiveTrackColor = c.sub.copy(alpha = 0.3f),
+                        disabledThumbColor = c.sub.copy(alpha = 0.4f),
+                        disabledActiveTrackColor = c.sub.copy(alpha = 0.3f),
+                        disabledInactiveTrackColor = c.sub.copy(alpha = 0.2f),
+                    ),
                 )
                 Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                     val shownPos = if (dragging) MusicFormat.seekTarget(dragFraction, duration) else position
-                    Text(MusicFormat.time(if (ready) shownPos else 0), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(MusicFormat.time(if (ready) duration else 0), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(MusicFormat.time(if (ready) shownPos else 0), style = MaterialTheme.typography.labelMedium, color = c.sub)
+                    Text(MusicFormat.time(if (ready) duration else 0), style = MaterialTheme.typography.labelMedium, color = c.sub)
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { MusicController.previous() }, enabled = hasSong) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song") }
+                IconButton(onClick = { MusicController.previous() }, enabled = hasSong) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song", tint = c.fg) }
                 FilledIconButton(
                     onClick = { MusicController.togglePlayPause() },
                     enabled = hasSong && state != MusicState.LOADING, modifier = Modifier.size(68.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = c.buttonBg, contentColor = c.buttonFg, disabledContainerColor = c.sub.copy(alpha = 0.25f)),
                 ) {
                     val playing = state == MusicState.PLAYING
                     Icon(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (playing) "Pause" else "Play", modifier = Modifier.size(36.dp))
                 }
-                FilledTonalIconButton(onClick = { MusicController.stop() }, enabled = ready, modifier = Modifier.size(52.dp)) {
-                    Icon(Icons.Filled.Stop, contentDescription = "Stop")
-                }
-                IconButton(onClick = { MusicController.next() }, enabled = hasSong) { Icon(Icons.Filled.SkipNext, contentDescription = "Next song") }
+                FilledTonalIconButton(
+                    onClick = { MusicController.stop() }, enabled = ready, modifier = Modifier.size(52.dp),
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = c.sub.copy(alpha = 0.2f), contentColor = c.fg, disabledContainerColor = c.sub.copy(alpha = 0.1f)),
+                ) { Icon(Icons.Filled.Stop, contentDescription = "Stop") }
+                IconButton(onClick = { MusicController.next() }, enabled = hasSong) { Icon(Icons.Filled.SkipNext, contentDescription = "Next song", tint = c.fg) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { MusicController.skip(-10_000) }, enabled = ready) { Icon(Icons.Filled.Replay10, contentDescription = "Back 10 seconds") }
+                IconButton(onClick = { MusicController.skip(-10_000) }, enabled = ready) { Icon(Icons.Filled.Replay10, contentDescription = "Back 10 seconds", tint = c.fg) }
                 IconButton(onClick = { MusicController.toggleShuffle() }) {
                     Icon(Icons.Filled.Shuffle, contentDescription = if (MusicController.shuffle) "Shuffle on" else "Shuffle off",
-                        tint = if (MusicController.shuffle) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
+                        tint = if (MusicController.shuffle) (if (c.brush != null) Color.White else c.accentA) else c.sub)
                 }
                 IconButton(onClick = { MusicController.cycleRepeat() }) {
                     val mode = MusicController.repeat
                     Icon(
                         if (mode == RepeatMode.ONE) Icons.Filled.RepeatOne else Icons.Filled.Repeat,
                         contentDescription = when (mode) { RepeatMode.OFF -> "Repeat off"; RepeatMode.ALL -> "Repeat all"; RepeatMode.ONE -> "Repeat one" },
-                        tint = if (mode == RepeatMode.OFF) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.primary,
+                        tint = if (mode == RepeatMode.OFF) c.sub else (if (c.brush != null) Color.White else c.accentA),
                     )
                 }
-                IconButton(onClick = { MusicController.skip(10_000) }, enabled = ready) { Icon(Icons.Filled.Forward10, contentDescription = "Forward 10 seconds") }
+                IconButton(onClick = { MusicController.skip(10_000) }, enabled = ready) { Icon(Icons.Filled.Forward10, contentDescription = "Forward 10 seconds", tint = c.fg) }
             }
         }
     }
 }
 
-/** A round "record" that gently pulses while music plays. */
+/** Lets the user pick how the player looks: style, accent colour and whether the mini player shows on every screen. */
 @Composable
-private fun Disc(spinning: Boolean, loading: Boolean) {
-    val pulse = rememberInfiniteTransition(label = "disc").animateFloat(
-        initialValue = 1f, targetValue = 1.06f,
-        animationSpec = infiniteRepeatable(tween(700, easing = FastOutSlowInEasing), AnimRepeat.Reverse),
-        label = "disc pulse",
-    )
-    Box(
-        Modifier.size(110.dp).scale(if (spinning) pulse.value else 1f).background(
-            Brush.linearGradient(listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.tertiary)), CircleShape,
-        ),
-        contentAlignment = Alignment.Center,
+private fun DesignPanel(design: MusicDesign, prefs: com.omnitools.app.data.Prefs) {
+    val scope = rememberCoroutineScope()
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = com.omnitools.app.ui.components.cardBorder(),
+        shape = RoundedCornerShape(18.dp), modifier = Modifier.fillMaxWidth(),
     ) {
-        if (loading) CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(40.dp))
-        else Icon(Icons.Filled.MusicNote, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(52.dp))
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Style", style = MaterialTheme.typography.titleSmall)
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PlayerStyle.values().forEach { st ->
+                    FilterChip(selected = design.style == st, onClick = { scope.launch { prefs.setMusicStyle(st) } }, label = { Text(st.label) })
+                }
+            }
+            Text("Colour", style = MaterialTheme.typography.titleSmall)
+            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                MusicAccents.names.forEachIndexed { i, label ->
+                    val pair = accentPair(design.copy(accent = i))
+                    val selected = design.accent == i
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Box(
+                            Modifier.size(40.dp)
+                                .background(Brush.linearGradient(listOf(pair.first, pair.second)), CircleShape)
+                                .then(if (selected) Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape) else Modifier)
+                                .clickable(role = androidx.compose.ui.semantics.Role.RadioButton) { scope.launch { prefs.setMusicAccent(i) } }
+                                .semantics { contentDescription = "$label colour" + if (selected) ", selected" else "" },
+                        )
+                        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Mini player on every screen", style = MaterialTheme.typography.titleSmall)
+                    Text("A slim bar with play, pause, skip and close, in portrait and landscape.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                Switch(checked = design.miniPlayer, onCheckedChange = { scope.launch { prefs.setMusicMini(it) } })
+            }
+        }
     }
 }

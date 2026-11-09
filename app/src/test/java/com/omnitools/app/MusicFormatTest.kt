@@ -101,3 +101,16 @@ class MusicQueueTest {
         assertEquals(false, MusicFormat.looksLikeAudio(null, null))
     }
 }
+
+class MusicDesignTest {
+    @Test fun styleLookupAndAccentRange() {
+        assertEquals(com.omnitools.app.tools.music.PlayerStyle.VINYL, com.omnitools.app.tools.music.PlayerStyle.from("VINYL"))
+        assertEquals(com.omnitools.app.tools.music.PlayerStyle.CLASSIC, com.omnitools.app.tools.music.PlayerStyle.from("nonsense"))
+        assertEquals(com.omnitools.app.tools.music.PlayerStyle.CLASSIC, com.omnitools.app.tools.music.PlayerStyle.from(null))
+        val a = com.omnitools.app.tools.music.MusicAccents
+        assertEquals(a.names.size, a.pairs.size)
+        assertEquals(0, a.coerce(-4))
+        assertEquals(a.names.lastIndex, a.coerce(99))
+        assertEquals(true, com.omnitools.app.tools.music.MusicDesign().miniPlayer)
+    }
+}

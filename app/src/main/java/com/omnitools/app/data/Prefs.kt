@@ -38,6 +38,9 @@ class Prefs(private val context: Context) {
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
         val sounds = booleanPreferencesKey("sounds")
+        val musicStyle = stringPreferencesKey("music_style")
+        val musicAccent = androidx.datastore.preferences.core.intPreferencesKey("music_accent")
+        val musicMini = booleanPreferencesKey("music_mini")
         val haptics = booleanPreferencesKey("haptics")
     }
 
@@ -67,6 +70,18 @@ class Prefs(private val context: Context) {
 
     /** Default calculator angle unit: true = degrees, false = radians. */
     val calcDegrees: Flow<Boolean> = store.data.map { it[Keys.calcDegrees] ?: true }
+
+    /** How the Music Player looks (style, accent colour, mini player on every screen). */
+    val musicDesign: Flow<com.omnitools.app.tools.music.MusicDesign> = store.data.map {
+        com.omnitools.app.tools.music.MusicDesign(
+            style = com.omnitools.app.tools.music.PlayerStyle.from(it[Keys.musicStyle]),
+            accent = com.omnitools.app.tools.music.MusicAccents.coerce(it[Keys.musicAccent] ?: 0),
+            miniPlayer = it[Keys.musicMini] ?: true,
+        )
+    }
+    suspend fun setMusicStyle(style: com.omnitools.app.tools.music.PlayerStyle) { store.edit { it[Keys.musicStyle] = style.name } }
+    suspend fun setMusicAccent(index: Int) { store.edit { it[Keys.musicAccent] = com.omnitools.app.tools.music.MusicAccents.coerce(index) } }
+    suspend fun setMusicMini(value: Boolean) { store.edit { it[Keys.musicMini] = value } }
 
     /** Button sounds (default on). */
     val sounds: Flow<Boolean> = store.data.map { it[Keys.sounds] ?: true }

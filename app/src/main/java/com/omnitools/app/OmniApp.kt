@@ -9,6 +9,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -88,6 +90,17 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         nav.navigate("tool/$id")
     }
 
+    val design by prefs.musicDesign.collectAsStateWithLifecycle(initialValue = com.omnitools.app.tools.music.MusicDesign())
+    val backEntry by nav.currentBackStackEntryAsState()
+    val onMusicScreen = backEntry?.destination?.route == ROUTE_TOOL && backEntry?.arguments?.getString("id") == "music_player"
+    val showMini = design.miniPlayer && com.omnitools.app.tools.music.MusicController.state != com.omnitools.app.tools.music.MusicState.EMPTY && !onMusicScreen
+
+    androidx.compose.foundation.layout.Column(Modifier.fillMaxSize()) {
+    Box(
+        Modifier.weight(1f).then(
+            if (showMini) Modifier.consumeWindowInsets(androidx.compose.foundation.layout.WindowInsets.navigationBars) else Modifier,
+        ),
+    ) {
     NavHost(
         navController = nav,
         startDestination = ROUTE_HOME,
@@ -134,5 +147,14 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
             )
         }
         composable(ROUTE_ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
+    }
+    }
+    androidx.compose.animation.AnimatedVisibility(
+        visible = showMini,
+        enter = androidx.compose.animation.slideInVertically(tween(260)) { it } + fadeIn(tween(200)),
+        exit = androidx.compose.animation.slideOutVertically(tween(220)) { it } + fadeOut(tween(160)),
+    ) {
+        com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { nav.navigate("tool/music_player") { launchSingleTop = true } })
+    }
     }
 }

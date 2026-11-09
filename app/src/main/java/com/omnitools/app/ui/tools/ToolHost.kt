@@ -58,7 +58,7 @@ fun ToolHost(toolId: String, prefs: Prefs, onBack: () -> Unit) {
         "percent_calc" -> PercentScreen(onBack)
         "date_calc" -> DateScreen(onBack)
         "stopwatch" -> StopwatchScreen(onBack)
-        "music_player" -> com.omnitools.app.tools.music.MusicScreen(onBack)
+        "music_player" -> com.omnitools.app.tools.music.MusicScreen(prefs, onBack)
         "tasks" -> TasksScreen(onBack)
         "random_tools" -> RandomScreen(onBack)
         "color_tool" -> ColorScreen(onBack)
