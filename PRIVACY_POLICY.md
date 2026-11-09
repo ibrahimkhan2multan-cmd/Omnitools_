@@ -18,6 +18,8 @@ These are stored only in the App's private storage and are removed when you clea
 - Favorite tools, recently used tools and your theme choice.
 - QR/barcode scan history (if you keep it enabled; you can delete items or everything).
 - The running timer's end time, so the alarm can still ring if the App is closed.
+- Music Player playlists (song names and where the files are on your phone; the music itself is never copied), and your player design choices.
+- Audio extracted with Video to Audio, until you delete it. Extraction happens entirely on your phone.
 
 Generated passwords and UUIDs are created on your device and are not saved.
 

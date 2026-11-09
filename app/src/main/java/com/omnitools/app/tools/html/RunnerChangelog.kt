@@ -20,6 +20,18 @@ object RunnerChangelog {
             ),
         ),
         Entry(
+            "Build 54", "9 Nov 2026", "Bug-fix pass on music, audio extraction and sounds",
+            listOf(
+                "Music: pressing Stop in the notification and then Play straight away could cut the music out. Fixed.",
+                "Music: Shuffle no longer re-shuffles the whole queue when you add or remove a song, so Previous and the play order stay consistent.",
+                "Music: a short call or alarm now pauses the music and it resumes by itself afterwards; a short notification sound only turns it down. Songs no longer lose audio focus between tracks.",
+                "Music: Pause pressed while a song is still loading now works. Long runs of missing songs are skipped safely.",
+                "Music: .m4a, .ogg and .3gp files that some phones label as video are now accepted. A note appears when Android cannot remember more picked files for playlists.",
+                "Video to Audio: a damaged copy is no longer kept as a result (it falls back to WAV), leftovers from an interrupted extraction are cleaned up, and Save a copy uses the right audio type.",
+                "App logo: no empty flash when returning to Home, and the blade tips are no longer clipped. Vinyl record animation is smoother.",
+            ),
+        ),
+        Entry(
             "Build 53", "9 Nov 2026", "New tool: Video to Audio",
             listOf(
                 "Pick a video from your phone and extract its sound. Nothing is uploaded; it all happens on the phone.",
