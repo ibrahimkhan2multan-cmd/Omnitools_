@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 53", "9 Nov 2026", "New tool: Video to Audio",
+            listOf(
+                "Pick a video from your phone and extract its sound. Nothing is uploaded; it all happens on the phone.",
+                "Original keeps the exact sound from the video with no quality loss and is fast (M4A for AAC sound, OGG or WebM for Opus/Vorbis). When the video's sound cannot be copied as is (for example MP3 or AC-3), it is converted to a WAV file instead.",
+                "Extracted audio is saved inside OmniTools, where you can play it in the Music Player, add it to the music queue, save a copy anywhere on your phone, or delete it.",
+                "Shows the sound format, length and progress, and can be cancelled. Videos with no sound are reported clearly.",
+            ),
+        ),
+        Entry(
             "Build 52", "9 Nov 2026", "Music Player: mini player, landscape and designs",
             listOf(
                 "A slim mini player now sits at the bottom of every screen while music is loaded, in portrait and landscape: play/pause, previous, next and close, a progress line, and a long song name that scrolls. Tap it to open the full player.",

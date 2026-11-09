@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Folder
@@ -441,6 +442,14 @@ object ToolRegistry {
             category = Category.PRODUCTIVITY,
             icon = Icons.Filled.MusicNote,
             keywords = listOf("mp3", "audio", "song", "play", "player", "sound", "m4a", "wav"),
+        ),
+        Tool(
+            id = "video_audio",
+            name = "Video to Audio",
+            description = "Pull the sound out of a video on your phone. Keep it in OmniTools, play it, or save a copy.",
+            category = Category.IMAGES,
+            icon = Icons.Filled.AudioFile,
+            keywords = listOf("extract", "mp4", "mp3", "convert", "video", "audio", "sound", "m4a", "wav", "rip"),
         ),
         Tool(
             id = "stopwatch",
