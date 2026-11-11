@@ -38,6 +38,8 @@ class Prefs(private val context: Context) {
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
         val sounds = booleanPreferencesKey("sounds")
+        val soundTheme = stringPreferencesKey("sound_theme")
+        val soundVolume = androidx.datastore.preferences.core.floatPreferencesKey("sound_volume")
         val seenUpdate = stringPreferencesKey("seen_update")
         val musicStyle = stringPreferencesKey("music_style")
         val musicAccent = androidx.datastore.preferences.core.intPreferencesKey("music_accent")
@@ -87,6 +89,12 @@ class Prefs(private val context: Context) {
     /** The newest update-log entry the user has opened (drives the "new" dot on Home). */
     val seenUpdate: Flow<String?> = store.data.map { it[Keys.seenUpdate] }
     suspend fun setSeenUpdate(version: String) { store.edit { it[Keys.seenUpdate] = version } }
+
+    /** The chosen sound theme and volume (0..1). */
+    val soundTheme: Flow<com.omnitools.app.ui.feedback.SoundTheme> = store.data.map { com.omnitools.app.ui.feedback.SoundTheme.from(it[Keys.soundTheme]) }
+    val soundVolume: Flow<Float> = store.data.map { (it[Keys.soundVolume] ?: 0.8f).coerceIn(0f, 1f) }
+    suspend fun setSoundTheme(theme: com.omnitools.app.ui.feedback.SoundTheme) { store.edit { it[Keys.soundTheme] = theme.name } }
+    suspend fun setSoundVolume(volume: Float) { store.edit { it[Keys.soundVolume] = volume.coerceIn(0f, 1f) } }
 
     /** Button sounds (default on). */
     val sounds: Flow<Boolean> = store.data.map { it[Keys.sounds] ?: true }

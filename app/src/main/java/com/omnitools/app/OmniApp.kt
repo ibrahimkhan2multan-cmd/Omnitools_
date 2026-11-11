@@ -107,11 +107,11 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     val backEntry by nav.currentBackStackEntryAsState()
     // A soft "back" sound whenever the screen stack gets shorter (system back gesture, back arrow, mini player closing a screen).
     val view = androidx.compose.ui.platform.LocalView.current
-    var lastDepth by androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    val lastDepth = androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
     androidx.compose.runtime.LaunchedEffect(backEntry) {
         val depth = nav.currentBackStack.value.size
-        if (depth < lastDepth) Feedback.back(view)
-        lastDepth = depth
+        if (depth < lastDepth.intValue) Feedback.back(view)
+        lastDepth.intValue = depth
     }
     val onMusicScreen = backEntry?.destination?.route == ROUTE_TOOL && backEntry?.arguments?.getString("id") == "music_player"
     val showMini = designOrNull != null && design.miniPlayer && com.omnitools.app.tools.music.MusicController.state != com.omnitools.app.tools.music.MusicState.EMPTY && !onMusicScreen
