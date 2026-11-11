@@ -1,8 +1,5 @@
 package com.omnitools.app.tools.text
 
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.Base64
@@ -65,10 +62,15 @@ object TextTools {
 
     fun base64Encode(text: String): String = Base64.getEncoder().encodeToString(text.toByteArray(Charsets.UTF_8))
 
-    fun base64Decode(text: String): String = try {
-        String(Base64.getDecoder().decode(text.trim().replace("\n", "").replace("\r", "")), Charsets.UTF_8)
-    } catch (e: IllegalArgumentException) {
-        throw TextToolException("This is not valid Base64 text.")
+    fun base64Decode(text: String): String {
+        val clean = text.filter { !it.isWhitespace() }
+        // Accept both the normal alphabet (+ /) and the URL-safe one (- _), with or without "=" padding.
+        val bytes = try {
+            Base64.getDecoder().decode(clean)
+        } catch (e: IllegalArgumentException) {
+            try { Base64.getUrlDecoder().decode(clean) } catch (e2: IllegalArgumentException) { throw TextToolException("This is not valid Base64 text.") }
+        }
+        return String(bytes, Charsets.UTF_8)
     }
 
     fun urlEncode(text: String): String = URLEncoder.encode(text, "UTF-8")
@@ -79,31 +81,24 @@ object TextTools {
         throw TextToolException("This is not valid URL-encoded text.")
     }
 
-    private fun parseJson(text: String): Any {
+    /**
+     * Formats or minifies JSON with the app's own strict parser, which keeps every number exactly as written
+     * (Android's org.json would turn 1.0 into 1 and 12345678901234567890 into 1.2345678901234567E19).
+     */
+    private fun reprint(text: String, indent: Int): String {
         val t = text.trim()
         if (t.isEmpty()) throw TextToolException("Enter some JSON first.")
+        if (t.first() != '{' && t.first() != '[') throw TextToolException("JSON must start with { or [.")
         return try {
-            when (t.first()) {
-                '{' -> JSONObject(t)
-                '[' -> JSONArray(t)
-                else -> throw TextToolException("JSON must start with { or [.")
-            }
-        } catch (e: JSONException) {
+            com.omnitools.app.tools.advanced.Json.format(t, indent)
+        } catch (e: com.omnitools.app.tools.advanced.Json.JsonException) {
             throw TextToolException("Invalid JSON: ${e.message?.lineSequence()?.firstOrNull() ?: "parse error"}")
         }
     }
 
-    fun jsonFormat(text: String): String = when (val j = parseJson(text)) {
-        is JSONObject -> j.toString(2)
-        is JSONArray -> j.toString(2)
-        else -> throw TextToolException("Invalid JSON.")
-    }
+    fun jsonFormat(text: String): String = reprint(text, 2)
 
-    fun jsonMinify(text: String): String = when (val j = parseJson(text)) {
-        is JSONObject -> j.toString()
-        is JSONArray -> j.toString()
-        else -> throw TextToolException("Invalid JSON.")
-    }
+    fun jsonMinify(text: String): String = reprint(text, 0)
 
     /** "hELLO. wORLD" -> "Hello. World". Capitalises the first letter of the text, of each sentence and of each line. */
     fun sentenceCase(text: String): String {

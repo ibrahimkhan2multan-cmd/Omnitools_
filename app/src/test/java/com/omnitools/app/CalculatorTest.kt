@@ -59,4 +59,37 @@ class CalculatorTest {
         assertEquals("0", ExpressionEvaluator.format(0.0))
         assertEquals("-2.5", ExpressionEvaluator.format(-2.5))
     }
+
+    @Test fun implicitMultiplication() {
+        assertEquals(6.0, eval("2(3)"), 1e-9)
+        assertEquals(9.0, eval("(1+2)(3)"), 1e-9)
+        assertEquals(2 * Math.PI, eval("2π"), 1e-9)
+        assertEquals(1.5, eval("3sin(30)"), 1e-9)
+        assertEquals(6.0, eval("2√9"), 1e-9)
+        assertEquals(2 * Math.E, eval("2e"), 1e-9)
+        assertEquals(200.0, eval("2e2"), 1e-9)          // still scientific notation
+        assertThrows(ExpressionEvaluator.EvalException::class.java) { eval("2foo") }
+    }
+
+    @Test fun tanOfRightAngleIsAnError() {
+        assertThrows(ExpressionEvaluator.EvalException::class.java) { eval("tan(90)") }
+        assertEquals(1.0, eval("tan(45)"), 1e-9)
+    }
+
+    @Test fun bigWholeNumbersKeepEveryDigit() {
+        assertEquals("562949953421312", ExpressionEvaluator.format(Math.pow(2.0, 49.0)))
+        assertEquals("123456789012345", ExpressionEvaluator.format(123456789012345.0))
+        assertEquals("-9007199254740", ExpressionEvaluator.format(-9007199254740.0))
+        assertEquals("1E+15", ExpressionEvaluator.format(1e15))
+        assertEquals("0.3", ExpressionEvaluator.format(0.1 + 0.2))
+    }
+}
+
+class UrduKeyboardDigitsTest {
+    @Test fun numberWordsRejectsNonAsciiDigitsInsteadOfCrashing() {
+        // Arabic-Indic and Extended Arabic-Indic digits come from Urdu / Arabic keyboards.
+        assertThrows(IllegalArgumentException::class.java) { com.omnitools.app.tools.calc.NumberWords.fromString("1.٣") }
+        assertThrows(IllegalArgumentException::class.java) { com.omnitools.app.tools.calc.NumberWords.fromString("۱۲۳") }
+        assertEquals("one hundred twenty-three point four five", com.omnitools.app.tools.calc.NumberWords.fromString("123.45"))
+    }
 }

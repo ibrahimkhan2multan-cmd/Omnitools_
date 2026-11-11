@@ -34,7 +34,7 @@ object BarcodeEncoder {
             Type.EAN_8 -> digitsProblem(text, listOf(7, 8), "7 or 8")
             Type.UPC_A -> digitsProblem(text, listOf(11, 12), "11 or 12")
             Type.ITF ->
-                if (!text.all { it.isDigit() }) "Digits only." else if (text.length % 2 != 0) "ITF needs an even number of digits." else null
+                if (!text.all { it in '0'..'9' }) "Digits only." else if (text.length % 2 != 0) "ITF needs an even number of digits." else null
         }
     }
 

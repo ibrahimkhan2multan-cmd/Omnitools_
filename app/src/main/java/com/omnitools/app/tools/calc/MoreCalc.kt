@@ -164,7 +164,8 @@ object NumberWords {
         val negative = s.startsWith("-")
         val body = s.removePrefix("-")
         val parts = body.split(".")
-        require(parts.size <= 2 && parts.all { p -> p.all { it.isDigit() } } && parts[0].isNotEmpty()) { "Enter a valid number." }
+        // ASCII digits only: other scripts' digits (for example Arabic-Indic) parse as numbers but cannot be looked up in the word table.
+        require(parts.size <= 2 && parts.all { p -> p.all { it in '0'..'9' } } && parts[0].isNotEmpty()) { "Enter a valid number using digits 0-9." }
         require(parts[0].length <= MAX_INTEGER_DIGITS) { "Up to $MAX_INTEGER_DIGITS digits before the decimal point." }
         val fraction = parts.getOrNull(1).orEmpty()
         require(fraction.length <= 30) { "Up to 30 digits after the decimal point." }

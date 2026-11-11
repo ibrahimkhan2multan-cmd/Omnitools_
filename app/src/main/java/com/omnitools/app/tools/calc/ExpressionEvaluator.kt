@@ -19,7 +19,7 @@ import kotlin.math.tan
  *
  * Grammar (highest precedence last):
  *   expr    = term (('+' | '-') term)*
- *   term    = unary (('*' | '/' | '×' | '÷') unary)*
+ *   term    = unary (('*' | '/' | '×' | '÷')? unary)*      (a missing sign before "(", a name, π or √ means multiply)
  *   unary   = ('-' | '+') unary | power
  *   power   = postfix ('^' unary)?          (right-associative)
  *   postfix = primary ('%' | '!')*
@@ -50,6 +50,8 @@ object ExpressionEvaluator {
         if (value.isNaN()) return "Not a number"
         if (value.isInfinite()) return if (value > 0) "Too large" else "Too small"
         val abs = abs(value)
+        // Whole numbers below 1e15 are shown exactly (rounding to 12 digits would turn 562949953421312 into 562949953421000).
+        if (abs < 1e15 && value == Math.floor(value)) return value.toLong().toString()
         if (abs >= 1e15 || abs < 1e-9) return String.format(java.util.Locale.ROOT, "%.9E", value).replace(Regex("\\.?0+E"), "E")
         val bd = java.math.BigDecimal(value).round(java.math.MathContext(12))
         return bd.stripTrailingZeros().toPlainString()
@@ -92,6 +94,8 @@ object ExpressionEvaluator {
             while (true) {
                 when {
                     consume('*') || consume('×') -> v *= parseUnary()
+                    // Implicit multiplication: 2(3), (1+2)(3), 2π, 3sin(30), 2√9.
+                    peek() == '(' || peek() == 'π' || peek() == '√' || peek().isLetter() -> v *= parseUnary()
                     consume('/') || consume('÷') -> {
                         val d = parseUnary()
                         if (d == 0.0) throw EvalException("Cannot divide by zero")
@@ -189,7 +193,7 @@ object ExpressionEvaluator {
                 "abs" -> abs(arg)
                 "sin" -> snap(sin(rad))
                 "cos" -> snap(cos(rad))
-                "tan" -> snap(tan(rad))
+                "tan" -> if (abs(cos(rad)) < 1e-14) throw EvalException("tan is not defined at this angle") else snap(tan(rad))
                 "asin" -> if (arg !in -1.0..1.0) throw EvalException("asin needs a value from -1 to 1") else fromRad(asin(arg))
                 "acos" -> if (arg !in -1.0..1.0) throw EvalException("acos needs a value from -1 to 1") else fromRad(acos(arg))
                 "atan" -> fromRad(atan(arg))

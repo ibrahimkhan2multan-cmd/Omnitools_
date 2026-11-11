@@ -49,7 +49,7 @@ fun LoanScreen(onBack: () -> Unit) {
     val a = amount.toDoubleOrNull()
     val r = rate.toDoubleOrNull()
     val t = term.toDoubleOrNull()
-    val months = t?.let { (if (years) it * 12 else it).let { m -> Math.round(m).toInt() } }
+    val months = t?.let { (if (years) it * 12 else it).let { m -> Math.round(m).coerceIn(0L, 100_000L).toInt() } }
     val ready = a != null && r != null && months != null
     val (result, error) = if (ready) attempt { LoanCalc.emi(a!!, r!!, months!!) } else null to null
     val rows = if (result != null) LoanCalc.schedule(a!!, r!!, months!!).take(12) else emptyList()

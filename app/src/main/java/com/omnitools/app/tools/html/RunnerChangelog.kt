@@ -6,6 +6,15 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 55", "11 Nov 2026", "Calculator, text and number-tool fixes",
+            listOf(
+                "Calculator: whole numbers up to 15 digits now show every digit (2^49 used to show 562949953421000). tan(90) now says it is undefined instead of showing a huge number.",
+                "Calculator: implicit multiplication works, so 2(3), 2π, 3sin(30) and 2√9 are accepted.",
+                "Number to Words: digits typed with an Urdu or Arabic keyboard no longer crash the tool; it asks for digits 0-9. A very long loan term no longer wraps around into a short one.",
+                "Text Tools: JSON format and minify keep numbers exactly as written (1.0 stays 1.0, long IDs are not rounded) and reject invalid JSON such as single quotes or trailing commas. Base64 decode accepts URL-safe text, missing padding and spaces.",
+            ),
+        ),
+        Entry(
             "Build 54", "9 Nov 2026", "Full code review: Music Player, Video to Audio and sounds",
             listOf(
                 "Fixed: pressing Play right after Stop could make the music cut out again.",

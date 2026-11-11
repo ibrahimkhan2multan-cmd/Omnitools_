@@ -109,3 +109,20 @@ class TextAndPasswordTest {
         assertFalse(ToolRegistry.all.any { it.name.isBlank() || it.description.isBlank() })
     }
 }
+
+class TextJsonAndBase64Test {
+    @Test fun jsonFormatKeepsNumbersExactly() {
+        val out = com.omnitools.app.tools.text.TextTools.jsonMinify("{\"id\": 12345678901234567890, \"x\": 1.0, \"y\": 0.10, \"z\": 1e5}")
+        assertEquals("{\"id\":12345678901234567890,\"x\":1.0,\"y\":0.10,\"z\":1e5}", out)
+        assertThrows(com.omnitools.app.tools.text.TextTools.TextToolException::class.java) { com.omnitools.app.tools.text.TextTools.jsonFormat("{'a':1}") }
+        assertThrows(com.omnitools.app.tools.text.TextTools.TextToolException::class.java) { com.omnitools.app.tools.text.TextTools.jsonFormat("{\"a\":1,}") }
+    }
+
+    @Test fun base64AcceptsUrlSafeUnpaddedAndSpaces() {
+        val t = com.omnitools.app.tools.text.TextTools
+        assertEquals("hello?>", t.base64Decode("aGVsbG8/Pg=="))
+        assertEquals("hello?>", t.base64Decode("aGVsbG8_Pg"))
+        assertEquals("hello?>", t.base64Decode(" aGVs bG8/\nPg== "))
+        assertThrows(com.omnitools.app.tools.text.TextTools.TextToolException::class.java) { t.base64Decode("!!!") }
+    }
+}
