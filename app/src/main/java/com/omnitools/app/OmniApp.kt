@@ -63,7 +63,13 @@ fun OmniApp(prefs: Prefs) {
 
     val sounds by prefs.sounds.collectAsStateWithLifecycle(initialValue = true)
     val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
-    androidx.compose.runtime.SideEffect { Feedback.soundOn = sounds; Feedback.hapticsOn = haptics }
+    val soundTheme by prefs.soundTheme.collectAsStateWithLifecycle(initialValue = com.omnitools.app.ui.feedback.SoundTheme.CLASSIC)
+    val soundVolume by prefs.soundVolume.collectAsStateWithLifecycle(initialValue = 0.8f)
+    androidx.compose.runtime.SideEffect {
+        Feedback.soundOn = sounds; Feedback.hapticsOn = haptics; Feedback.volume = soundVolume
+        if (Feedback.theme != soundTheme) { Feedback.theme = soundTheme; Feedback.warmUp() }
+    }
+    androidx.compose.runtime.LaunchedEffect(Unit) { Feedback.warmUp() }
 
     OmniToolsTheme(themeMode = mode) {
       WithClickSounds {
@@ -99,6 +105,14 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     val designOrNull by prefs.musicDesign.collectAsStateWithLifecycle<com.omnitools.app.tools.music.MusicDesign?>(initialValue = null)
     val design = designOrNull ?: com.omnitools.app.tools.music.MusicDesign()
     val backEntry by nav.currentBackStackEntryAsState()
+    // A soft "back" sound whenever the screen stack gets shorter (system back gesture, back arrow, mini player closing a screen).
+    val view = androidx.compose.ui.platform.LocalView.current
+    var lastDepth by androidx.compose.runtime.remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    androidx.compose.runtime.LaunchedEffect(backEntry) {
+        val depth = nav.currentBackStack.value.size
+        if (depth < lastDepth) Feedback.back(view)
+        lastDepth = depth
+    }
     val onMusicScreen = backEntry?.destination?.route == ROUTE_TOOL && backEntry?.arguments?.getString("id") == "music_player"
     val showMini = designOrNull != null && design.miniPlayer && com.omnitools.app.tools.music.MusicController.state != com.omnitools.app.tools.music.MusicState.EMPTY && !onMusicScreen
 

@@ -22,6 +22,10 @@ import androidx.compose.material3.Switch
 import com.omnitools.app.ui.feedback.Cue
 import com.omnitools.app.ui.feedback.Feedback
 import androidx.compose.material3.Text
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.omnitools.app.ui.feedback.SoundTheme
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,6 +67,8 @@ fun SettingsScreen(
     val calcDegrees by prefs.calcDegrees.collectAsStateWithLifecycle(initialValue = true)
     val sounds by prefs.sounds.collectAsStateWithLifecycle(initialValue = true)
     val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
+    val soundTheme by prefs.soundTheme.collectAsStateWithLifecycle(initialValue = SoundTheme.CLASSIC)
+    val soundVolume by prefs.soundVolume.collectAsStateWithLifecycle(initialValue = 0.8f)
 
     ScreenScaffold(title = "Settings", onBack = onBack) { padding ->
         Column(
@@ -104,6 +110,36 @@ fun SettingsScreen(
                 checked = sounds,
                 onChange = { scope.launch { prefs.setSounds(it) }; if (it) { Feedback.soundOn = true; Feedback.play(Cue.TOGGLE) } },
             )
+            if (sounds) {
+                Text("Sound theme", style = MaterialTheme.typography.titleSmall)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    SoundTheme.values().forEach { t ->
+                        FilterChip(
+                            selected = soundTheme == t,
+                            onClick = {
+                                scope.launch { prefs.setSoundTheme(t) }
+                                Feedback.theme = t       // applied at once so the preview already uses it
+                                Feedback.play(Cue.SUCCESS)
+                            },
+                            label = { Text(t.label) },
+                        )
+                    }
+                }
+                Text(soundTheme.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("Volume", style = MaterialTheme.typography.titleSmall)
+                androidx.compose.material3.Slider(
+                    value = soundVolume,
+                    onValueChange = { Feedback.volume = it; scope.launch { prefs.setSoundVolume(it) } },
+                    onValueChangeFinished = { Feedback.play(Cue.CLICK) },
+                    modifier = Modifier.semantics { contentDescription = "Sound volume" },
+                )
+                Text("Try the sounds", style = MaterialTheme.typography.titleSmall)
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("Click" to Cue.CLICK, "Switch" to Cue.TOGGLE, "Run" to Cue.RUN, "Done" to Cue.SUCCESS, "Error" to Cue.ERROR, "Back" to Cue.BACK).forEach { (label, cue) ->
+                        OutlinedButton(onClick = { Feedback.play(cue) }) { Text(label) }
+                    }
+                }
+            }
             SwitchRow(
                 title = "Vibration",
                 subtitle = "A tiny tick on taps.",

@@ -13,7 +13,12 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.currentValueOf
@@ -24,15 +29,48 @@ import kotlinx.coroutines.launch
 object Feedback {
     @Volatile var soundOn: Boolean = true
     @Volatile var hapticsOn: Boolean = true
+    @Volatile var theme: SoundTheme = SoundTheme.CLASSIC
+    @Volatile var volume: Float = 0.8f
 
-    private val tracks = HashMap<Cue, AudioTrack>()
+    private val tracks = HashMap<Pair<SoundTheme, Cue>, AudioTrack>()
+    private var lastClickAt = 0L
+
+    /** Builds the sounds of the current theme ahead of time, so the first tap after a change is not late. */
+    fun warmUp() {
+        Thread {
+            for (c in Cue.values()) { try { track(theme, c) } catch (_: Throwable) {} }
+        }.start()
+    }
+
+    @Synchronized
+    private fun track(t: SoundTheme, cue: Cue): AudioTrack = tracks.getOrPut(t to cue) {
+        val data = SoundSynth.render(t, cue)
+        AudioTrack.Builder()
+            .setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build(),
+            )
+            .setAudioFormat(
+                AudioFormat.Builder()
+                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                    .setSampleRate(SoundSynth.SAMPLE_RATE)
+                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                    .build(),
+            )
+            .setTransferMode(AudioTrack.MODE_STATIC)
+            .setBufferSizeInBytes(data.size * 2)
+            .build()
+            .also { it.write(data, 0, data.size) }
+    }
 
     @Synchronized
     fun play(cue: Cue) {
         if (!soundOn) return
         try {
-            val track = tracks.getOrPut(cue) {
-                val data = SoundSynth.render(cue)
+            val track = tracks.getOrPut(theme to cue) {
+                val data = SoundSynth.render(theme, cue)
                 AudioTrack.Builder()
                     .setAudioAttributes(
                         AudioAttributes.Builder()
@@ -54,6 +92,7 @@ object Feedback {
             }
             track.stop()
             track.reloadStaticData()
+            track.setVolume(volume.coerceIn(0f, 1f))
             track.play()
         } catch (_: Throwable) {
             // Sound is a nicety: never let it break a button.
@@ -66,7 +105,21 @@ object Feedback {
         }
     }
 
-    fun click(view: View?) { play(Cue.CLICK); tick(view) }
+    /** The sound and tick for any tap. Two detectors can see the same tap, so repeats within a split second are ignored. */
+    fun click(view: View?) {
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastClickAt < 90) return
+        lastClickAt = now
+        play(Cue.CLICK); tick(view)
+    }
+
+    /** The "back" sound, skipped when a tap on a back button has just made the normal click. */
+    fun back(view: View?) {
+        val now = android.os.SystemClock.uptimeMillis()
+        if (now - lastClickAt < 300) return
+        lastClickAt = now
+        play(Cue.BACK); tick(view)
+    }
 }
 
 /** Wraps the normal ripple and also plays the click sound when a press is released. */
@@ -92,5 +145,36 @@ private class SoundIndication(private val base: IndicationNodeFactory) : Indicat
 @Composable
 fun WithClickSounds(content: @Composable () -> Unit) {
     val indication = androidx.compose.runtime.remember { SoundIndication(ripple()) }
-    CompositionLocalProvider(LocalIndication provides indication, content = content)
+    CompositionLocalProvider(LocalIndication provides indication) { ClickSoundHost(content) }
+}
+
+/**
+ * Plays the click for every tap that something handled, wherever it is on screen. Material icon buttons (back arrows,
+ * toolbar icons), switches and custom cards draw their own press effect and would otherwise stay silent.
+ * It only watches: it never consumes touches, and drags or scrolls (finger moved) make no sound.
+ */
+private fun Modifier.clickSoundOnTaps(view: View): Modifier = pointerInput(view) {
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+        val slop = viewConfiguration.touchSlop
+        var moved = false
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Final)
+            if (event.changes.size > 1) moved = true
+            val c = event.changes.firstOrNull { it.id == down.id } ?: break
+            if ((c.position - down.position).getDistance() > slop) moved = true
+            if (c.previousPressed && !c.pressed) {
+                // A button that handled the tap consumes the release; empty space does not.
+                if (!moved && c.isConsumed) Feedback.click(view)
+                break
+            }
+            if (!c.pressed) break
+        }
+    }
+}
+
+@Composable
+private fun ClickSoundHost(content: @Composable () -> Unit) {
+    val view = LocalView.current
+    androidx.compose.foundation.layout.Box(Modifier.fillMaxSize().clickSoundOnTaps(view)) { content() }
 }

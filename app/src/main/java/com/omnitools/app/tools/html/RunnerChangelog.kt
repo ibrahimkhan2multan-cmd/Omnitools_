@@ -6,6 +6,14 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 57", "11 Nov 2026", "Sound themes and a click on every button",
+            listOf(
+                "Every tap on a button now makes a sound, including back arrows, toolbar icons, switches and cards. The back gesture makes a soft back sound.",
+                "Settings > Sound & touch: pick a sound theme (Classic, Galaxy, Bubble, Retro, Crystal or Wood), set the volume, and try each sound.",
+                "All sounds are made by the app itself, so there is still no internet use and nothing extra to download.",
+            ),
+        ),
+        Entry(
             "Build 56", "11 Nov 2026", "Update log moved to the Home screen",
             listOf(
                 "The update log now has its own button at the top of the Home screen, next to Settings. A small dot shows when there is something you have not read yet.",
