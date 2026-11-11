@@ -38,6 +38,7 @@ class Prefs(private val context: Context) {
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
         val sounds = booleanPreferencesKey("sounds")
+        val seenUpdate = stringPreferencesKey("seen_update")
         val musicStyle = stringPreferencesKey("music_style")
         val musicAccent = androidx.datastore.preferences.core.intPreferencesKey("music_accent")
         val musicMini = booleanPreferencesKey("music_mini")
@@ -82,6 +83,10 @@ class Prefs(private val context: Context) {
     suspend fun setMusicStyle(style: com.omnitools.app.tools.music.PlayerStyle) { store.edit { it[Keys.musicStyle] = style.name } }
     suspend fun setMusicAccent(index: Int) { store.edit { it[Keys.musicAccent] = com.omnitools.app.tools.music.MusicAccents.coerce(index) } }
     suspend fun setMusicMini(value: Boolean) { store.edit { it[Keys.musicMini] = value } }
+
+    /** The newest update-log entry the user has opened (drives the "new" dot on Home). */
+    val seenUpdate: Flow<String?> = store.data.map { it[Keys.seenUpdate] }
+    suspend fun setSeenUpdate(version: String) { store.edit { it[Keys.seenUpdate] = version } }
 
     /** Button sounds (default on). */
     val sounds: Flow<Boolean> = store.data.map { it[Keys.sounds] ?: true }

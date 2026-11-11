@@ -6,6 +6,13 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 56", "11 Nov 2026", "Update log moved to the Home screen",
+            listOf(
+                "The update log now has its own button at the top of the Home screen, next to Settings. A small dot shows when there is something you have not read yet.",
+                "It no longer lives inside the Code Runner, so the Code Runner tabs are just your code and the preview.",
+            ),
+        ),
+        Entry(
             "Build 55", "11 Nov 2026", "Calculator, text and number-tool fixes",
             listOf(
                 "Calculator: whole numbers up to 15 digits now show every digit (2^49 used to show 562949953421000). tan(90) now says it is undefined instead of showing a huge number.",
@@ -153,6 +160,9 @@ object RunnerChangelog {
     const val LIMITS = "Code Runner limits. Not supported: Java, C, C++, Kotlin, Go, Rust, PHP and other languages that need a compiler or a server. " +
         "Python has the standard library only (no pip, numpy or pandas). An endless loop freezes the preview; leave the Preview tab and run again. " +
         "Python needs a few seconds to start the first time. Everything runs on the phone and nothing is sent anywhere."
+
+    /** The newest build in the log, e.g. "Build 56". Used for the "new" dot on the Home button. */
+    val latestVersion: String get() = entries.first().version
 
     fun asText(): String = buildString {
         append("OmniTools update log\n")

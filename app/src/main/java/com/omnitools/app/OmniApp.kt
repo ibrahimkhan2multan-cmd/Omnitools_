@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 private const val ROUTE_HOME = "home"
 private const val ROUTE_SETTINGS = "settings"
 private const val ROUTE_ABOUT = "about"
+private const val ROUTE_UPDATES = "updates"
 private const val ROUTE_CATEGORY = "category/{name}"
 private const val ROUTE_TOOL = "tool/{id}"
 
@@ -92,6 +93,9 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         nav.navigate("tool/$id")
     }
 
+    // The "new" dot is hidden until the saved value has loaded, so it does not flash on every start.
+    val seenUpdateLoaded by prefs.seenUpdate.collectAsStateWithLifecycle<String?>(initialValue = com.omnitools.app.tools.html.RunnerChangelog.latestVersion)
+    val seenUpdate = seenUpdateLoaded
     val designOrNull by prefs.musicDesign.collectAsStateWithLifecycle<com.omnitools.app.tools.music.MusicDesign?>(initialValue = null)
     val design = designOrNull ?: com.omnitools.app.tools.music.MusicDesign()
     val backEntry by nav.currentBackStackEntryAsState()
@@ -121,6 +125,8 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
                 onOpenCategory = { nav.navigate("category/${it.name}") },
                 onToggleFavorite = { id -> scope.launch { prefs.toggleFavorite(id) } },
                 onOpenSettings = { nav.navigate(ROUTE_SETTINGS) },
+                hasNewUpdate = seenUpdate != com.omnitools.app.tools.html.RunnerChangelog.latestVersion,
+                onOpenUpdates = { nav.navigate(ROUTE_UPDATES) },
             )
         }
         composable(ROUTE_CATEGORY) { entry ->
@@ -149,6 +155,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
                 onOpenAbout = { nav.navigate(ROUTE_ABOUT) },
             )
         }
+        composable(ROUTE_UPDATES) { com.omnitools.app.ui.updates.UpdatesScreen(prefs = prefs, onBack = { nav.popBackStack() }) }
         composable(ROUTE_ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
     }
     }

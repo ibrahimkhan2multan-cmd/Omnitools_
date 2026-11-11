@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -61,6 +62,8 @@ fun HomeScreen(
     onOpenCategory: (Category) -> Unit,
     onToggleFavorite: (String) -> Unit,
     onOpenSettings: () -> Unit,
+    hasNewUpdate: Boolean = false,
+    onOpenUpdates: () -> Unit = {},
 ) {
     var query by rememberSaveable { mutableStateOf("") }
     val results = remember(query) { ToolRegistry.search(query) }
@@ -76,7 +79,7 @@ fun HomeScreen(
             modifier = Modifier.padding(padding),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 24.dp),
         ) {
-            item { Header(onOpenSettings) }
+            item { Header(onOpenSettings, hasNewUpdate, onOpenUpdates) }
             item {
                 OutlinedTextField(
                     value = query,
@@ -157,7 +160,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun Header(onOpenSettings: () -> Unit) {
+private fun Header(onOpenSettings: () -> Unit, hasNewUpdate: Boolean, onOpenUpdates: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,6 +181,13 @@ private fun Header(onOpenSettings: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+        IconButton(onClick = onOpenUpdates) {
+            androidx.compose.material3.BadgedBox(
+                badge = { if (hasNewUpdate) androidx.compose.material3.Badge() },
+            ) {
+                Icon(Icons.Filled.NewReleases, contentDescription = if (hasNewUpdate) "Update log, new" else "Update log")
+            }
         }
         IconButton(onClick = onOpenSettings) {
             Icon(Icons.Filled.Settings, contentDescription = "Settings")

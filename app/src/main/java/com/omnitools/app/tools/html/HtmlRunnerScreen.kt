@@ -48,14 +48,13 @@ fun HtmlRunnerScreen(onBack: () -> Unit) {
     var runId by remember { mutableStateOf(0) }
     var document by remember { mutableStateOf("") }
     var runtimeRun by remember { mutableStateOf(false) }
-    // Editor tabs first, then Preview, then Updates.
+    // Editor tabs first, then Preview.
     val editorTabs = when (mode) {
         RunnerMode.WEB -> listOf("HTML", "CSS", "JavaScript")
         RunnerMode.PYTHON -> listOf("Code", "Input")
         else -> listOf("Code")
     }
     val previewTab = editorTabs.size
-    val updatesTab = previewTab + 1
 
     fun run() {
         document = RunnerDocs.build(mode, html, css, js, codes[mode].orEmpty(), stdin)
@@ -77,13 +76,12 @@ fun HtmlRunnerScreen(onBack: () -> Unit) {
                 }
             }
             Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                (editorTabs + "Preview" + "Updates").forEachIndexed { i, label ->
+                (editorTabs + "Preview").forEachIndexed { i, label ->
                     FilterChip(selected = tab == i, onClick = { if (i == previewTab) run() else tab = i }, label = { Text(label) })
                 }
             }
             when {
                 tab == previewTab -> HtmlPreviewPanel(document, runId, Modifier.weight(1f).fillMaxWidth(), runtime = runtimeRun)
-                tab == updatesTab -> UpdatesPanel(Modifier.weight(1f).fillMaxWidth())
                 else -> {
                     val value: String
                     val setValue: (String) -> Unit
@@ -124,20 +122,5 @@ fun HtmlRunnerScreen(onBack: () -> Unit) {
                 }
             }
         }
-    }
-}
-
-/** The update log, with Copy and Share so it can be sent to someone. */
-@Composable
-private fun UpdatesPanel(modifier: Modifier = Modifier) {
-    val text = remember { RunnerChangelog.asText() }
-    Column(modifier.verticalScroll(rememberScrollState()).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        CopyShareRow(text, "OmniTools update log")
-        RunnerChangelog.entries.forEach { e ->
-            Text("${e.version}  \u00B7  ${e.date}", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-            Text(e.title, style = MaterialTheme.typography.titleMedium)
-            e.items.forEach { Text("\u2022 $it", style = MaterialTheme.typography.bodyMedium) }
-        }
-        Text(RunnerChangelog.LIMITS, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

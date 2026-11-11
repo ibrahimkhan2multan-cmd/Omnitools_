@@ -106,7 +106,7 @@ class RunnerLanguagesTest {
         assertTrue(t.contains("Not supported"))
         assertTrue(t.contains("Gaming & Modding") && t.contains("28 new tools") && t.contains("Subnet Calculator"))
         val log = com.omnitools.app.tools.html.RunnerChangelog.entries
-        assertEquals("Build 55", log.first().version)
+        assertEquals("Build 56", log.first().version)
         assertTrue(log.all { it.items.isNotEmpty() && it.title.isNotBlank() })
     }
 }
