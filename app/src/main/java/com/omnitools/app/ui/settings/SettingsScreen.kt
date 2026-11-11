@@ -22,6 +22,9 @@ import androidx.compose.material3.Switch
 import com.omnitools.app.ui.feedback.Cue
 import com.omnitools.app.ui.feedback.Feedback
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -65,6 +68,7 @@ fun SettingsScreen(
     val saveScans by prefs.saveScans.collectAsStateWithLifecycle(initialValue = true)
     val showRecents by prefs.showRecents.collectAsStateWithLifecycle(initialValue = true)
     val calcDegrees by prefs.calcDegrees.collectAsStateWithLifecycle(initialValue = true)
+    val bgTheme by prefs.backgroundTheme.collectAsStateWithLifecycle(initialValue = com.omnitools.app.ui.theme.BackgroundTheme.DEFAULT)
     val sounds by prefs.sounds.collectAsStateWithLifecycle(initialValue = true)
     val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
     val soundTheme by prefs.soundTheme.collectAsStateWithLifecycle(initialValue = SoundTheme.CLASSIC)
@@ -86,6 +90,40 @@ fun SettingsScreen(
                         label = { Text(label) },
                     )
                 }
+            }
+
+            SectionTitle("Background theme")
+            Text(
+                bgTheme.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 20.dp),
+            )
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                com.omnitools.app.ui.theme.BackgroundTheme.values().forEach { b ->
+                    FilterChip(
+                        selected = bgTheme == b,
+                        onClick = { scope.launch { prefs.setBackgroundTheme(b) } },
+                        label = { Text(b.label) },
+                        leadingIcon = {
+                            androidx.compose.foundation.layout.Box(
+                                Modifier.size(18.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                                    .background(androidx.compose.ui.graphics.Brush.linearGradient(if (b.swatch.size > 1) b.swatch else listOf(b.swatch[0], b.swatch[0]))),
+                            )
+                        },
+                    )
+                }
+            }
+            if (bgTheme != com.omnitools.app.ui.theme.BackgroundTheme.DEFAULT) {
+                Text(
+                    "This theme uses its own light or dark colours, so the Dark / Light setting above applies only to Plain.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
             }
 
             SectionTitle("Calculator")

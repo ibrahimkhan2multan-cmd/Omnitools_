@@ -12,6 +12,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,9 +82,10 @@ fun omniColorScheme(dark: Boolean): ColorScheme = if (dark) DarkColors else Ligh
 
 /** themeMode: "system", "dark" or "light". */
 @Composable
-fun OmniToolsTheme(themeMode: String = "system", content: @Composable () -> Unit) {
+fun OmniToolsTheme(themeMode: String = "system", background: BackgroundTheme = BackgroundTheme.DEFAULT, content: @Composable () -> Unit) {
     val systemDark = isSystemInDarkTheme()
-    val dark = when (themeMode) {
+    val themed = background != BackgroundTheme.DEFAULT
+    val dark = if (themed) background.dark else when (themeMode) {
         "dark" -> true
         "light" -> false
         else -> systemDark
@@ -102,10 +104,24 @@ fun OmniToolsTheme(themeMode: String = "system", content: @Composable () -> Unit
         }
     }
 
+    val base = omniColorScheme(dark)
+    // With an animated background the screens become see-through and cards get a soft see-through tint.
+    val scheme = if (!themed) base else base.copy(
+        primary = background.primary, onPrimary = background.onPrimary, secondary = background.secondary,
+        background = Color.Transparent,
+        surface = base.surface.copy(alpha = if (dark) 0.72f else 0.78f),
+        surfaceVariant = base.surfaceVariant.copy(alpha = if (dark) 0.72f else 0.78f),
+    )
     MaterialTheme(
-        colorScheme = omniColorScheme(dark),
+        colorScheme = scheme,
         shapes = OmniShapes,
         typography = OmniTypography,
-        content = content,
-    )
+    ) {
+        if (themed) {
+            androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.fillMaxSize()) {
+                Backdrop(background)
+                content()
+            }
+        } else content()
+    }
 }

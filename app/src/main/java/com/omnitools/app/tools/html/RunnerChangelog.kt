@@ -6,6 +6,13 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 58", "11 Nov 2026", "Animated background themes",
+            listOf(
+                "Settings > Background theme: Galaxy (twinkling stars), Candy, Rainbow, Aurora, Sunset and Ocean. Every screen sits on the animated picture; Plain keeps the old look.",
+                "Each theme brings its own colours and its own light or dark look, so cards and text stay readable.",
+            ),
+        ),
+        Entry(
             "Build 57", "11 Nov 2026", "Sound themes and a click on every button",
             listOf(
                 "Every tap on a button now makes a sound, including back arrows, toolbar icons, switches and cards. The back gesture makes a soft back sound.",

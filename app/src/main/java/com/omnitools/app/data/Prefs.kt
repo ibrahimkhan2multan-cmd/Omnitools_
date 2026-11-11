@@ -38,6 +38,7 @@ class Prefs(private val context: Context) {
         val showRecents = booleanPreferencesKey("show_recents")
         val calcDegrees = booleanPreferencesKey("calc_degrees")
         val sounds = booleanPreferencesKey("sounds")
+        val bgTheme = stringPreferencesKey("bg_theme")
         val soundTheme = stringPreferencesKey("sound_theme")
         val soundVolume = androidx.datastore.preferences.core.floatPreferencesKey("sound_volume")
         val seenUpdate = stringPreferencesKey("seen_update")
@@ -89,6 +90,10 @@ class Prefs(private val context: Context) {
     /** The newest update-log entry the user has opened (drives the "new" dot on Home). */
     val seenUpdate: Flow<String?> = store.data.map { it[Keys.seenUpdate] }
     suspend fun setSeenUpdate(version: String) { store.edit { it[Keys.seenUpdate] = version } }
+
+    /** The animated background (Plain, Galaxy, Candy, ...). */
+    val backgroundTheme: Flow<com.omnitools.app.ui.theme.BackgroundTheme> = store.data.map { com.omnitools.app.ui.theme.BackgroundTheme.from(it[Keys.bgTheme]) }
+    suspend fun setBackgroundTheme(theme: com.omnitools.app.ui.theme.BackgroundTheme) { store.edit { it[Keys.bgTheme] = theme.name } }
 
     /** The chosen sound theme and volume (0..1). */
     val soundTheme: Flow<com.omnitools.app.ui.feedback.SoundTheme> = store.data.map { com.omnitools.app.ui.feedback.SoundTheme.from(it[Keys.soundTheme]) }

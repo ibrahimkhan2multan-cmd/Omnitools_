@@ -71,9 +71,10 @@ fun OmniApp(prefs: Prefs) {
     }
     androidx.compose.runtime.LaunchedEffect(Unit) { Feedback.warmUp() }
 
-    OmniToolsTheme(themeMode = mode) {
+    val bgTheme by prefs.backgroundTheme.collectAsStateWithLifecycle(initialValue = com.omnitools.app.ui.theme.BackgroundTheme.DEFAULT)
+    OmniToolsTheme(themeMode = mode, background = bgTheme) {
       WithClickSounds {
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background, contentColor = MaterialTheme.colorScheme.onBackground) {
             if (!accepted) {
                 PrivacyGateScreen(onAccept = { scope.launch { prefs.acceptPrivacy() } })
             } else if (!done) {
