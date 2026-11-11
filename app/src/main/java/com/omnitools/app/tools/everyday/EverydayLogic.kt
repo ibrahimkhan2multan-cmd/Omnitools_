@@ -18,7 +18,8 @@ object NumberBase {
         if (s.startsWith("-")) { negative = true; s = s.substring(1) }
         val prefix = when (base) { 2 -> "0b"; 8 -> "0o"; 16 -> "0x"; else -> "" }
         if (prefix.isNotEmpty() && s.lowercase().startsWith(prefix)) s = s.substring(2)
-        if (s.isEmpty() || s.length > MAX_DIGITS) return null
+        // A second sign ("--5", "+5") is not a number; BigInteger would accept it and flip the meaning.
+        if (s.isEmpty() || s.length > MAX_DIGITS || s[0] == '+' || s[0] == '-') return null
         return try {
             val v = BigInteger(s, base)
             if (negative) v.negate() else v

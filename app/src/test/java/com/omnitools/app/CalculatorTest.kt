@@ -93,3 +93,27 @@ class UrduKeyboardDigitsTest {
         assertEquals("one hundred twenty-three point four five", com.omnitools.app.tools.calc.NumberWords.fromString("123.45"))
     }
 }
+
+class AuditEdgeCaseTest {
+    @Test fun timestampRejectsYearsThatBreakMillisecondMaths() {
+        val utc = java.time.ZoneOffset.UTC
+        assertThrows(IllegalArgumentException::class.java) { com.omnitools.app.tools.dev.TimestampTool.parse("+999999999-12-31T00:00:00", utc) }
+        assertEquals(253402300799L, com.omnitools.app.tools.dev.TimestampTool.parse("9999-12-31 23:59:59", utc).epochSecond)
+        assertEquals(1710513000L, com.omnitools.app.tools.dev.TimestampTool.parse("2024-03-15 14:30:00", utc).epochSecond)
+    }
+
+    @Test fun numberBaseRejectsDoubleSigns() {
+        val n = com.omnitools.app.tools.everyday.NumberBase
+        assertEquals(null, n.parse("--5", 10))
+        assertEquals(null, n.parse("+5", 10))
+        assertEquals(null, n.parse("-+5", 10))
+        assertEquals(java.math.BigInteger.valueOf(-255), n.parse("-0xFF", 16))
+        assertEquals(java.math.BigInteger.valueOf(10), n.parse("1010", 2))
+    }
+
+    @Test fun itfBarcodeRejectsNonAsciiDigitsCleanly() {
+        val t = com.omnitools.app.tools.qr.BarcodeEncoder.Type.ITF
+        assertEquals("Digits only.", com.omnitools.app.tools.qr.BarcodeEncoder.validate(t, "١٢٣٤"))
+        assertEquals(null, com.omnitools.app.tools.qr.BarcodeEncoder.validate(t, "1234"))
+    }
+}

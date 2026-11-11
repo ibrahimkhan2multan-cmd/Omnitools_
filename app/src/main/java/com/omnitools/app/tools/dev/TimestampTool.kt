@@ -27,18 +27,24 @@ object TimestampTool {
 
     fun format(instant: Instant, zone: ZoneId): String = display.format(instant.atZone(zone))
 
+    /** Years 1 to 9999 only: beyond that the millisecond value no longer fits in a Long and conversions throw. */
+    private fun checked(i: Instant): Instant {
+        require(i.epochSecond in -62_135_596_800L..253_402_300_799L) { "Use a year from 0001 to 9999." }
+        return i
+    }
+
     fun parse(text: String, zone: ZoneId): Instant {
         val t = text.trim()
         require(t.isNotEmpty()) { "Enter a date like 2024-03-15 14:30:00." }
         for (p in patterns) {
             try {
-                return LocalDateTime.parse(t, p).atZone(zone).toInstant()
+                return checked(LocalDateTime.parse(t, p).atZone(zone).toInstant())
             } catch (e: DateTimeParseException) {
                 // try the next format
             }
         }
         try {
-            return LocalDate.parse(t).atStartOfDay(zone).toInstant()
+            return checked(LocalDate.parse(t).atStartOfDay(zone).toInstant())
         } catch (e: DateTimeParseException) {
             throw IllegalArgumentException("Use the form 2024-03-15 14:30:00 (the time is optional).")
         }
