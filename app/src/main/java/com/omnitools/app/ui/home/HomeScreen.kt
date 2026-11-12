@@ -48,6 +48,7 @@ import com.omnitools.app.data.ToolRegistry
 import com.omnitools.app.ui.components.EmptyState
 import com.omnitools.app.ui.components.Entrance
 import com.omnitools.app.ui.components.IconBadge
+import com.omnitools.app.ui.components.accent
 import com.omnitools.app.ui.components.OmniLogo
 import com.omnitools.app.ui.components.pressable
 import com.omnitools.app.ui.components.SectionTitle
@@ -205,7 +206,7 @@ private fun CategoryCard(category: Category, modifier: Modifier, onClick: () -> 
         shape = RoundedCornerShape(18.dp),
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IconBadge(category.icon, size = 40)
+            IconBadge(category.icon, size = 40, accent = category.accent())
             Text(category.title, style = MaterialTheme.typography.titleSmall)
             Text(
                 "$count tool${if (count == 1) "" else "s"}",

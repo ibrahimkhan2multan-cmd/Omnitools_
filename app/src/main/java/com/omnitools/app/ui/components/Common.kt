@@ -49,6 +49,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.omnitools.app.data.Tool
+import com.omnitools.app.data.Category
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.border
 
 /** Standard screen frame: top bar with back arrow and optional actions. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,15 +146,35 @@ fun LinkRow(
 
 /** Rounded badge that holds a tool/category icon: one calm accent color everywhere, so lists stay easy to scan. */
 @Composable
-fun IconBadge(icon: ImageVector, size: Int = 44) {
+fun IconBadge(icon: ImageVector, size: Int = 44, accent: Color = Color.Unspecified) {
+    val c = if (accent == Color.Unspecified) MaterialTheme.colorScheme.primary else accent
+    val shape = RoundedCornerShape((size * 0.32f).dp)
     Box(
         modifier = Modifier
             .size(size.dp)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), RoundedCornerShape((size * 0.32f).dp)),
+            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(c.copy(alpha = 0.30f), c.copy(alpha = 0.10f))), shape)
+            .border(1.dp, c.copy(alpha = 0.30f), shape),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size((size * 0.5f).dp))
+        Icon(icon, contentDescription = null, tint = c, modifier = Modifier.size((size * 0.52f).dp))
     }
+}
+
+/** Each category gets its own colour, so the dashboard is easy to scan and looks alive. */
+fun Category.accent(): Color = when (this) {
+    Category.FILES -> Color(0xFFF2A93B)
+    Category.DEV -> Color(0xFF58A6FF)
+    Category.PDF -> Color(0xFFFF6B6B)
+    Category.IMAGES -> Color(0xFFB07CFF)
+    Category.QR -> Color(0xFF3DD6B0)
+    Category.DEVICE -> Color(0xFF7CC4FF)
+    Category.NOTES -> Color(0xFFFFD166)
+    Category.CALC -> Color(0xFF5BE0A0)
+    Category.PRODUCTIVITY -> Color(0xFFFF8FB1)
+    Category.SECURITY -> Color(0xFF6FA8FF)
+    Category.NETWORK -> Color(0xFF4FD1E8)
+    Category.ADVANCED -> Color(0xFFFF9F5A)
+    Category.GAMING -> Color(0xFFE56BFF)
 }
 
 /** A full-width row for one tool, with a favorite star. */
@@ -177,7 +200,7 @@ fun ToolRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            IconBadge(tool.icon)
+            IconBadge(tool.icon, accent = tool.category.accent())
             Column(modifier = Modifier.weight(1f)) {
                 Text(tool.name, style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(2.dp))

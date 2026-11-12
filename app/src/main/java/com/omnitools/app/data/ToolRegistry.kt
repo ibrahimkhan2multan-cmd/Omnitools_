@@ -1,78 +1,80 @@
 package com.omnitools.app.data
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Calculate
-import androidx.compose.material.icons.filled.Casino
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.Event
-import androidx.compose.material.icons.filled.FindInPage
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Percent
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.PhoneAndroid
-import androidx.compose.material.icons.filled.QrCode2
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.AudioFile
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.Construction
-import androidx.compose.material.icons.filled.Notes
-import androidx.compose.material.icons.filled.FolderZip
-import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material.icons.filled.Html
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.GraphicEq
-import androidx.compose.material.icons.filled.MonitorWeight
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material.icons.filled.ViewHeadline
-import androidx.compose.material.icons.filled.ViewWeek
-import androidx.compose.material.icons.filled.FormatListNumbered
-import androidx.compose.material.icons.filled.Crop
-import androidx.compose.material.icons.filled.Fingerprint
-import androidx.compose.material.icons.filled.PictureAsPdf
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material.icons.filled.LocalOffer
-import androidx.compose.material.icons.filled.HourglassBottom
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Link
-import androidx.compose.material.icons.filled.Storage
-import androidx.compose.material.icons.filled.DriveFileRenameOutline
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.BatteryFull
-import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.FormatColorText
-import androidx.compose.material.icons.filled.DataObject
-import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.rounded.Calculate
+import androidx.compose.material.icons.rounded.Casino
+import androidx.compose.material.icons.rounded.Checklist
+import androidx.compose.material.icons.rounded.Event
+import androidx.compose.material.icons.rounded.FindInPage
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Percent
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.QrCode2
+import androidx.compose.material.icons.rounded.QrCodeScanner
+import androidx.compose.material.icons.rounded.SwapHoriz
+import androidx.compose.material.icons.rounded.TextFields
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.AudioFile
+import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.PhotoLibrary
+import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Wifi
+import androidx.compose.material.icons.rounded.Construction
+import androidx.compose.material.icons.rounded.Notes
+import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Terminal
+import androidx.compose.material.icons.rounded.Html
+import androidx.compose.material.icons.rounded.AccountBalance
+import androidx.compose.material.icons.rounded.GraphicEq
+import androidx.compose.material.icons.rounded.MonitorWeight
+import androidx.compose.material.icons.rounded.Receipt
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Tag
+import androidx.compose.material.icons.rounded.ViewHeadline
+import androidx.compose.material.icons.rounded.ViewWeek
+import androidx.compose.material.icons.rounded.FormatListNumbered
+import androidx.compose.material.icons.rounded.Crop
+import androidx.compose.material.icons.rounded.Fingerprint
+import androidx.compose.material.icons.rounded.PictureAsPdf
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.Numbers
+import androidx.compose.material.icons.rounded.LocalOffer
+import androidx.compose.material.icons.rounded.HourglassBottom
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material.icons.rounded.DriveFileRenameOutline
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Public
+import androidx.compose.material.icons.rounded.BatteryFull
+import androidx.compose.material.icons.rounded.Inventory2
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.FormatColorText
+import androidx.compose.material.icons.rounded.DataObject
+import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class Category(val title: String, val icon: ImageVector) {
-    FILES("Files & Archives", Icons.Filled.Folder),
-    DEV("Coding & Developer Tools", Icons.Filled.Code),
-    PDF("PDF & Documents", Icons.Filled.Description),
-    IMAGES("Images & Media", Icons.Filled.Image),
-    QR("QR & Barcode", Icons.Filled.QrCode2),
-    DEVICE("Device Information", Icons.Filled.PhoneAndroid),
-    NOTES("Notes & Text", Icons.Filled.Notes),
-    CALC("Calculators & Converters", Icons.Filled.Calculate),
-    PRODUCTIVITY("Productivity", Icons.Filled.Timer),
-    SECURITY("Security & Privacy", Icons.Filled.Security),
-    NETWORK("Network Utilities", Icons.Filled.Wifi),
-    ADVANCED("Advanced Tools", Icons.Filled.Construction),
-    GAMING("Gaming & Modding", Icons.Filled.SportsEsports),
+    FILES("Files & Archives", Icons.Rounded.Folder),
+    DEV("Coding & Developer Tools", Icons.Rounded.Code),
+    PDF("PDF & Documents", Icons.Rounded.Description),
+    IMAGES("Images & Media", Icons.Rounded.Image),
+    QR("QR & Barcode", Icons.Rounded.QrCode2),
+    DEVICE("Device Information", Icons.Rounded.PhoneAndroid),
+    NOTES("Notes & Text", Icons.Rounded.Notes),
+    CALC("Calculators & Converters", Icons.Rounded.Calculate),
+    PRODUCTIVITY("Productivity", Icons.Rounded.Timer),
+    SECURITY("Security & Privacy", Icons.Rounded.Security),
+    NETWORK("Network Utilities", Icons.Rounded.Wifi),
+    ADVANCED("Advanced Tools", Icons.Rounded.Construction),
+    GAMING("Gaming & Modding", Icons.Rounded.SportsEsports),
 }
 
 /**
@@ -96,7 +98,7 @@ object ToolRegistry {
             name = "UUID Generator",
             description = "Random UUIDs for add-on packs and mods, in the format you need.",
             category = Category.GAMING,
-            icon = Icons.Filled.Tag,
+            icon = Icons.Rounded.Tag,
             keywords = listOf("guid", "id", "minecraft", "manifest", "unique"),
         ),
         Tool(
@@ -104,7 +106,7 @@ object ToolRegistry {
             name = "Add-on Manifest Builder",
             description = "Create a Minecraft Bedrock manifest.json for a behavior or resource pack.",
             category = Category.GAMING,
-            icon = Icons.Filled.DataObject,
+            icon = Icons.Rounded.DataObject,
             keywords = listOf("minecraft", "bedrock", "json", "pack", "mod", "addon"),
         ),
         Tool(
@@ -112,7 +114,7 @@ object ToolRegistry {
             name = "Color Code Preview",
             description = "Preview Minecraft colour and style codes and convert & to the game's section sign.",
             category = Category.GAMING,
-            icon = Icons.Filled.FormatColorText,
+            icon = Icons.Rounded.FormatColorText,
             keywords = listOf("minecraft", "motd", "chat", "format", "section"),
         ),
         Tool(
@@ -120,7 +122,7 @@ object ToolRegistry {
             name = "Coordinates & Chunks",
             description = "Nether and Overworld conversion, chunk, region file and distance.",
             category = Category.GAMING,
-            icon = Icons.Filled.Explore,
+            icon = Icons.Rounded.Explore,
             keywords = listOf("minecraft", "nether", "chunk", "region", "xyz"),
         ),
         Tool(
@@ -128,7 +130,7 @@ object ToolRegistry {
             name = "Pack Builder",
             description = "Zip a pack folder into .mcpack, .mcaddon or .zip and check its manifest.",
             category = Category.GAMING,
-            icon = Icons.Filled.Inventory2,
+            icon = Icons.Rounded.Inventory2,
             keywords = listOf("minecraft", "mcpack", "mcaddon", "zip", "package"),
         ),
         Tool(
@@ -136,7 +138,7 @@ object ToolRegistry {
             name = "Merge PDFs",
             description = "Combine several PDFs into one, in the order you choose.",
             category = Category.PDF,
-            icon = Icons.Filled.PictureAsPdf,
+            icon = Icons.Rounded.PictureAsPdf,
             keywords = listOf("join", "combine", "append"),
         ),
         Tool(
@@ -144,7 +146,7 @@ object ToolRegistry {
             name = "Extract PDF Pages",
             description = "Keep, split, delete or reorder pages of a PDF.",
             category = Category.PDF,
-            icon = Icons.Filled.Description,
+            icon = Icons.Rounded.Description,
             keywords = listOf("split", "pages", "delete", "reorder", "range"),
         ),
         Tool(
@@ -152,7 +154,7 @@ object ToolRegistry {
             name = "PDF to Images",
             description = "Save every page of a PDF as a PNG or JPEG picture.",
             category = Category.PDF,
-            icon = Icons.Filled.Image,
+            icon = Icons.Rounded.Image,
             keywords = listOf("convert", "export", "png", "jpg", "pages"),
         ),
         Tool(
@@ -160,7 +162,7 @@ object ToolRegistry {
             name = "Color Picker",
             description = "Tap a picture to read the exact colour at that spot.",
             category = Category.IMAGES,
-            icon = Icons.Filled.Palette,
+            icon = Icons.Rounded.Palette,
             keywords = listOf("eyedropper", "hex", "rgb", "pick"),
         ),
         Tool(
@@ -168,7 +170,7 @@ object ToolRegistry {
             name = "Color Palette",
             description = "Find the main colours of a picture.",
             category = Category.IMAGES,
-            icon = Icons.Filled.Palette,
+            icon = Icons.Rounded.Palette,
             keywords = listOf("colors", "theme", "swatch", "dominant"),
         ),
         Tool(
@@ -176,7 +178,7 @@ object ToolRegistry {
             name = "Photo Details (EXIF)",
             description = "See camera, date and location details in a photo and save a clean copy.",
             category = Category.IMAGES,
-            icon = Icons.Filled.Image,
+            icon = Icons.Rounded.Image,
             keywords = listOf("metadata", "gps", "location", "privacy", "camera"),
         ),
         Tool(
@@ -184,7 +186,7 @@ object ToolRegistry {
             name = "Compress to Size",
             description = "Shrink a picture to fit under a size limit such as 200 KB.",
             category = Category.IMAGES,
-            icon = Icons.Filled.Crop,
+            icon = Icons.Rounded.Crop,
             keywords = listOf("reduce", "kb", "upload", "smaller"),
         ),
         Tool(
@@ -192,7 +194,7 @@ object ToolRegistry {
             name = "File Info & Compare",
             description = "Details and SHA-256 checksum of a file, and whether two files match.",
             category = Category.FILES,
-            icon = Icons.Filled.Fingerprint,
+            icon = Icons.Rounded.Fingerprint,
             keywords = listOf("checksum", "hash", "identical", "size"),
         ),
         Tool(
@@ -200,7 +202,7 @@ object ToolRegistry {
             name = "Flashcards",
             description = "Make question-and-answer cards and study them. Saved on this device.",
             category = Category.NOTES,
-            icon = Icons.Filled.EditNote,
+            icon = Icons.Rounded.EditNote,
             keywords = listOf("study", "learn", "quiz", "memorize"),
         ),
         Tool(
@@ -208,7 +210,7 @@ object ToolRegistry {
             name = "QR Code Sheet",
             description = "Turn a list of lines into a printable PDF sheet of QR codes.",
             category = Category.QR,
-            icon = Icons.Filled.QrCode2,
+            icon = Icons.Rounded.QrCode2,
             keywords = listOf("print", "labels", "batch", "pdf", "tickets"),
         ),
         Tool(
@@ -216,7 +218,7 @@ object ToolRegistry {
             name = "Battery",
             description = "Level, charging state, health, temperature and voltage.",
             category = Category.DEVICE,
-            icon = Icons.Filled.BatteryFull,
+            icon = Icons.Rounded.BatteryFull,
             keywords = listOf("charge", "power", "health", "temperature"),
         ),
         Tool(
@@ -224,7 +226,7 @@ object ToolRegistry {
             name = "Storage & Memory",
             description = "How much storage and RAM is used and free.",
             category = Category.DEVICE,
-            icon = Icons.Filled.Storage,
+            icon = Icons.Rounded.Storage,
             keywords = listOf("ram", "space", "free", "disk"),
         ),
         Tool(
@@ -232,7 +234,7 @@ object ToolRegistry {
             name = "Display Info",
             description = "Resolution, density, refresh rate and screen size.",
             category = Category.DEVICE,
-            icon = Icons.Filled.PhoneAndroid,
+            icon = Icons.Rounded.PhoneAndroid,
             keywords = listOf("screen", "dpi", "hz", "resolution"),
         ),
         Tool(
@@ -240,7 +242,7 @@ object ToolRegistry {
             name = "Sensors",
             description = "List every sensor the phone has, with specs.",
             category = Category.DEVICE,
-            icon = Icons.Filled.GraphicEq,
+            icon = Icons.Rounded.GraphicEq,
             keywords = listOf("accelerometer", "gyroscope", "light", "proximity"),
         ),
         Tool(
@@ -248,7 +250,7 @@ object ToolRegistry {
             name = "Subnet Calculator",
             description = "Network, broadcast, mask and host range from an IPv4 address and prefix.",
             category = Category.NETWORK,
-            icon = Icons.Filled.Wifi,
+            icon = Icons.Rounded.Wifi,
             keywords = listOf("cidr", "ip", "mask", "network", "host"),
         ),
         Tool(
@@ -256,7 +258,7 @@ object ToolRegistry {
             name = "IP Converter",
             description = "Convert IPv4 and IPv6 addresses between dotted, decimal, hex and binary.",
             category = Category.NETWORK,
-            icon = Icons.Filled.SwapHoriz,
+            icon = Icons.Rounded.SwapHoriz,
             keywords = listOf("ipv4", "ipv6", "binary", "hex"),
         ),
         Tool(
@@ -264,7 +266,7 @@ object ToolRegistry {
             name = "URL Parser",
             description = "Split a web address into scheme, host, port, path and query parameters.",
             category = Category.NETWORK,
-            icon = Icons.Filled.Link,
+            icon = Icons.Rounded.Link,
             keywords = listOf("link", "query", "host", "phishing"),
         ),
         Tool(
@@ -272,7 +274,7 @@ object ToolRegistry {
             name = "HTTP Status Codes",
             description = "Searchable guide to HTTP response codes, such as 404 and 503.",
             category = Category.NETWORK,
-            icon = Icons.Filled.Public,
+            icon = Icons.Rounded.Public,
             keywords = listOf("404", "500", "error", "web", "api"),
         ),
         Tool(
@@ -280,7 +282,7 @@ object ToolRegistry {
             name = "Port Numbers",
             description = "Searchable list of common network ports and what uses them.",
             category = Category.NETWORK,
-            icon = Icons.Filled.Numbers,
+            icon = Icons.Rounded.Numbers,
             keywords = listOf("tcp", "udp", "ssh", "https", "service"),
         ),
         Tool(
@@ -288,7 +290,7 @@ object ToolRegistry {
             name = "JSON Formatter",
             description = "Validate, pretty-print, minify and sort JSON with exact error positions.",
             category = Category.ADVANCED,
-            icon = Icons.Filled.Code,
+            icon = Icons.Rounded.Code,
             keywords = listOf("format", "validate", "minify", "beautify"),
         ),
         Tool(
@@ -296,7 +298,7 @@ object ToolRegistry {
             name = "Text Compare",
             description = "Line-by-line comparison showing what was added and removed.",
             category = Category.ADVANCED,
-            icon = Icons.Filled.FindInPage,
+            icon = Icons.Rounded.FindInPage,
             keywords = listOf("diff", "compare", "changes"),
         ),
         Tool(
@@ -304,7 +306,7 @@ object ToolRegistry {
             name = "JWT Decoder",
             description = "Read the header, payload and dates of a JSON Web Token (signature not verified).",
             category = Category.ADVANCED,
-            icon = Icons.Filled.Key,
+            icon = Icons.Rounded.Key,
             keywords = listOf("token", "bearer", "auth", "jwt"),
         ),
         Tool(
@@ -312,7 +314,7 @@ object ToolRegistry {
             name = "CSV and JSON Converter",
             description = "Convert tables between CSV and JSON in either direction.",
             category = Category.ADVANCED,
-            icon = Icons.Filled.SwapHoriz,
+            icon = Icons.Rounded.SwapHoriz,
             keywords = listOf("csv", "json", "table", "convert"),
         ),
         Tool(
@@ -320,7 +322,7 @@ object ToolRegistry {
             name = "Chmod Calculator",
             description = "Turn Unix file permissions into octal and rwx form and back.",
             category = Category.ADVANCED,
-            icon = Icons.Filled.Terminal,
+            icon = Icons.Rounded.Terminal,
             keywords = listOf("permissions", "linux", "rwx", "unix"),
         ),
         Tool(
@@ -328,7 +330,7 @@ object ToolRegistry {
             name = "Password Strength",
             description = "Estimate how strong a password is, with tips to improve it.",
             category = Category.SECURITY,
-            icon = Icons.Filled.Fingerprint,
+            icon = Icons.Rounded.Fingerprint,
             keywords = listOf("check", "test", "guess", "crack"),
         ),
         Tool(
@@ -336,7 +338,7 @@ object ToolRegistry {
             name = "Passphrase Generator",
             description = "Memorable multi-word passphrases from the secure random generator.",
             category = Category.SECURITY,
-            icon = Icons.Filled.Key,
+            icon = Icons.Rounded.Key,
             keywords = listOf("words", "diceware", "password"),
         ),
         Tool(
@@ -344,7 +346,7 @@ object ToolRegistry {
             name = "Text Encryptor",
             description = "Encrypt and decrypt messages with a password using AES-256.",
             category = Category.SECURITY,
-            icon = Icons.Filled.Security,
+            icon = Icons.Rounded.Security,
             keywords = listOf("encrypt", "decrypt", "aes", "secret", "message"),
         ),
         Tool(
@@ -352,7 +354,7 @@ object ToolRegistry {
             name = "QR Content Inspector",
             description = "See what a QR code contains (Wi-Fi, contact, link, etc.) and spot risks.",
             category = Category.QR,
-            icon = Icons.Filled.FindInPage,
+            icon = Icons.Rounded.FindInPage,
             keywords = listOf("wifi", "vcard", "link", "check", "safe"),
         ),
         Tool(
@@ -360,7 +362,7 @@ object ToolRegistry {
             name = "QR & Barcode Scanner",
             description = "Scan QR codes and common barcodes with the camera, with link safety checks and history.",
             category = Category.QR,
-            icon = Icons.Filled.QrCodeScanner,
+            icon = Icons.Rounded.QrCodeScanner,
             keywords = listOf("scan", "camera", "barcode", "ean", "upc", "history"),
         ),
         Tool(
@@ -368,7 +370,7 @@ object ToolRegistry {
             name = "QR Code Generator",
             description = "Create QR codes for text, links, Wi-Fi and contacts. Works fully offline.",
             category = Category.QR,
-            icon = Icons.Filled.QrCode2,
+            icon = Icons.Rounded.QrCode2,
             keywords = listOf("create", "make", "wifi", "contact", "vcard", "url", "share"),
         ),
         Tool(
@@ -376,7 +378,7 @@ object ToolRegistry {
             name = "Notepad",
             description = "Create, edit, search and delete notes. Saved on this device only.",
             category = Category.NOTES,
-            icon = Icons.Filled.EditNote,
+            icon = Icons.Rounded.EditNote,
             keywords = listOf("note", "write", "memo", "autosave"),
         ),
         Tool(
@@ -384,7 +386,7 @@ object ToolRegistry {
             name = "Text Tools",
             description = "Word counter, case converter, sort, dedupe, find & replace, Base64, URL encode, JSON format.",
             category = Category.NOTES,
-            icon = Icons.Filled.TextFields,
+            icon = Icons.Rounded.TextFields,
             keywords = listOf("count", "words", "characters", "uppercase", "lowercase", "base64", "url", "json", "minify", "reverse", "duplicate"),
         ),
         Tool(
@@ -392,7 +394,7 @@ object ToolRegistry {
             name = "Calculator",
             description = "Scientific calculator with brackets, percentages, powers, roots and trigonometry.",
             category = Category.CALC,
-            icon = Icons.Filled.Calculate,
+            icon = Icons.Rounded.Calculate,
             keywords = listOf("math", "scientific", "percent", "sqrt"),
         ),
         Tool(
@@ -400,7 +402,7 @@ object ToolRegistry {
             name = "Unit Converter",
             description = "Length, weight, area, volume, temperature, speed, data size and number bases.",
             category = Category.CALC,
-            icon = Icons.Filled.SwapHoriz,
+            icon = Icons.Rounded.SwapHoriz,
             keywords = listOf("convert", "length", "weight", "temperature", "binary", "hex", "bytes", "celsius", "fahrenheit"),
         ),
         Tool(
@@ -408,7 +410,7 @@ object ToolRegistry {
             name = "Device Information",
             description = "Model, Android version, screen, memory, storage, battery and supported ABIs.",
             category = Category.DEVICE,
-            icon = Icons.Filled.PhoneAndroid,
+            icon = Icons.Rounded.PhoneAndroid,
             keywords = listOf("phone", "specs", "battery", "ram", "storage", "cpu", "api"),
         ),
         Tool(
@@ -416,7 +418,7 @@ object ToolRegistry {
             name = "Password Generator",
             description = "Strong random passwords from a secure random source. Never stored or sent anywhere.",
             category = Category.SECURITY,
-            icon = Icons.Filled.Key,
+            icon = Icons.Rounded.Key,
             keywords = listOf("random", "secure", "strong", "uuid"),
         ),
         Tool(
@@ -424,7 +426,7 @@ object ToolRegistry {
             name = "Percentage & Discount",
             description = "X% of Y, percentage change, discounts with optional tax.",
             category = Category.CALC,
-            icon = Icons.Filled.Percent,
+            icon = Icons.Rounded.Percent,
             keywords = listOf("sale", "price", "tax", "increase", "decrease", "percent"),
         ),
         Tool(
@@ -432,15 +434,31 @@ object ToolRegistry {
             name = "Date & Age Calculator",
             description = "Days between dates, exact age, next birthday, add or subtract time from a date.",
             category = Category.CALC,
-            icon = Icons.Filled.Event,
+            icon = Icons.Rounded.Event,
             keywords = listOf("birthday", "difference", "calendar", "days", "weeks"),
+        ),
+        Tool(
+            id = "photo_viewer",
+            name = "Photo Viewer",
+            description = "Open pictures from your phone (JPEG, PNG, WebP, GIF, HEIC and more). Swipe, pinch to zoom, share.",
+            category = Category.IMAGES,
+            icon = Icons.Rounded.PhotoLibrary,
+            keywords = listOf("photo", "picture", "image", "gallery", "viewer", "jpg", "png", "heic", "webp", "gif", "zoom"),
+        ),
+        Tool(
+            id = "video_player",
+            name = "Video Player",
+            description = "Play videos from your phone offline (MP4, MKV, WebM and more) with playlist and speed control.",
+            category = Category.IMAGES,
+            icon = Icons.Rounded.PlayCircle,
+            keywords = listOf("video", "movie", "mp4", "mkv", "webm", "play", "player", "film", "clip"),
         ),
         Tool(
             id = "music_player",
             name = "Music Player",
             description = "Play an MP3 or other audio file from your phone, offline. Keeps playing while you use other tools.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.MusicNote,
+            icon = Icons.Rounded.MusicNote,
             keywords = listOf("mp3", "audio", "song", "play", "player", "sound", "m4a", "wav"),
         ),
         Tool(
@@ -448,7 +466,7 @@ object ToolRegistry {
             name = "Video to Audio",
             description = "Pull the sound out of a video on your phone. Keep it in OmniTools, play it, or save a copy.",
             category = Category.IMAGES,
-            icon = Icons.Filled.AudioFile,
+            icon = Icons.Rounded.AudioFile,
             keywords = listOf("extract", "mp4", "mp3", "convert", "video", "audio", "sound", "m4a", "wav", "rip"),
         ),
         Tool(
@@ -456,7 +474,7 @@ object ToolRegistry {
             name = "Stopwatch & Timer",
             description = "Stopwatch with laps and a countdown timer with alarm sound.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.Timer,
+            icon = Icons.Rounded.Timer,
             keywords = listOf("lap", "countdown", "alarm", "clock"),
         ),
         Tool(
@@ -464,7 +482,7 @@ object ToolRegistry {
             name = "Task List",
             description = "Simple to-do list with progress. Saved on this device.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.Checklist,
+            icon = Icons.Rounded.Checklist,
             keywords = listOf("todo", "to-do", "checklist", "reminder"),
         ),
         Tool(
@@ -472,7 +490,7 @@ object ToolRegistry {
             name = "Dice, Coin & Random",
             description = "Roll dice, flip a coin, random numbers, or pick one option from a list.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.Casino,
+            icon = Icons.Rounded.Casino,
             keywords = listOf("random", "d20", "heads", "tails", "choose", "decide", "raffle"),
         ),
         Tool(
@@ -480,7 +498,7 @@ object ToolRegistry {
             name = "Color Converter",
             description = "HEX, RGB and HSL conversion with a live preview and contrast check.",
             category = Category.DEV,
-            icon = Icons.Filled.Palette,
+            icon = Icons.Rounded.Palette,
             keywords = listOf("hex", "rgb", "hsl", "picker", "contrast", "css"),
         ),
         Tool(
@@ -488,7 +506,7 @@ object ToolRegistry {
             name = "Regex Tester",
             description = "Test regular expressions with match positions and groups. Time-limited for safety.",
             category = Category.DEV,
-            icon = Icons.Filled.FindInPage,
+            icon = Icons.Rounded.FindInPage,
             keywords = listOf("regular expression", "pattern", "match", "groups"),
         ),
         Tool(
@@ -496,7 +514,7 @@ object ToolRegistry {
             name = "Hash & Checksum",
             description = "MD5, SHA-1, SHA-256 and SHA-512 of a file or text, with checksum compare and file details.",
             category = Category.SECURITY,
-            icon = Icons.Filled.Fingerprint,
+            icon = Icons.Rounded.Fingerprint,
             keywords = listOf("md5", "sha", "sha256", "checksum", "verify", "file info", "digest"),
         ),
         Tool(
@@ -504,7 +522,7 @@ object ToolRegistry {
             name = "Image Editor",
             description = "Rotate, flip, crop and resize a picture, then save as JPEG, PNG or WebP with a size preview.",
             category = Category.IMAGES,
-            icon = Icons.Filled.Crop,
+            icon = Icons.Rounded.Crop,
             keywords = listOf("photo", "resize", "compress", "convert", "jpg", "png", "webp", "rotate", "crop"),
         ),
         Tool(
@@ -512,7 +530,7 @@ object ToolRegistry {
             name = "Images to PDF",
             description = "Combine pictures into one PDF with page size, margin and quality options.",
             category = Category.PDF,
-            icon = Icons.Filled.PictureAsPdf,
+            icon = Icons.Rounded.PictureAsPdf,
             keywords = listOf("jpg", "photos", "scan", "combine", "merge", "convert"),
         ),
         Tool(
@@ -520,7 +538,7 @@ object ToolRegistry {
             name = "PDF Reader",
             description = "Open a PDF, flip through pages, jump to a page and zoom. No text search.",
             category = Category.PDF,
-            icon = Icons.Filled.Visibility,
+            icon = Icons.Rounded.Visibility,
             keywords = listOf("view", "open", "read", "pages", "document"),
         ),
         Tool(
@@ -528,7 +546,7 @@ object ToolRegistry {
             name = "Loan & EMI Calculator",
             description = "Monthly payment, total interest and the first payments of a fixed-rate loan.",
             category = Category.CALC,
-            icon = Icons.Filled.AccountBalance,
+            icon = Icons.Rounded.AccountBalance,
             keywords = listOf("emi", "mortgage", "interest", "payment", "credit", "car loan"),
         ),
         Tool(
@@ -536,7 +554,7 @@ object ToolRegistry {
             name = "Number Base Converter",
             description = "Convert whole numbers between binary, octal, decimal and hexadecimal.",
             category = Category.CALC,
-            icon = Icons.Filled.Numbers,
+            icon = Icons.Rounded.Numbers,
             keywords = listOf("binary", "hex", "octal", "decimal", "base"),
         ),
         Tool(
@@ -544,7 +562,7 @@ object ToolRegistry {
             name = "Discount & Sale Price",
             description = "Price after a discount and tax, or work out how many percent off a sale price is.",
             category = Category.CALC,
-            icon = Icons.Filled.LocalOffer,
+            icon = Icons.Rounded.LocalOffer,
             keywords = listOf("sale", "percent off", "tax", "vat", "shopping"),
         ),
         Tool(
@@ -552,7 +570,7 @@ object ToolRegistry {
             name = "Countdown",
             description = "Days left until your events, saved on this device.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.HourglassBottom,
+            icon = Icons.Rounded.HourglassBottom,
             keywords = listOf("days until", "birthday", "deadline", "event"),
         ),
         Tool(
@@ -560,7 +578,7 @@ object ToolRegistry {
             name = "Habit Tracker",
             description = "Tick off daily habits and keep your streaks, saved on this device.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.CheckCircle,
+            icon = Icons.Rounded.CheckCircle,
             keywords = listOf("streak", "routine", "daily"),
         ),
         Tool(
@@ -568,7 +586,7 @@ object ToolRegistry {
             name = "Folder Analyzer",
             description = "See what takes space in a folder: totals, types and the biggest files. Read-only.",
             category = Category.FILES,
-            icon = Icons.Filled.Storage,
+            icon = Icons.Rounded.Storage,
             keywords = listOf("storage", "space", "size", "largest", "disk", "cleanup"),
         ),
         Tool(
@@ -576,7 +594,7 @@ object ToolRegistry {
             name = "Duplicate Finder",
             description = "Find identical files in a folder and free space. Nothing is deleted without your confirmation.",
             category = Category.FILES,
-            icon = Icons.Filled.ContentCopy,
+            icon = Icons.Rounded.ContentCopy,
             keywords = listOf("duplicates", "same files", "clean", "free space", "copies"),
         ),
         Tool(
@@ -584,7 +602,7 @@ object ToolRegistry {
             name = "Batch Rename",
             description = "Rename many files at once: find and replace, prefix, numbering, letter case. Preview before anything changes.",
             category = Category.FILES,
-            icon = Icons.Filled.DriveFileRenameOutline,
+            icon = Icons.Rounded.DriveFileRenameOutline,
             keywords = listOf("rename", "files", "numbering", "bulk", "photos", "names"),
         ),
         Tool(
@@ -592,7 +610,7 @@ object ToolRegistry {
             name = "Encode / Decode",
             description = "Base64, URL, HTML entities, hex and binary, both directions, on your device.",
             category = Category.DEV,
-            icon = Icons.Filled.Link,
+            icon = Icons.Rounded.Link,
             keywords = listOf("base64", "url", "percent", "html", "entities", "hex", "binary", "encode", "decode"),
         ),
         Tool(
@@ -600,7 +618,7 @@ object ToolRegistry {
             name = "Time Zones",
             description = "See what time it is in other cities for a time you pick. Works offline.",
             category = Category.PRODUCTIVITY,
-            icon = Icons.Filled.Public,
+            icon = Icons.Rounded.Public,
             keywords = listOf("timezone", "world clock", "utc", "meeting", "convert time"),
         ),
         Tool(
@@ -608,7 +626,7 @@ object ToolRegistry {
             name = "BMI Calculator",
             description = "Body mass index in kg/cm or lb/ft, with the weight range for your height.",
             category = Category.CALC,
-            icon = Icons.Filled.MonitorWeight,
+            icon = Icons.Rounded.MonitorWeight,
             keywords = listOf("weight", "height", "health", "body mass"),
         ),
         Tool(
@@ -616,7 +634,7 @@ object ToolRegistry {
             name = "Tip & Bill Split",
             description = "Add a tip and split a bill between people, with optional rounding up.",
             category = Category.CALC,
-            icon = Icons.Filled.Receipt,
+            icon = Icons.Rounded.Receipt,
             keywords = listOf("restaurant", "split", "share", "gratuity"),
         ),
         Tool(
@@ -624,7 +642,7 @@ object ToolRegistry {
             name = "Roman Numerals",
             description = "Convert numbers 1 to 3999 to Roman numerals and back.",
             category = Category.CALC,
-            icon = Icons.Filled.FormatListNumbered,
+            icon = Icons.Rounded.FormatListNumbered,
             keywords = listOf("roman", "numeral", "xiv", "convert"),
         ),
         Tool(
@@ -632,7 +650,7 @@ object ToolRegistry {
             name = "Number to Words",
             description = "Write any number in English words, such as for cheques and documents.",
             category = Category.CALC,
-            icon = Icons.Filled.Tag,
+            icon = Icons.Rounded.Tag,
             keywords = listOf("spell", "cheque", "check", "words", "say"),
         ),
         Tool(
@@ -640,7 +658,7 @@ object ToolRegistry {
             name = "Timestamp Converter",
             description = "Unix timestamps to dates and back, in UTC or your time zone.",
             category = Category.DEV,
-            icon = Icons.Filled.Schedule,
+            icon = Icons.Rounded.Schedule,
             keywords = listOf("unix", "epoch", "date", "time", "milliseconds"),
         ),
         Tool(
@@ -648,7 +666,7 @@ object ToolRegistry {
             name = "Morse Code",
             description = "Translate text to Morse code and Morse code to text.",
             category = Category.NOTES,
-            icon = Icons.Filled.GraphicEq,
+            icon = Icons.Rounded.GraphicEq,
             keywords = listOf("dot", "dash", "sos", "telegraph"),
         ),
         Tool(
@@ -656,7 +674,7 @@ object ToolRegistry {
             name = "Lorem Ipsum Generator",
             description = "Placeholder text by paragraphs, sentences or words.",
             category = Category.NOTES,
-            icon = Icons.Filled.ViewHeadline,
+            icon = Icons.Rounded.ViewHeadline,
             keywords = listOf("dummy", "placeholder", "filler", "design"),
         ),
         Tool(
@@ -664,7 +682,7 @@ object ToolRegistry {
             name = "Barcode Generator",
             description = "Code 128, Code 39, EAN-13, EAN-8, UPC-A and ITF barcodes. Save or share as PNG.",
             category = Category.QR,
-            icon = Icons.Filled.ViewWeek,
+            icon = Icons.Rounded.ViewWeek,
             keywords = listOf("ean", "upc", "code128", "label", "product", "stripes"),
         ),
         Tool(
@@ -672,7 +690,7 @@ object ToolRegistry {
             name = "ZIP Manager",
             description = "See what is inside a ZIP, extract it to a folder (unsafe paths are blocked), or zip files together.",
             category = Category.FILES,
-            icon = Icons.Filled.FolderZip,
+            icon = Icons.Rounded.FolderZip,
             keywords = listOf("archive", "compress", "unzip", "extract", "zip", "rar"),
         ),
         Tool(
@@ -680,7 +698,7 @@ object ToolRegistry {
             name = "Code Editor",
             description = "Open, edit and save text and code files with line numbers, colours, find & replace and undo.",
             category = Category.DEV,
-            icon = Icons.Filled.Terminal,
+            icon = Icons.Rounded.Terminal,
             keywords = listOf("source", "program", "kotlin", "python", "javascript", "json", "edit file", "text file"),
         ),
         Tool(
@@ -688,7 +706,7 @@ object ToolRegistry {
             name = "Code Runner",
             description = "Run HTML, CSS, JavaScript, Markdown, SVG and JSON in a locked-down page with a console. Touch games work.",
             category = Category.DEV,
-            icon = Icons.Filled.Html,
+            icon = Icons.Rounded.Html,
             keywords = listOf("html", "js", "web", "javascript", "css", "markdown", "svg", "json", "preview", "sandbox", "playground", "game", "canvas", "runner"),
         ),
     )

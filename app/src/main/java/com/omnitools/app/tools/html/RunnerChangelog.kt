@@ -6,6 +6,14 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 59", "12 Nov 2026", "Photo Viewer, Video Player and polished icons",
+            listOf(
+                "New Photo Viewer: open one or many pictures (JPEG, PNG, WebP, GIF, BMP, and HEIC or AVIF on phones that support them), swipe between them, pinch or double-tap to zoom, share. Animated GIFs show their first frame.",
+                "New Video Player: plays MP4, MKV, WebM, 3GP, TS and more offline, with a playlist, speed from 0.5x to 2x, seeking and a rotate button. What plays depends on your phone's codecs; videos it cannot play show a message and the player moves on.",
+                "Icons are now rounded and every category has its own colour with a soft gradient badge.",
+            ),
+        ),
+        Entry(
             "Build 58", "11 Nov 2026", "Animated background themes",
             listOf(
                 "Settings > Background theme: Galaxy (twinkling stars), Candy, Rainbow, Aurora, Sunset and Ocean. Every screen sits on the animated picture; Plain keeps the old look.",
