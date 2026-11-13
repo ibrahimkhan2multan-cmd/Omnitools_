@@ -52,6 +52,7 @@ import com.omnitools.app.data.Tool
 import com.omnitools.app.data.Category
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.border
 
 /** Standard screen frame: top bar with back arrow and optional actions. */
