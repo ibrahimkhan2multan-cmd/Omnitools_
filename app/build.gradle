@@ -17,6 +17,8 @@ android {
     // Rises with every CI build so each new APK installs over the previous one.
     versionCode 100 + (System.getenv("GITHUB_RUN_NUMBER") ?: "0").toInteger()
     versionName "1.0.1"
+    // Real phones only. PDFium adds a native library per CPU type, so x86 emulator builds are left out to keep the APK small.
+    ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }
 
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -84,6 +86,7 @@ dependencies {
   implementation 'androidx.compose.material:material-icons-extended'
   implementation 'androidx.navigation:navigation-compose:2.8.5'
   implementation 'androidx.datastore:datastore-preferences:1.1.1'
+  implementation 'io.legere:pdfiumandroid:1.0.30'
   implementation 'androidx.media3:media3-exoplayer:1.5.1'
   implementation 'androidx.media3:media3-ui:1.5.1'
 

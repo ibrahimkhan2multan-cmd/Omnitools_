@@ -6,6 +6,16 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 60", "13 Nov 2026", "PDF Reader rebuilt on the PDFium engine",
+            listOf(
+                "The PDF Reader now uses PDFium (the engine inside Chrome). It draws pictures, scanned pages and files that Android's own viewer could not show.",
+                "Password-protected PDFs open: the reader asks for the password.",
+                "All pages sit in one scrolling list, with zoom, previous/next and go-to-page. Files some phones label as plain binary files can be picked too.",
+                "If PDFium cannot start on a phone, the reader falls back to the old Android engine. Merge, split and save-as-images use the same engine.",
+                "The APK is built for real phones (arm64 and 32-bit ARM) only, to keep the PDF engine from making it much bigger.",
+            ),
+        ),
+        Entry(
             "Build 59", "12 Nov 2026", "Photo Viewer, Video Player and polished icons",
             listOf(
                 "New Photo Viewer: open one or many pictures (JPEG, PNG, WebP, GIF, BMP, and HEIC or AVIF on phones that support them), swipe between them, pinch or double-tap to zoom, share. Animated GIFs show their first frame.",
