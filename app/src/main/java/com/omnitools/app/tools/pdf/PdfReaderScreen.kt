@@ -231,7 +231,7 @@ fun PdfReaderScreen(onBack: () -> Unit) {
                 val viewportPx = with(density) { maxWidth.roundToPx() }
                 val widthPx = (viewportPx * zoom).toInt()
                 Box(Modifier.fillMaxSize().horizontalScroll(rememberScrollState())) {
-                    LazyColumn(state = listState, modifier = Modifier.width(maxWidth * zoom), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    LazyColumn(state = listState, modifier = Modifier.width(with(density) { widthPx.toDp() }), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(s.pageCount, key = { it }) { i ->
                             val (pw, ph) = sizes.getOrElse(i) { A4 }
                             PdfPageItem(s, i, widthPx, pw.toFloat() / ph.coerceAtLeast(1), cache)
