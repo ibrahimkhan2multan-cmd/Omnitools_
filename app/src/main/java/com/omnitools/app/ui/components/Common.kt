@@ -25,10 +25,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.omnitools.app.data.Tool
 import com.omnitools.app.data.Category
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.border
 
 /** Standard screen frame: top bar with back arrow and optional actions. */
@@ -69,7 +70,7 @@ fun ScreenScaffold(
                 title = { Text(title, style = MaterialTheme.typography.titleLarge.copy(lineHeight = 26.sp), maxLines = 2) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = actions,
@@ -118,7 +119,7 @@ fun LinkRow(
     icon: ImageVector,
     title: String,
     subtitle: String? = null,
-    trailing: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+    trailing: ImageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
     onClick: () -> Unit,
 ) {
     Card(
@@ -147,13 +148,16 @@ fun LinkRow(
 /** Rounded badge that holds a tool/category icon: one calm accent color everywhere, so lists stay easy to scan. */
 @Composable
 fun IconBadge(icon: ImageVector, size: Int = 44, accent: Color = Color.Unspecified) {
-    val c = if (accent == Color.Unspecified) MaterialTheme.colorScheme.primary else accent
-    val shape = RoundedCornerShape((size * 0.32f).dp)
+    val base = if (accent == Color.Unspecified) MaterialTheme.colorScheme.primary else accent
+    // On light screens the bright category colours are darkened a little so the icon keeps good contrast.
+    val onLight = MaterialTheme.colorScheme.onBackground.luminance() < 0.5f
+    val c = if (onLight && accent != Color.Unspecified) androidx.compose.ui.graphics.lerp(base, Color.Black, 0.30f) else base
+    val shape = RoundedCornerShape((size * 0.30f).dp)
     Box(
         modifier = Modifier
             .size(size.dp)
-            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(c.copy(alpha = 0.30f), c.copy(alpha = 0.10f))), shape)
-            .border(1.dp, c.copy(alpha = 0.30f), shape),
+            .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(c.copy(alpha = 0.22f), c.copy(alpha = 0.10f))), shape)
+            .border(1.dp, c.copy(alpha = 0.28f), shape),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = null, tint = c, modifier = Modifier.size((size * 0.52f).dp))
@@ -234,7 +238,7 @@ fun FavoriteStar(isFavorite: Boolean, onClick: () -> Unit) {
     )
     IconButton(onClick = onClick) {
         Icon(
-            if (isFavorite) Icons.Filled.Star else Icons.Filled.StarBorder,
+            if (isFavorite) Icons.Rounded.Star else Icons.Rounded.StarBorder,
             contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
             tint = tint,
             modifier = Modifier.graphicsLayer {
@@ -246,6 +250,37 @@ fun FavoriteStar(isFavorite: Boolean, onClick: () -> Unit) {
 }
 
 /** Small centered message used for empty states. */
+@Composable
+fun FeatureEmptyState(
+    icon: ImageVector,
+    title: String,
+    body: String,
+    actionLabel: String,
+    onAction: () -> Unit,
+    modifier: Modifier = Modifier,
+    accent: Color = Color.Unspecified,
+) {
+    Column(
+        modifier.fillMaxSize().padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        IconBadge(icon, size = 72, accent = accent)
+        Spacer(Modifier.height(16.dp))
+        Text(title, style = MaterialTheme.typography.titleMedium, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+        Spacer(Modifier.height(6.dp))
+        Text(
+            body,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+        Spacer(Modifier.height(20.dp))
+        androidx.compose.material3.Button(onClick = onAction) { Text(actionLabel) }
+    }
+}
+
+/** A short message in the middle of an empty list. */
 @Composable
 fun EmptyState(message: String, modifier: Modifier = Modifier) {
     Box(modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {

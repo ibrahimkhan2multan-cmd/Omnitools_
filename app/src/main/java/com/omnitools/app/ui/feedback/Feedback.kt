@@ -65,9 +65,16 @@ object Feedback {
             .also { it.write(data, 0, data.size) }
     }
 
+    private var lastCue: Cue? = null
+    private var lastCueAt = 0L
+
     @Synchronized
     fun play(cue: Cue) {
         if (!soundOn) return
+        // The same sound twice within a split second is just noise (rapid taps), so the second one is skipped.
+        val now = android.os.SystemClock.uptimeMillis()
+        if (cue == lastCue && now - lastCueAt < 60) return
+        lastCue = cue; lastCueAt = now
         try {
             val track = tracks.getOrPut(theme to cue) {
                 val data = SoundSynth.render(theme, cue)

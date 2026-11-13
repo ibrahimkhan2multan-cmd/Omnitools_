@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Alarm
+import androidx.compose.material.icons.rounded.Alarm
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -113,7 +113,7 @@ private fun RingScreen(onStop: () -> Unit, onClose: () -> Unit) {
                     }
                 }
                 Icon(
-                    Icons.Filled.Alarm,
+                    Icons.Rounded.Alarm,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(84.dp).scale(bell),

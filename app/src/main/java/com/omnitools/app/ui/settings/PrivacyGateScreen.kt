@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.Camera
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -51,15 +51,15 @@ fun PrivacyGateScreen(onAccept: () -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            GateInfo(Icons.Filled.Shield, "Your data stays on your device", "No internet permission, no account, no analytics, no ads. Nothing is uploaded or shared.")
-            GateInfo(Icons.Filled.Camera, "Permissions", "Camera only for the scanner. Notifications, sound and full-screen alert only so timers can ring when the app is closed. Files only through the system picker.")
-            GateInfo(Icons.Filled.Key, "Passwords", "Generated on your device and never saved or sent.")
+            GateInfo(Icons.Rounded.Shield, "Your data stays on your device", "No internet permission, no account, no analytics, no ads. Nothing is uploaded or shared.")
+            GateInfo(Icons.Rounded.Camera, "Permissions", "Camera only for the scanner. Notifications, sound and full-screen alert only so timers can ring when the app is closed. Files only through the system picker.")
+            GateInfo(Icons.Rounded.Key, "Passwords", "Generated on your device and never saved or sent.")
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
             LinkRow(
-                icon = Icons.Filled.PrivacyTip,
+                icon = Icons.Rounded.PrivacyTip,
                 title = "Read the full privacy policy",
                 subtitle = "Opens in your browser",
-                trailing = Icons.AutoMirrored.Filled.OpenInNew,
+                trailing = Icons.AutoMirrored.Rounded.OpenInNew,
                 onClick = {
                     try {
                         uriHandler.openUri(POLICY_URL)

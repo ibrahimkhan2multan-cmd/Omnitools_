@@ -22,7 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -58,7 +58,7 @@ fun DeviceInfoScreen(onBack: () -> Unit) {
                     s.title + "\n" + s.rows.joinToString("\n") { (k, v) -> "$k: $v" }
                 }
                 Actions.copy(context, "Device information", text)
-            }) { Icon(Icons.Filled.ContentCopy, contentDescription = "Copy all device information") }
+            }) { Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy all device information") }
         },
     ) { padding ->
         Column(

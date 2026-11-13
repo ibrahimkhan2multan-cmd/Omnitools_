@@ -17,12 +17,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AudioFile
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.PlaylistAdd
-import androidx.compose.material.icons.filled.SaveAlt
-import androidx.compose.material.icons.filled.VideoFile
+import androidx.compose.material.icons.rounded.AudioFile
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.SaveAlt
+import androidx.compose.material.icons.rounded.VideoFile
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -176,7 +176,7 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            IconBadge(Icons.Filled.VideoFile, size = 44)
+                            IconBadge(Icons.Rounded.VideoFile, size = 44)
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(videoName ?: "No video selected", style = MaterialTheme.typography.titleSmall)
@@ -221,7 +221,7 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
                                 OutlinedButton(onClick = { cancel() }, modifier = Modifier.fillMaxWidth()) { Text("Cancel") }
                             } else {
                                 Button(onClick = { extract() }, modifier = Modifier.fillMaxWidth().height(50.dp), shape = RoundedCornerShape(16.dp)) {
-                                    Icon(Icons.Filled.AudioFile, contentDescription = null)
+                                    Icon(Icons.Rounded.AudioFile, contentDescription = null)
                                     Spacer(Modifier.width(8.dp))
                                     Text("Extract audio")
                                 }
@@ -259,14 +259,14 @@ fun VideoToAudioScreen(onBack: () -> Unit) {
                             IconButton(onClick = {
                                 MusicController.playQueue(context, listOf(Track(Uri.fromFile(f).toString(), f.name)))
                                 message = "Playing in the Music Player. Use the mini player at the bottom to control it."; isError = false
-                            }) { Icon(Icons.Filled.PlayArrow, contentDescription = "Play ${f.name}") }
+                            }) { Icon(Icons.Rounded.PlayArrow, contentDescription = "Play ${f.name}") }
                             IconButton(onClick = {
                                 MusicController.addToQueue(context, listOf(Track(Uri.fromFile(f).toString(), f.name)))
                                 message = "Added to the Music Player queue."; isError = false
-                            }) { Icon(Icons.Filled.PlaylistAdd, contentDescription = "Add ${f.name} to the music queue") }
-                            IconButton(onClick = { toSave = f; saver.launch(f.name to mimeFor(f)) }) { Icon(Icons.Filled.SaveAlt, contentDescription = "Save a copy of ${f.name} to your phone") }
+                            }) { Icon(Icons.Rounded.PlaylistAdd, contentDescription = "Add ${f.name} to the music queue") }
+                            IconButton(onClick = { toSave = f; saver.launch(f.name to mimeFor(f)) }) { Icon(Icons.Rounded.SaveAlt, contentDescription = "Save a copy of ${f.name} to your phone") }
                             Spacer(Modifier.weight(1f))
-                            IconButton(onClick = { toDelete = f }) { Icon(Icons.Filled.Delete, contentDescription = "Delete ${f.name}") }
+                            IconButton(onClick = { toDelete = f }) { Icon(Icons.Rounded.Delete, contentDescription = "Delete ${f.name}") }
                         }
                     }
                 }

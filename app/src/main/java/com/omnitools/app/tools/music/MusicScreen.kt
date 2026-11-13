@@ -32,24 +32,24 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Forward10
-import androidx.compose.material.icons.filled.LibraryMusic
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.PlaylistAdd
-import androidx.compose.material.icons.filled.Repeat
-import androidx.compose.material.icons.filled.RepeatOne
-import androidx.compose.material.icons.filled.Replay10
-import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Forward10
+import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.PlaylistAdd
+import androidx.compose.material.icons.rounded.Repeat
+import androidx.compose.material.icons.rounded.RepeatOne
+import androidx.compose.material.icons.rounded.Replay10
+import androidx.compose.material.icons.rounded.Shuffle
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.SkipPrevious
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -67,7 +67,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -204,12 +204,12 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
                     dragging = false
                 })
             Button(onClick = { pick(null) }, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(16.dp)) {
-                Icon(Icons.Filled.PlaylistAdd, contentDescription = null)
+                Icon(Icons.Rounded.PlaylistAdd, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(if (MusicController.queue.isEmpty()) "Choose songs" else "Add songs to queue")
             }
             TextButton(onClick = { customize = !customize }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Filled.Palette, contentDescription = null)
+                Icon(Icons.Rounded.Palette, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text(if (customize) "Hide player design" else "Customize player design")
             }
@@ -244,7 +244,7 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
                     }
                     itemsIndexed(MusicController.queue, key = { i, t -> "q$i${t.uri}" }) { i, t ->
                         TrackRow(i + 1, t.name, highlighted = i == MusicController.index, onClick = { MusicController.playIndex(i) }) {
-                            IconButton(onClick = { MusicController.removeFromQueue(i) }) { Icon(Icons.Filled.Close, contentDescription = "Remove from queue") }
+                            IconButton(onClick = { MusicController.removeFromQueue(i) }) { Icon(Icons.Rounded.Close, contentDescription = "Remove from queue") }
                         }
                     }
                 }
@@ -258,7 +258,7 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
             } else if (playlist == null) {
                 item {
                     Button(onClick = { nameDialog = "new" }, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(16.dp)) {
-                        Icon(Icons.Filled.LibraryMusic, contentDescription = null)
+                        Icon(Icons.Rounded.LibraryMusic, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
                         Text("New playlist")
                     }
@@ -280,14 +280,14 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
                         modifier = Modifier.fillMaxWidth().clickable { openId = p.id },
                     ) {
                         Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                            com.omnitools.app.ui.components.IconBadge(Icons.Filled.LibraryMusic, size = 40)
+                            com.omnitools.app.ui.components.IconBadge(Icons.Rounded.LibraryMusic, size = 40)
                             Spacer(Modifier.width(12.dp))
                             Column(Modifier.weight(1f)) {
                                 Text(p.name, style = MaterialTheme.typography.titleSmall)
                                 Text("${p.tracks.size} song${if (p.tracks.size == 1) "" else "s"}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             IconButton(onClick = { playTracks(p.tracks, 0, false) }, enabled = p.tracks.isNotEmpty()) {
-                                Icon(Icons.Filled.PlayArrow, contentDescription = "Play ${p.name}")
+                                Icon(Icons.Rounded.PlayArrow, contentDescription = "Play ${p.name}")
                             }
                         }
                     }
@@ -297,8 +297,8 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         TextButton(onClick = { openId = null }) { Text("‹ All playlists") }
                         Spacer(Modifier.weight(1f))
-                        IconButton(onClick = { nameDialog = "rename" }) { Icon(Icons.Filled.Edit, contentDescription = "Rename playlist") }
-                        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Filled.Delete, contentDescription = "Delete playlist") }
+                        IconButton(onClick = { nameDialog = "rename" }) { Icon(Icons.Rounded.Edit, contentDescription = "Rename playlist") }
+                        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Rounded.Delete, contentDescription = "Delete playlist") }
                     }
                 }
                 item {
@@ -308,24 +308,24 @@ fun MusicScreen(prefs: com.omnitools.app.data.Prefs, onBack: () -> Unit) {
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                         Button(onClick = { playTracks(playlist.tracks, 0, false) }, enabled = playlist.tracks.isNotEmpty(), modifier = Modifier.weight(1f)) {
-                            Icon(Icons.Filled.PlayArrow, contentDescription = null); Spacer(Modifier.width(4.dp)); Text("Play")
+                            Icon(Icons.Rounded.PlayArrow, contentDescription = null); Spacer(Modifier.width(4.dp)); Text("Play")
                         }
                         OutlinedButton(
                             onClick = { playTracks(playlist.tracks, playlist.tracks.indices.random(), true) },
                             enabled = playlist.tracks.isNotEmpty(), modifier = Modifier.weight(1f),
-                        ) { Icon(Icons.Filled.Shuffle, contentDescription = null); Spacer(Modifier.width(4.dp)); Text("Shuffle") }
+                        ) { Icon(Icons.Rounded.Shuffle, contentDescription = null); Spacer(Modifier.width(4.dp)); Text("Shuffle") }
                     }
                 }
                 item {
                     OutlinedButton(onClick = { pick(playlist.id) }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(Icons.Filled.PlaylistAdd, contentDescription = null); Spacer(Modifier.width(8.dp)); Text("Add songs")
+                        Icon(Icons.Rounded.PlaylistAdd, contentDescription = null); Spacer(Modifier.width(8.dp)); Text("Add songs")
                     }
                 }
                 itemsIndexed(playlist.tracks, key = { i, t -> "p$i${t.uri}" }) { i, t ->
                     TrackRow(i + 1, t.name, highlighted = false, onClick = { playTracks(playlist.tracks, i, false) }) {
-                        IconButton(onClick = { MusicLibrary.moveTrack(playlist.id, i, -1) }, enabled = i > 0) { Icon(Icons.Filled.ArrowUpward, contentDescription = "Move up") }
-                        IconButton(onClick = { MusicLibrary.moveTrack(playlist.id, i, 1) }, enabled = i < playlist.tracks.lastIndex) { Icon(Icons.Filled.ArrowDownward, contentDescription = "Move down") }
-                        IconButton(onClick = { MusicLibrary.removeTrack(playlist.id, i) }) { Icon(Icons.Filled.Close, contentDescription = "Remove from playlist") }
+                        IconButton(onClick = { MusicLibrary.moveTrack(playlist.id, i, -1) }, enabled = i > 0) { Icon(Icons.Rounded.ArrowUpward, contentDescription = "Move up") }
+                        IconButton(onClick = { MusicLibrary.moveTrack(playlist.id, i, 1) }, enabled = i < playlist.tracks.lastIndex) { Icon(Icons.Rounded.ArrowDownward, contentDescription = "Move down") }
+                        IconButton(onClick = { MusicLibrary.removeTrack(playlist.id, i) }) { Icon(Icons.Rounded.Close, contentDescription = "Remove from playlist") }
                     }
                 }
                 if (playlist.tracks.isEmpty()) {
@@ -393,7 +393,7 @@ private fun TrackRow(number: Int, name: String, highlighted: Boolean, onClick: (
             .padding(start = 12.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (highlighted) Icon(Icons.Filled.MusicNote, contentDescription = "Now playing", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+        if (highlighted) Icon(Icons.Rounded.MusicNote, contentDescription = "Now playing", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         else Text("$number", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.width(20.dp))
         Spacer(Modifier.width(10.dp))
         Text(MusicFormat.titleNoExtension(name), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f).padding(vertical = 10.dp))
@@ -460,36 +460,36 @@ private fun PlayerCard(
                 }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { MusicController.previous() }, enabled = hasSong) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song", tint = c.fg) }
+                IconButton(onClick = { MusicController.previous() }, enabled = hasSong) { Icon(Icons.Rounded.SkipPrevious, contentDescription = "Previous song", tint = c.fg) }
                 FilledIconButton(
                     onClick = { MusicController.togglePlayPause() },
                     enabled = hasSong, modifier = Modifier.size(68.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(containerColor = c.buttonBg, contentColor = c.buttonFg, disabledContainerColor = c.sub.copy(alpha = 0.25f)),
                 ) {
                     val playing = MusicController.showsPause
-                    Icon(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (playing) "Pause" else "Play", modifier = Modifier.size(36.dp))
+                    Icon(if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, contentDescription = if (playing) "Pause" else "Play", modifier = Modifier.size(36.dp))
                 }
                 FilledTonalIconButton(
                     onClick = { MusicController.stop() }, enabled = ready, modifier = Modifier.size(52.dp),
                     colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = c.sub.copy(alpha = 0.2f), contentColor = c.fg, disabledContainerColor = c.sub.copy(alpha = 0.1f)),
-                ) { Icon(Icons.Filled.Stop, contentDescription = "Stop") }
-                IconButton(onClick = { MusicController.next() }, enabled = hasSong) { Icon(Icons.Filled.SkipNext, contentDescription = "Next song", tint = c.fg) }
+                ) { Icon(Icons.Rounded.Stop, contentDescription = "Stop") }
+                IconButton(onClick = { MusicController.next() }, enabled = hasSong) { Icon(Icons.Rounded.SkipNext, contentDescription = "Next song", tint = c.fg) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { MusicController.skip(-10_000) }, enabled = ready) { Icon(Icons.Filled.Replay10, contentDescription = "Back 10 seconds", tint = c.fg) }
+                IconButton(onClick = { MusicController.skip(-10_000) }, enabled = ready) { Icon(Icons.Rounded.Replay10, contentDescription = "Back 10 seconds", tint = c.fg) }
                 IconButton(onClick = { MusicController.toggleShuffle() }) {
-                    Icon(Icons.Filled.Shuffle, contentDescription = if (MusicController.shuffle) "Shuffle on" else "Shuffle off",
+                    Icon(Icons.Rounded.Shuffle, contentDescription = if (MusicController.shuffle) "Shuffle on" else "Shuffle off",
                         tint = if (MusicController.shuffle) (if (c.brush != null) Color.White else c.accentA) else c.sub)
                 }
                 IconButton(onClick = { MusicController.cycleRepeat() }) {
                     val mode = MusicController.repeat
                     Icon(
-                        if (mode == RepeatMode.ONE) Icons.Filled.RepeatOne else Icons.Filled.Repeat,
+                        if (mode == RepeatMode.ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
                         contentDescription = when (mode) { RepeatMode.OFF -> "Repeat off"; RepeatMode.ALL -> "Repeat all"; RepeatMode.ONE -> "Repeat one" },
                         tint = if (mode == RepeatMode.OFF) c.sub else (if (c.brush != null) Color.White else c.accentA),
                     )
                 }
-                IconButton(onClick = { MusicController.skip(10_000) }, enabled = ready) { Icon(Icons.Filled.Forward10, contentDescription = "Forward 10 seconds", tint = c.fg) }
+                IconButton(onClick = { MusicController.skip(10_000) }, enabled = ready) { Icon(Icons.Rounded.Forward10, contentDescription = "Forward 10 seconds", tint = c.fg) }
             }
         }
     }

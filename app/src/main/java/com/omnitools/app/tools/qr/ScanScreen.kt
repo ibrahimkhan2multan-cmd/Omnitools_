@@ -21,13 +21,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.DeleteSweep
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.OpenInBrowser
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.OpenInBrowser
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -124,15 +124,15 @@ fun ScanScreen(prefs: Prefs, onBack: () -> Unit) {
             if (showHistory) {
                 if (history.isNotEmpty()) {
                     IconButton(onClick = { confirmClear = true }) {
-                        Icon(Icons.Filled.DeleteSweep, contentDescription = "Clear history")
+                        Icon(Icons.Rounded.DeleteSweep, contentDescription = "Clear history")
                     }
                 }
             } else {
                 IconButton(onClick = { pictureLauncher.launch("image/*") }, enabled = !pictureBusy) {
-                    Icon(Icons.Filled.Image, contentDescription = "Scan a QR code from a picture")
+                    Icon(Icons.Rounded.Image, contentDescription = "Scan a QR code from a picture")
                 }
                 IconButton(onClick = { showHistory = true }) {
-                    Icon(Icons.Filled.History, contentDescription = "Scan history")
+                    Icon(Icons.Rounded.History, contentDescription = "Scan history")
                 }
             }
         },
@@ -342,16 +342,16 @@ private fun ResultCard(
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onCopy) {
-                    Icon(Icons.Filled.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Rounded.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp))
                     Text("  Copy")
                 }
                 OutlinedButton(onClick = onShare) {
-                    Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(Icons.Rounded.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                     Text("  Share")
                 }
                 if (analysis.canOpen) {
                     OutlinedButton(onClick = onOpen) {
-                        Icon(Icons.Filled.OpenInBrowser, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Rounded.OpenInBrowser, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text("  Open")
                     }
                 }
@@ -383,7 +383,7 @@ private fun HistoryList(history: List<ScanEntry>, onPick: (ScanEntry) -> Unit, o
                     )
                 }
                 IconButton(onClick = { onDelete(entry) }) {
-                    Icon(Icons.Filled.Delete, contentDescription = "Delete this scan")
+                    Icon(Icons.Rounded.Delete, contentDescription = "Delete this scan")
                 }
             }
         }

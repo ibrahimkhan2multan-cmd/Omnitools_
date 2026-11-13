@@ -21,10 +21,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.automirrored.rounded.Redo
+import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Checkbox
@@ -246,9 +246,9 @@ fun CodeEditorScreen(onBack: () -> Unit) {
         title = "Code Editor",
         onBack = { guard(onBack) },
         actions = {
-            IconButton(onClick = ::undo, enabled = canUndo) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo") }
-            IconButton(onClick = ::redo, enabled = canRedo) { Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = "Redo") }
-            IconButton(onClick = ::save) { Icon(Icons.Filled.Save, contentDescription = "Save") }
+            IconButton(onClick = ::undo, enabled = canUndo) { Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = "Undo") }
+            IconButton(onClick = ::redo, enabled = canRedo) { Icon(Icons.AutoMirrored.Rounded.Redo, contentDescription = "Redo") }
+            IconButton(onClick = ::save) { Icon(Icons.Rounded.Save, contentDescription = "Save") }
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize().imePadding()) {
@@ -322,7 +322,7 @@ fun CodeEditorScreen(onBack: () -> Unit) {
                 Column(Modifier.fillMaxSize()) {
                     Row(Modifier.fillMaxWidth().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text("Preview (no internet, no file access)", Modifier.weight(1f).padding(start = 8.dp), style = MaterialTheme.typography.titleSmall)
-                        IconButton(onClick = { showPreview = false }) { Icon(Icons.Filled.Close, contentDescription = "Close preview") }
+                        IconButton(onClick = { showPreview = false }) { Icon(Icons.Rounded.Close, contentDescription = "Close preview") }
                     }
                     HtmlPreviewPanel(document, previewRun, Modifier.weight(1f).fillMaxWidth())
                 }

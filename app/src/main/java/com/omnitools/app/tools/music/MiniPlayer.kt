@@ -15,11 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.SkipNext
+import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -96,13 +96,13 @@ fun MiniPlayer(design: MusicDesign, onOpen: () -> Unit, modifier: Modifier = Mod
                         style = MaterialTheme.typography.labelSmall, color = sub,
                     )
                 }
-                IconButton(onClick = { MusicController.previous() }) { Icon(Icons.Filled.SkipPrevious, contentDescription = "Previous song", tint = fg) }
+                IconButton(onClick = { MusicController.previous() }) { Icon(Icons.Rounded.SkipPrevious, contentDescription = "Previous song", tint = fg) }
                 IconButton(onClick = { MusicController.togglePlayPause() }) {
                     val playing = MusicController.showsPause
-                    Icon(if (playing) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = if (playing) "Pause" else "Play", tint = fg, modifier = Modifier.size(30.dp))
+                    Icon(if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, contentDescription = if (playing) "Pause" else "Play", tint = fg, modifier = Modifier.size(30.dp))
                 }
-                IconButton(onClick = { MusicController.next() }) { Icon(Icons.Filled.SkipNext, contentDescription = "Next song", tint = fg) }
-                IconButton(onClick = { MusicController.clear() }) { Icon(Icons.Filled.Close, contentDescription = "Stop and close player", tint = sub) }
+                IconButton(onClick = { MusicController.next() }) { Icon(Icons.Rounded.SkipNext, contentDescription = "Next song", tint = fg) }
+                IconButton(onClick = { MusicController.clear() }) { Icon(Icons.Rounded.Close, contentDescription = "Stop and close player", tint = sub) }
             }
         }
     }

@@ -17,10 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.NewReleases
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.NewReleases
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -74,6 +74,9 @@ fun HomeScreen(
         ToolRegistry.all.filter { it.id !in recents && it.id !in favorites }.take(4)
     }
     val categories = remember { ToolRegistry.activeCategories() }
+    // More category cards per row on wide screens (landscape, tablets).
+    val screenWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
+    val columns = when { screenWidth >= 840 -> 4; screenWidth >= 560 -> 3; else -> 2 }
 
     Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
         LazyColumn(
@@ -87,11 +90,11 @@ fun HomeScreen(
                     onValueChange = { query = it },
                     singleLine = true,
                     placeholder = { Text("Search tools") },
-                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
                     trailingIcon = {
                         if (query.isNotEmpty()) {
                             IconButton(onClick = { query = "" }) {
-                                Icon(Icons.Filled.Clear, contentDescription = "Clear search")
+                                Icon(Icons.Rounded.Clear, contentDescription = "Clear search")
                             }
                         }
                     },
@@ -134,7 +137,7 @@ fun HomeScreen(
                     }
                 }
                 item { SectionTitle("Categories") }
-                itemsIndexed(categories.chunked(2), key = { _, row -> "c_" + row.joinToString { it.name } }) { rowIndex, row ->
+                itemsIndexed(categories.chunked(columns), key = { _, row -> "c_" + row.joinToString { it.name } }) { rowIndex, row ->
                     Entrance("cr_${row.joinToString { it.name }}", index = rowIndex + 1) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
@@ -143,7 +146,7 @@ fun HomeScreen(
                             row.forEach { category ->
                                 CategoryCard(category, Modifier.weight(1f)) { onOpenCategory(category) }
                             }
-                            if (row.size == 1) Spacer(Modifier.weight(1f))
+                            repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                         }
                     }
                 }
@@ -187,11 +190,11 @@ private fun Header(onOpenSettings: () -> Unit, hasNewUpdate: Boolean, onOpenUpda
             androidx.compose.material3.BadgedBox(
                 badge = { if (hasNewUpdate) androidx.compose.material3.Badge() },
             ) {
-                Icon(Icons.Filled.NewReleases, contentDescription = if (hasNewUpdate) "Update log, new" else "Update log")
+                Icon(Icons.Rounded.NewReleases, contentDescription = if (hasNewUpdate) "Update log, new" else "Update log")
             }
         }
         IconButton(onClick = onOpenSettings) {
-            Icon(Icons.Filled.Settings, contentDescription = "Settings")
+            Icon(Icons.Rounded.Settings, contentDescription = "Settings")
         }
     }
 }
@@ -207,7 +210,7 @@ private fun CategoryCard(category: Category, modifier: Modifier, onClick: () -> 
     ) {
         Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             IconBadge(category.icon, size = 40, accent = category.accent())
-            Text(category.title, style = MaterialTheme.typography.titleSmall)
+            Text(category.title, style = MaterialTheme.typography.titleSmall, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             Text(
                 "$count tool${if (count == 1) "" else "s"}",
                 style = MaterialTheme.typography.bodySmall,

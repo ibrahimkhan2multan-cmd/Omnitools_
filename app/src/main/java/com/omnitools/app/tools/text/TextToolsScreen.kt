@@ -21,11 +21,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Redo
-import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.automirrored.rounded.Redo
+import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
@@ -136,13 +136,13 @@ fun TextToolsScreen(onBack: () -> Unit) {
         title = "Text Tools",
         onBack = onBack,
         actions = {
-            IconButton(onClick = ::doUndo, enabled = undo.isNotEmpty()) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo") }
-            IconButton(onClick = ::doRedo, enabled = redo.isNotEmpty()) { Icon(Icons.AutoMirrored.Filled.Redo, contentDescription = "Redo") }
+            IconButton(onClick = ::doUndo, enabled = undo.isNotEmpty()) { Icon(Icons.AutoMirrored.Rounded.Undo, contentDescription = "Undo") }
+            IconButton(onClick = ::doRedo, enabled = redo.isNotEmpty()) { Icon(Icons.AutoMirrored.Rounded.Redo, contentDescription = "Redo") }
             IconButton(onClick = { Actions.copy(context, "Text", value.text); say("Copied.") }, enabled = value.text.isNotEmpty()) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = "Copy all")
+                Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy all")
             }
             IconButton(onClick = { Actions.shareText(context, value.text) }, enabled = value.text.isNotEmpty()) {
-                Icon(Icons.Filled.Share, contentDescription = "Share")
+                Icon(Icons.Rounded.Share, contentDescription = "Share")
             }
             IconButton(
                 onClick = {
@@ -152,7 +152,7 @@ fun TextToolsScreen(onBack: () -> Unit) {
                     }
                 },
                 enabled = value.text.isNotEmpty(),
-            ) { Icon(Icons.Filled.Delete, contentDescription = "Clear") }
+            ) { Icon(Icons.Rounded.Delete, contentDescription = "Clear") }
         },
     ) { padding ->
         Column(

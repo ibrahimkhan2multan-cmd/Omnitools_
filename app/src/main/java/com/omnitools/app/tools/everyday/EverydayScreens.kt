@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -200,7 +200,7 @@ fun CountdownScreen(onBack: () -> Unit) {
                             )
                         }
                         IconButton(onClick = { update(items.filterNot { it.id == item.id }) }) {
-                            Icon(Icons.Filled.Close, contentDescription = "Delete ${item.name}")
+                            Icon(Icons.Rounded.Close, contentDescription = "Delete ${item.name}")
                         }
                     }
                 }
@@ -272,7 +272,7 @@ fun HabitScreen(onBack: () -> Unit) {
                                 )
                             }
                             IconButton(onClick = { update(habits.filterNot { it.id == h.id }) }) {
-                                Icon(Icons.Filled.Close, contentDescription = "Delete ${h.name}")
+                                Icon(Icons.Rounded.Close, contentDescription = "Delete ${h.name}")
                             }
                         }
                         Row(Modifier.fillMaxWidth().padding(end = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -299,7 +299,7 @@ fun HabitScreen(onBack: () -> Unit) {
                                             },
                                         contentAlignment = Alignment.Center,
                                     ) {
-                                        if (done) Icon(Icons.Filled.Check, contentDescription = "Done", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp))
+                                        if (done) Icon(Icons.Rounded.Check, contentDescription = "Done", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(20.dp))
                                     }
                                 }
                             }

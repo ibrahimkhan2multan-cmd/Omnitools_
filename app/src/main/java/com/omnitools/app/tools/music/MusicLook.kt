@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -99,7 +99,7 @@ fun Artwork(design: MusicDesign, playing: Boolean, loading: Boolean, size: Dp) {
                 contentAlignment = Alignment.Center,
             ) {
                 if (loading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(size / 2.6f))
-                else Icon(Icons.Filled.MusicNote, contentDescription = null, tint = Color.White, modifier = Modifier.size(size / 2.1f))
+                else Icon(Icons.Rounded.MusicNote, contentDescription = null, tint = Color.White, modifier = Modifier.size(size / 2.1f))
             }
         }
     }

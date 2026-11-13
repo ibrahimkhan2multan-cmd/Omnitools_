@@ -11,9 +11,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -71,7 +71,7 @@ fun TasksScreen(onBack: () -> Unit) {
         actions = {
             if (doneCount > 0) {
                 IconButton(onClick = { update(tasks.filterNot { it.done }) }) {
-                    Icon(Icons.Filled.DeleteSweep, contentDescription = "Remove completed tasks")
+                    Icon(Icons.Rounded.DeleteSweep, contentDescription = "Remove completed tasks")
                 }
             }
         },
@@ -86,7 +86,7 @@ fun TasksScreen(onBack: () -> Unit) {
                 keyboardActions = KeyboardActions(onDone = { add() }),
                 trailingIcon = {
                     IconButton(onClick = { add() }, enabled = input.isNotBlank()) {
-                        Icon(Icons.Filled.Add, contentDescription = "Add task")
+                        Icon(Icons.Rounded.Add, contentDescription = "Add task")
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -117,7 +117,7 @@ fun TasksScreen(onBack: () -> Unit) {
                                 color = if (task.done) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onBackground,
                             )
                             IconButton(onClick = { update(tasks.filterNot { it.id == task.id }) }) {
-                                Icon(Icons.Filled.Close, contentDescription = "Delete task")
+                                Icon(Icons.Rounded.Close, contentDescription = "Delete task")
                             }
                         }
                     }

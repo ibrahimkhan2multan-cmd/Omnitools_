@@ -109,8 +109,8 @@ fun OmniToolsTheme(themeMode: String = "system", background: BackgroundTheme = B
     val scheme = if (!themed) base else base.copy(
         primary = background.primary, onPrimary = background.onPrimary, secondary = background.secondary,
         background = Color.Transparent,
-        surface = base.surface.copy(alpha = if (dark) 0.72f else 0.78f),
-        surfaceVariant = base.surfaceVariant.copy(alpha = if (dark) 0.72f else 0.78f),
+        surface = base.surface.copy(alpha = if (dark) 0.86f else 0.88f),
+        surfaceVariant = base.surfaceVariant.copy(alpha = if (dark) 0.86f else 0.88f),
     )
     MaterialTheme(
         colorScheme = scheme,

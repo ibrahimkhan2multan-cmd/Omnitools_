@@ -40,11 +40,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Stop
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -169,7 +169,7 @@ private fun PlayPauseLabel(playing: Boolean, idleText: String, activeText: Strin
         label = "play pause",
     ) { isPlaying ->
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Icon(if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow, contentDescription = null)
+            Icon(if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, contentDescription = null)
             Text(if (isPlaying) activeText else idleText)
         }
     }
@@ -253,7 +253,7 @@ private fun TimerTab() {
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 modifier = Modifier.fillMaxWidth().height(56.dp),
             ) {
-                Icon(Icons.Filled.Stop, contentDescription = null)
+                Icon(Icons.Rounded.Stop, contentDescription = null)
                 Text(if (ringing) "  Stop alarm" else "  Dismiss")
             }
         }
@@ -435,7 +435,7 @@ private fun RingReadyCard(
 private fun PermissionLine(label: String, ok: Boolean, onAllow: () -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(
-            if (ok) Icons.Filled.CheckCircle else Icons.Filled.WarningAmber,
+            if (ok) Icons.Rounded.CheckCircle else Icons.Rounded.WarningAmber,
             contentDescription = if (ok) "Allowed" else "Not allowed",
             tint = if (ok) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.error,
             modifier = Modifier.size(20.dp),

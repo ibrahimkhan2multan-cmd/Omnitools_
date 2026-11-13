@@ -42,9 +42,10 @@ import kotlinx.coroutines.delay
 fun Modifier.pressable(enabled: Boolean = true, onClick: () -> Unit): Modifier = composed {
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
+    val reduced = com.omnitools.app.ui.theme.rememberReducedMotion()
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.96f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        targetValue = if (pressed && !reduced) 0.97f else 1f,
+        animationSpec = tween(com.omnitools.app.ui.theme.Dur.PRESS, easing = FastOutSlowInEasing),
         label = "press scale",
     )
     this
@@ -63,19 +64,20 @@ object EntranceMemory {
 /** Fades and slides its content in, once per app run, staggered by [index]. */
 @Composable
 fun Entrance(key: String, index: Int, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val alreadySeen = remember { key in EntranceMemory.seen }
+    val reduced = com.omnitools.app.ui.theme.rememberReducedMotion()
+    val alreadySeen = remember { reduced || key in EntranceMemory.seen }
     val progress = remember { Animatable(if (alreadySeen) 1f else 0f) }
     LaunchedEffect(Unit) {
         if (!alreadySeen) {
             EntranceMemory.seen.add(key)
-            delay(index.coerceAtMost(10) * 45L)
-            progress.animateTo(1f, spring(dampingRatio = 0.8f, stiffness = Spring.StiffnessLow))
+            delay(index.coerceAtMost(6) * 35L)
+            progress.animateTo(1f, tween(com.omnitools.app.ui.theme.Dur.MEDIUM + 60, easing = FastOutSlowInEasing))
         }
     }
     Box(
         modifier.graphicsLayer {
             alpha = progress.value.coerceIn(0f, 1f)
-            translationY = (1f - progress.value) * 36.dp.toPx()
+            translationY = (1f - progress.value) * 18.dp.toPx()
         },
     ) { content() }
 }
@@ -87,7 +89,8 @@ fun Entrance(key: String, index: Int, modifier: Modifier = Modifier, content: @C
 @Composable
 fun OmniLogo(size: Dp, modifier: Modifier = Modifier) {
     // Decided before the first frame, so later visits never draw an empty logo for a moment.
-    val firstTime = remember { "logo" !in EntranceMemory.seen }
+    val reduced = com.omnitools.app.ui.theme.rememberReducedMotion()
+    val firstTime = remember { !reduced && "logo" !in EntranceMemory.seen }
     val blades = remember { List(6) { Animatable(if (firstTime) 0f else 1f) } }
     val spin = remember { Animatable(if (firstTime) 0f else 1f) }
     LaunchedEffect(Unit) {
@@ -103,11 +106,12 @@ fun OmniLogo(size: Dp, modifier: Modifier = Modifier) {
             blades.forEach { it.snapTo(1f) }
         }
     }
-    val pulse = rememberInfiniteTransition(label = "hub").animateFloat(
+    val pulseAnim = rememberInfiniteTransition(label = "hub").animateFloat(
         initialValue = 0.9f, targetValue = 1.15f,
         animationSpec = infiniteRepeatable(tween(1600, easing = FastOutSlowInEasing), RepeatMode.Reverse),
         label = "hub pulse",
     )
+    val pulse = if (reduced) androidx.compose.runtime.rememberUpdatedState(1f) else pulseAnim
     val bladePath = remember { PathParser().parsePathString("M54,54 C61,47 63,36 54,25 C68,26 79,38 73,52 C70,58 62,58 54,54 Z").toPath() }
     val colors = remember {
         listOf(0xFF4F8CFF to 0xFF22D3EE, 0xFF22D3EE to 0xFF34D399, 0xFF34D399 to 0xFFFACC15,

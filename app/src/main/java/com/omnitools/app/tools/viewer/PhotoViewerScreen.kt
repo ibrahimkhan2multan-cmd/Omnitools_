@@ -47,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.omnitools.app.ui.components.ScreenScaffold
+import com.omnitools.app.ui.components.accent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -81,22 +82,15 @@ fun PhotoViewerScreen(onBack: () -> Unit) {
         },
     ) { padding ->
         if (photos.isEmpty()) {
-            Column(
-                Modifier.padding(padding).fillMaxSize().padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(Icons.Rounded.PhotoLibrary, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(bottom = 12.dp))
-                Text("Open pictures from your phone", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-                Text(
-                    "JPEG, PNG, WebP, GIF, BMP and, on phones that support them, HEIC and AVIF. Pick one or many, then swipe between them. Pinch or double-tap to zoom.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 8.dp),
-                )
-                Button(onClick = { picker.launch(arrayOf("image/*")) }) { Text("Choose pictures") }
-            }
+            com.omnitools.app.ui.components.FeatureEmptyState(
+                icon = Icons.Rounded.PhotoLibrary,
+                title = "Open pictures from your phone",
+                body = "JPEG, PNG, WebP, GIF, BMP and, on phones that support them, HEIC and AVIF. Pick one or many, then swipe between them. Pinch or double-tap to zoom.",
+                actionLabel = "Choose pictures",
+                onAction = { picker.launch(arrayOf("image/*")) },
+                modifier = Modifier.padding(padding),
+                accent = com.omnitools.app.data.Category.IMAGES.accent(),
+            )
         } else {
             Column(Modifier.padding(padding).fillMaxSize()) {
                 HorizontalPager(
@@ -137,7 +131,7 @@ private fun PhotoPage(uri: Uri, active: Boolean, onZoomChanged: (Boolean) -> Uni
             l.bitmap == null -> Text(l.error ?: "Cannot open this picture.", textAlign = TextAlign.Center, modifier = Modifier.padding(24.dp), color = MaterialTheme.colorScheme.error)
             else -> Image(
                 bitmap = l.bitmap.asImageBitmap(),
-                contentDescription = null,
+                contentDescription = "Picture",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxSize()

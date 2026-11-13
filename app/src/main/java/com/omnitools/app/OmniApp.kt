@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import com.omnitools.app.ui.theme.Dur
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -105,6 +106,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     val seenUpdate = seenUpdateLoaded
     val designOrNull by prefs.musicDesign.collectAsStateWithLifecycle<com.omnitools.app.tools.music.MusicDesign?>(initialValue = null)
     val design = designOrNull ?: com.omnitools.app.tools.music.MusicDesign()
+    val reducedMotion = com.omnitools.app.ui.theme.rememberReducedMotion()
     val backEntry by nav.currentBackStackEntryAsState()
     // A soft "back" sound whenever the screen stack gets shorter (system back gesture, back arrow, mini player closing a screen).
     val view = androidx.compose.ui.platform.LocalView.current
@@ -126,10 +128,10 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     NavHost(
         navController = nav,
         startDestination = ROUTE_HOME,
-        enterTransition = { slideInHorizontally(tween(340, easing = FastOutSlowInEasing)) { it / 5 } + fadeIn(tween(300)) },
-        exitTransition = { slideOutHorizontally(tween(340, easing = FastOutSlowInEasing)) { -it / 8 } + fadeOut(tween(220)) },
-        popEnterTransition = { slideInHorizontally(tween(340, easing = FastOutSlowInEasing)) { -it / 8 } + fadeIn(tween(300)) },
-        popExitTransition = { slideOutHorizontally(tween(320, easing = FastOutSlowInEasing)) { it / 5 } + fadeOut(tween(240)) },
+        enterTransition = { if (reducedMotion) fadeIn(tween(120)) else slideInHorizontally(tween(Dur.SCREEN, easing = FastOutSlowInEasing)) { it / 10 } + fadeIn(tween(Dur.MEDIUM)) },
+        exitTransition = { if (reducedMotion) fadeOut(tween(100)) else slideOutHorizontally(tween(Dur.SCREEN, easing = FastOutSlowInEasing)) { -it / 14 } + fadeOut(tween(Dur.FAST)) },
+        popEnterTransition = { if (reducedMotion) fadeIn(tween(120)) else slideInHorizontally(tween(Dur.SCREEN, easing = FastOutSlowInEasing)) { -it / 14 } + fadeIn(tween(Dur.MEDIUM)) },
+        popExitTransition = { if (reducedMotion) fadeOut(tween(100)) else slideOutHorizontally(tween(Dur.SCREEN, easing = FastOutSlowInEasing)) { it / 10 } + fadeOut(tween(Dur.FAST)) },
     ) {
         composable(ROUTE_HOME) {
             HomeScreen(
@@ -176,8 +178,8 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     }
     androidx.compose.animation.AnimatedVisibility(
         visible = showMini,
-        enter = androidx.compose.animation.slideInVertically(tween(260)) { it } + fadeIn(tween(200)),
-        exit = androidx.compose.animation.slideOutVertically(tween(220)) { it } + fadeOut(tween(160)),
+        enter = androidx.compose.animation.slideInVertically(tween(Dur.MEDIUM, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(Dur.FAST)),
+        exit = androidx.compose.animation.slideOutVertically(tween(Dur.FAST, easing = FastOutSlowInEasing)) { it / 2 } + fadeOut(tween(Dur.FAST)),
     ) {
         com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { nav.navigate("tool/music_player") })
     }

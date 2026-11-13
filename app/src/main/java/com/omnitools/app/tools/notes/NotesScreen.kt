@@ -12,11 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ContentCopy
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -83,7 +83,7 @@ fun NotesScreen(onBack: () -> Unit) {
                     onValueChange = { query = it },
                     singleLine = true,
                     placeholder = { Text("Search notes") },
-                    leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 )
@@ -130,7 +130,7 @@ fun NotesScreen(onBack: () -> Unit) {
             FloatingActionButton(
                 onClick = { editing = Note(NotesRepository.newId(), "", "", System.currentTimeMillis()) },
                 modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp),
-            ) { Icon(Icons.Filled.Add, contentDescription = "New note") }
+            ) { Icon(Icons.Rounded.Add, contentDescription = "New note") }
         }
     }
 }
@@ -181,13 +181,13 @@ private fun NoteEditor(repo: NotesRepository, initial: Note, onClose: () -> Unit
         onBack = ::saveAndClose,
         actions = {
             IconButton(onClick = { Actions.copy(context, "Note", body) }) {
-                Icon(Icons.Filled.ContentCopy, contentDescription = "Copy note text")
+                Icon(Icons.Rounded.ContentCopy, contentDescription = "Copy note text")
             }
             IconButton(onClick = { Actions.shareText(context, if (title.isBlank()) body else "$title\n\n$body") }) {
-                Icon(Icons.Filled.Share, contentDescription = "Share note")
+                Icon(Icons.Rounded.Share, contentDescription = "Share note")
             }
             IconButton(onClick = { confirmDelete = true }) {
-                Icon(Icons.Filled.Delete, contentDescription = "Delete note")
+                Icon(Icons.Rounded.Delete, contentDescription = "Delete note")
             }
         },
     ) { padding ->

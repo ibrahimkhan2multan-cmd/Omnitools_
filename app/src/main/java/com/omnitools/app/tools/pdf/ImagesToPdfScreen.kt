@@ -19,9 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -230,9 +230,9 @@ private fun PictureRow(
                 overflow = TextOverflow.Ellipsis,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            IconButton(onClick = onUp, enabled = enabled && canMoveUp) { Icon(Icons.Filled.ArrowUpward, contentDescription = "Move up") }
-            IconButton(onClick = onDown, enabled = enabled && canMoveDown) { Icon(Icons.Filled.ArrowDownward, contentDescription = "Move down") }
-            IconButton(onClick = onRemove, enabled = enabled) { Icon(Icons.Filled.Close, contentDescription = "Remove picture") }
+            IconButton(onClick = onUp, enabled = enabled && canMoveUp) { Icon(Icons.Rounded.ArrowUpward, contentDescription = "Move up") }
+            IconButton(onClick = onDown, enabled = enabled && canMoveDown) { Icon(Icons.Rounded.ArrowDownward, contentDescription = "Move down") }
+            IconButton(onClick = onRemove, enabled = enabled) { Icon(Icons.Rounded.Close, contentDescription = "Remove picture") }
         }
     }
 }

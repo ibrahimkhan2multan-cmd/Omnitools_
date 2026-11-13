@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.InsertDriveFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -179,7 +179,7 @@ private fun ExtractTab() {
         SectionTitle("Contents")
         entries.take(SHOWN_ENTRIES).forEach { e ->
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                Icon(if (e.isDirectory) Icons.Filled.Folder else Icons.Filled.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                Icon(if (e.isDirectory) Icons.Rounded.Folder else Icons.Rounded.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(e.name, modifier = Modifier.weight(1f), color = if (e.safe) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
                 if (!e.isDirectory && e.size >= 0) Text(Format.bytes(e.size), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -260,9 +260,9 @@ private fun CreateTab() {
     }
     files.forEach { uri ->
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Filled.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(Icons.Rounded.InsertDriveFile, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(names[uri] ?: "file", modifier = Modifier.weight(1f).padding(horizontal = 8.dp))
-            IconButton(onClick = { files = files - uri }, enabled = !busy) { Icon(Icons.Filled.Close, contentDescription = "Remove") }
+            IconButton(onClick = { files = files - uri }, enabled = !busy) { Icon(Icons.Rounded.Close, contentDescription = "Remove") }
         }
     }
     if (files.isNotEmpty()) {

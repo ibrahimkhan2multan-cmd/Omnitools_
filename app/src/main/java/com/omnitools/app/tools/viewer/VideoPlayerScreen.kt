@@ -60,6 +60,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.omnitools.app.tools.music.MusicController
 import com.omnitools.app.ui.components.ScreenScaffold
+import com.omnitools.app.ui.components.accent
 
 private fun Context.findActivity(): Activity? {
     var c: Context = this
@@ -127,22 +128,15 @@ fun VideoPlayerScreen(onBack: () -> Unit) {
         },
     ) { padding ->
         if (videos.isEmpty()) {
-            Column(
-                Modifier.padding(padding).fillMaxSize().padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Icon(Icons.Rounded.PlayCircle, null, tint = MaterialTheme.colorScheme.primary)
-                Text("Play videos from your phone", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 12.dp))
-                Text(
-                    "MP4, MKV, WebM, 3GP, TS and more. Works offline, with a playlist, speed control and seeking. Pick one or many videos.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 8.dp),
-                )
-                Button(onClick = { picker.launch(arrayOf("video/*")) }) { Text("Choose videos") }
-            }
+            com.omnitools.app.ui.components.FeatureEmptyState(
+                icon = Icons.Rounded.PlayCircle,
+                title = "Play videos from your phone",
+                body = "MP4, MKV, WebM, 3GP, TS and more. Works offline, with a playlist, speed control and seeking. Pick one or many videos.",
+                actionLabel = "Choose videos",
+                onAction = { picker.launch(arrayOf("video/*")) },
+                modifier = Modifier.padding(padding),
+                accent = com.omnitools.app.data.Category.IMAGES.accent(),
+            )
         } else {
             val playerView: @Composable (Modifier) -> Unit = { mod ->
                 AndroidView(

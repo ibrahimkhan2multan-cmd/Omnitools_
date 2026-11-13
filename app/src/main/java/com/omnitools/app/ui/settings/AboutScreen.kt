@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.Camera
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -67,13 +67,13 @@ fun AboutScreen(onBack: () -> Unit) {
             }
 
             InfoCard(
-                Icons.Filled.Shield,
+                Icons.Rounded.Shield,
                 "What this app does with your data",
                 "OmniTools has no internet permission, no account, no analytics and no ads. Notes, favorites, " +
                     "scan history and the running timer are stored only on this device. Nothing is uploaded or shared.",
             )
             InfoCard(
-                Icons.Filled.Camera,
+                Icons.Rounded.Camera,
                 "Permissions",
                 "Camera: only when you open the scanner; analysed on-device.\n\n" +
                     "Notifications, sound, vibration, full-screen alert and restart-after-reboot: only so a timer can ring " +
@@ -81,7 +81,7 @@ fun AboutScreen(onBack: () -> Unit) {
                     "Files are opened only through the system picker, and only the ones you choose.",
             )
             InfoCard(
-                Icons.Filled.Key,
+                Icons.Rounded.Key,
                 "Generated passwords",
                 "Passwords are created on your device with a secure random generator and are never saved or sent.",
             )
@@ -89,10 +89,10 @@ fun AboutScreen(onBack: () -> Unit) {
             HorizontalDivider(Modifier.padding(horizontal = 24.dp), color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
 
             LinkRow(
-                icon = Icons.Filled.PrivacyTip,
+                icon = Icons.Rounded.PrivacyTip,
                 title = "View Full Privacy Policy",
                 subtitle = "Opens in your browser",
-                trailing = Icons.AutoMirrored.Filled.OpenInNew,
+                trailing = Icons.AutoMirrored.Rounded.OpenInNew,
                 onClick = {
                     try {
                         uriHandler.openUri(POLICY_URL)

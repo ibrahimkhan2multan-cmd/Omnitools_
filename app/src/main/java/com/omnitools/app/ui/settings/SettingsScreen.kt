@@ -4,7 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.rounded.Info
 import com.omnitools.app.ui.components.LinkRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -126,6 +126,13 @@ fun SettingsScreen(
                 )
             }
 
+            Text(
+                "Animations follow your phone's animation setting. If animations are switched off there, OmniTools shows still backgrounds and plain transitions.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
+            )
+
             SectionTitle("Calculator")
             Text(
                 "Angle unit used by sin, cos and tan when you open the calculator.",
@@ -224,7 +231,7 @@ fun SettingsScreen(
 
             SectionTitle("About")
             LinkRow(
-                icon = Icons.Filled.Info,
+                icon = Icons.Rounded.Info,
                 title = "About & privacy",
                 subtitle = "Version, permissions and privacy policy",
                 onClick = onOpenAbout,

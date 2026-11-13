@@ -34,11 +34,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.ZoomIn
-import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.ChevronLeft
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.ZoomIn
+import androidx.compose.material.icons.rounded.ZoomOut
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -163,7 +163,7 @@ fun PdfReaderScreen(onBack: () -> Unit) {
                     } catch (e: Exception) {
                         error = "No other app could open this PDF."
                     }
-                }) { Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = "Open in another app") }
+                }) { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = "Open in another app") }
             }
         },
     ) { padding ->
@@ -204,10 +204,10 @@ fun PdfReaderScreen(onBack: () -> Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                IconButton(onClick = { scope.launch { listState.animateScrollToItem((page - 1).coerceAtLeast(0)) } }, enabled = page > 0) { Icon(Icons.Filled.ChevronLeft, contentDescription = "Previous page") }
+                IconButton(onClick = { scope.launch { listState.animateScrollToItem((page - 1).coerceAtLeast(0)) } }, enabled = page > 0) { Icon(Icons.Rounded.ChevronLeft, contentDescription = "Previous page") }
                 Text("${page + 1} / ${s.pageCount}", style = MaterialTheme.typography.titleSmall)
                 IconButton(onClick = { scope.launch { listState.animateScrollToItem((page + 1).coerceAtMost(s.pageCount - 1)) } }, enabled = page < s.pageCount - 1) {
-                    Icon(Icons.Filled.ChevronRight, contentDescription = "Next page")
+                    Icon(Icons.Rounded.ChevronRight, contentDescription = "Next page")
                 }
                 OutlinedTextField(
                     value = jumpText,
@@ -221,8 +221,8 @@ fun PdfReaderScreen(onBack: () -> Unit) {
                     }),
                     modifier = Modifier.weight(1f),
                 )
-                IconButton(onClick = { zoom = (zoom - 0.5f).coerceAtLeast(1f) }, enabled = zoom > 1f) { Icon(Icons.Filled.ZoomOut, contentDescription = "Zoom out") }
-                IconButton(onClick = { zoom = (zoom + 0.5f).coerceAtMost(4f) }, enabled = zoom < 4f) { Icon(Icons.Filled.ZoomIn, contentDescription = "Zoom in") }
+                IconButton(onClick = { zoom = (zoom - 0.5f).coerceAtLeast(1f) }, enabled = zoom > 1f) { Icon(Icons.Rounded.ZoomOut, contentDescription = "Zoom out") }
+                IconButton(onClick = { zoom = (zoom + 0.5f).coerceAtMost(4f) }, enabled = zoom < 4f) { Icon(Icons.Rounded.ZoomIn, contentDescription = "Zoom in") }
             }
 
             // All pages in one scrolling list. Only the pages on screen are drawn, and recently drawn ones are kept.

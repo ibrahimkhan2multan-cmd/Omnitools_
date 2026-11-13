@@ -54,9 +54,10 @@ fun Backdrop(theme: BackgroundTheme, modifier: Modifier = Modifier.fillMaxSize()
     if (theme == BackgroundTheme.DEFAULT) return
     val transition = rememberInfiniteTransition(label = "backdrop")
     val t = transition.animateFloat(0f, 1f, infiniteRepeatable(tween(40000, easing = LinearEasing), RepeatMode.Restart), label = "t")
+    val reduced = rememberReducedMotion()
     val rainbow = remember { List(7) { it } }
     Canvas(modifier) {
-        val time = t.value
+        val time = if (reduced) 0.25f else t.value
         when (theme) {
             BackgroundTheme.GALAXY -> drawGalaxy(time)
             BackgroundTheme.CANDY -> drawCandy(time)
@@ -66,6 +67,8 @@ fun Backdrop(theme: BackgroundTheme, modifier: Modifier = Modifier.fillMaxSize()
             BackgroundTheme.OCEAN -> drawOcean(time)
             BackgroundTheme.DEFAULT -> {}
         }
+        // A light veil over the picture keeps text readable on every part of every theme.
+        drawRect(if (theme.dark) Color.Black.copy(alpha = 0.22f) else Color.White.copy(alpha = 0.22f))
     }
 }
 

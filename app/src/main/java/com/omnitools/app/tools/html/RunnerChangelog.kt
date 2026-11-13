@@ -6,6 +6,16 @@ object RunnerChangelog {
 
     val entries: List<Entry> = listOf(
         Entry(
+            "Build 61", "13 Nov 2026", "Polish pass: icons, motion, readability",
+            listOf(
+                "Icons: the whole app now uses one rounded icon family, and category badges are cleaner (softer tint, darker on light screens for contrast).",
+                "Motion: screen changes, card presses, list entrances and the mini player are shorter and calmer, with no bouncing. Everything follows your phone's animation setting: with animations off you get still backgrounds and simple fades.",
+                "Themes: a light veil over every animated background and firmer cards keep text readable on all six themes.",
+                "Photo Viewer and Video Player now share one empty-state design. Home shows more category cards per row in landscape and on wide screens.",
+                "Sounds: the same sound is never played twice within a split second, so rapid taps no longer buzz.",
+            ),
+        ),
+        Entry(
             "Build 60", "13 Nov 2026", "PDF Reader rebuilt on the PDFium engine",
             listOf(
                 "The PDF Reader now uses PDFium (the engine inside Chrome). It draws pictures, scanned pages and files that Android's own viewer could not show.",
