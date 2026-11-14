@@ -39,6 +39,10 @@ Every permission is used only for the feature listed. If you deny one, the rest 
 
 Tools such as PDF, image, ZIP and code editor tools open or save files only through Android's system file picker, and only the files you pick. Processing happens on your device. Files are not uploaded anywhere.
 
+The Music Player, Video Player, Photo Viewer, PDF Reader and Video to Audio tools work the same way: they read only the files you pick, play or draw them on your device, and send nothing anywhere. The PDF Reader uses PDFium, a PDF engine bundled inside the App, so no online service is involved. Videos and pictures are decoded by Android and by a player library bundled in the App.
+
+While a file is being processed the App may make a short-lived private copy in its own cache (for example when a file provider cannot be read directly, or to share a QR code image). These copies are removed as soon as they are no longer needed and any that remain are deleted the next time the App starts. Playlists, notes, tasks, countdowns, habits and extracted audio are stored only in the App's private storage and are removed when you clear the App's data or uninstall it. Text you copy (such as a generated password) stays on the system clipboard until you or Android clear it, and your phone's keyboard or clipboard history may keep it.
+
 ## 5. HTML/JS runner
 
 The HTML/JS runner executes code you type or open inside a sandboxed web view with network access blocked. It cannot read your files or contacts.

@@ -73,6 +73,7 @@ fun SettingsScreen(
     val haptics by prefs.haptics.collectAsStateWithLifecycle(initialValue = true)
     val soundTheme by prefs.soundTheme.collectAsStateWithLifecycle(initialValue = SoundTheme.CLASSIC)
     val soundVolume by prefs.soundVolume.collectAsStateWithLifecycle(initialValue = 0.8f)
+    var sliderValue by remember(soundVolume) { mutableStateOf(soundVolume) }
 
     ScreenScaffold(title = "Settings", onBack = onBack) { padding ->
         Column(
@@ -156,6 +157,7 @@ fun SettingsScreen(
                 onChange = { scope.launch { prefs.setSounds(it) }; if (it) { Feedback.soundOn = true; Feedback.play(Cue.TOGGLE) } },
             )
             if (sounds) {
+              Column(Modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Sound theme", style = MaterialTheme.typography.titleSmall)
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     SoundTheme.values().forEach { t ->
@@ -164,6 +166,7 @@ fun SettingsScreen(
                             onClick = {
                                 scope.launch { prefs.setSoundTheme(t) }
                                 Feedback.theme = t       // applied at once so the preview already uses it
+                                Feedback.warmUp()
                                 Feedback.play(Cue.SUCCESS)
                             },
                             label = { Text(t.label) },
@@ -173,9 +176,9 @@ fun SettingsScreen(
                 Text(soundTheme.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text("Volume", style = MaterialTheme.typography.titleSmall)
                 androidx.compose.material3.Slider(
-                    value = soundVolume,
-                    onValueChange = { Feedback.volume = it; scope.launch { prefs.setSoundVolume(it) } },
-                    onValueChangeFinished = { Feedback.play(Cue.CLICK) },
+                    value = sliderValue,
+                    onValueChange = { Feedback.volume = it; sliderValue = it },
+                    onValueChangeFinished = { scope.launch { prefs.setSoundVolume(sliderValue) }; Feedback.play(Cue.CLICK) },
                     modifier = Modifier.semantics { contentDescription = "Sound volume" },
                 )
                 Text("Try the sounds", style = MaterialTheme.typography.titleSmall)
@@ -184,6 +187,7 @@ fun SettingsScreen(
                         OutlinedButton(onClick = { Feedback.play(cue) }) { Text(label) }
                     }
                 }
+              }
             }
             SwitchRow(
                 title = "Vibration",

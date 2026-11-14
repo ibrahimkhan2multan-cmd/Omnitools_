@@ -90,7 +90,8 @@ fun PdfReaderScreen(onBack: () -> Unit) {
     val cache = remember { PageCache() }
 
     // Always release the file when the screen closes or another document replaces this one.
-    DisposableEffect(session) { onDispose { session?.close() } }
+    val current = session
+    DisposableEffect(current) { onDispose { current?.close() } }
 
     fun openFile(picked: Uri, password: String?) {
         scope.launch {
@@ -98,10 +99,17 @@ fun PdfReaderScreen(onBack: () -> Unit) {
             error = null
             try {
                 val opened = withContext(Dispatchers.IO) { PdfSession.open(context, picked, password) }
-                val info = withContext(Dispatchers.IO) { FileInfo.query(context, picked) }
-                // Page sizes up front, so the list has the right height for every page before it is drawn.
-                val measured = withContext(Dispatchers.IO) {
-                    List(opened.pageCount) { i -> if (opened.pageCount > 3000) A4 else try { opened.pageSize(i) } catch (e: Exception) { A4 } }
+                val info: FileDetails
+                val measured: List<Pair<Int, Int>>
+                try {
+                    info = withContext(Dispatchers.IO) { FileInfo.query(context, picked) }
+                    // Page sizes up front, so the list has the right height for every page before it is drawn.
+                    measured = withContext(Dispatchers.IO) {
+                        List(opened.pageCount) { i -> if (opened.pageCount > 3000) A4 else try { opened.pageSize(i) } catch (e: Exception) { A4 } }
+                    }
+                } catch (t: Throwable) {
+                    opened.close()
+                    throw t
                 }
                 cache.evictAll()
                 uri = picked

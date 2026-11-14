@@ -37,14 +37,16 @@ object Feedback {
 
     /** Builds the sounds of the current theme ahead of time, so the first tap after a change is not late. */
     fun warmUp() {
+        val current = theme
         Thread {
+            releaseOtherThemes(current)
             for (c in Cue.values()) { try { track(theme, c) } catch (_: Throwable) {} }
         }.start()
     }
 
-    @Synchronized
-    private fun track(t: SoundTheme, cue: Cue): AudioTrack = tracks.getOrPut(t to cue) {
-        val data = SoundSynth.render(t, cue)
+    private val playLock = Any()
+
+    private fun build(data: ShortArray): AudioTrack =
         AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
@@ -63,44 +65,49 @@ object Feedback {
             .setBufferSizeInBytes(data.size * 2)
             .build()
             .also { it.write(data, 0, data.size) }
+
+    /** The ready-made sound. It is rendered outside the lock, so a tap never waits for another sound to be prepared. */
+    private fun track(t: SoundTheme, cue: Cue): AudioTrack {
+        synchronized(tracks) { tracks[t to cue]?.let { return it } }
+        val built = build(SoundSynth.render(t, cue))
+        synchronized(tracks) {
+            val existing = tracks[t to cue]
+            if (existing != null) { built.release(); return existing }
+            tracks[t to cue] = built
+            return built
+        }
+    }
+
+    /** Frees the sounds of themes that are no longer in use. */
+    fun releaseOtherThemes(keep: SoundTheme) {
+        synchronized(tracks) {
+            val it = tracks.entries.iterator()
+            while (it.hasNext()) {
+                val e = it.next()
+                if (e.key.first != keep) { try { e.value.release() } catch (_: Throwable) {}; it.remove() }
+            }
+        }
     }
 
     private var lastCue: Cue? = null
     private var lastCueAt = 0L
 
-    @Synchronized
     fun play(cue: Cue) {
         if (!soundOn) return
         // The same sound twice within a split second is just noise (rapid taps), so the second one is skipped.
         val now = android.os.SystemClock.uptimeMillis()
-        if (cue == lastCue && now - lastCueAt < 60) return
-        lastCue = cue; lastCueAt = now
+        synchronized(playLock) {
+            if (cue == lastCue && now - lastCueAt < 60) return
+            lastCue = cue; lastCueAt = now
+        }
         try {
-            val track = tracks.getOrPut(theme to cue) {
-                val data = SoundSynth.render(theme, cue)
-                AudioTrack.Builder()
-                    .setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build(),
-                    )
-                    .setAudioFormat(
-                        AudioFormat.Builder()
-                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                            .setSampleRate(SoundSynth.SAMPLE_RATE)
-                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                            .build(),
-                    )
-                    .setTransferMode(AudioTrack.MODE_STATIC)
-                    .setBufferSizeInBytes(data.size * 2)
-                    .build()
-                    .also { it.write(data, 0, data.size) }
+            val track = track(theme, cue)
+            synchronized(playLock) {
+                track.stop()
+                track.reloadStaticData()
+                track.setVolume(volume.coerceIn(0f, 1f))
+                track.play()
             }
-            track.stop()
-            track.reloadStaticData()
-            track.setVolume(volume.coerceIn(0f, 1f))
-            track.play()
         } catch (_: Throwable) {
             // Sound is a nicety: never let it break a button.
         }

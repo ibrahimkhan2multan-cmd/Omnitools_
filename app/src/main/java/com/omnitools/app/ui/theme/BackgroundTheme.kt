@@ -134,11 +134,11 @@ private fun DrawScope.drawAurora(t: Float) {
 }
 
 private fun DrawScope.drawSunset(t: Float) {
-    drawRect(Brush.verticalGradient(listOf(Color(0xFF1E0B3A), Color(0xFF5A1F6E), Color(0xFFA83A6E), Color(0xFFE0703F))))
+    drawRect(Brush.verticalGradient(listOf(Color(0xFF1E0B3A), Color(0xFF4A1A5E), Color(0xFF7C2A5E), Color(0xFF9A4A3A))))
     val w = size.width; val h = size.height
     val sy = h * (0.72f + 0.01f * wave(t, 1, 0f))
-    glow(Color(0x88FFB070), w * 0.5f, sy, w * 0.9f)
-    drawCircle(Color(0xFFFFC27A), w * 0.16f, Offset(w * 0.5f, sy))
+    glow(Color(0x55FF9A5C), w * 0.5f, h * 0.9f, w * 0.8f)
+    drawCircle(Color(0xFFE0A060), w * 0.10f, Offset(w * 0.5f, h * 0.9f))
     for (s in STARS.take(35)) drawCircle(Color.White.copy(alpha = 0.25f + 0.4f * (0.5f + 0.5f * wave(t, s.speed * 4, s.phase))), s.r * density, Offset(s.x * w, s.y * h * 0.4f))
     band(t, h * 0.80f, h * 0.012f, 1, 0.1f, h * 0.2f, Color(0x992B0E3A))
 }

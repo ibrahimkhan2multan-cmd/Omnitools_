@@ -65,8 +65,10 @@ fun CameraScanner(
         )
         val providerFuture = ProcessCameraProvider.getInstance(context)
         var provider: ProcessCameraProvider? = null
+        var disposed = false // the screen may close before the camera has finished starting
 
         providerFuture.addListener({
+            if (disposed) return@addListener
             try {
                 val p = providerFuture.get()
                 provider = p
@@ -87,6 +89,7 @@ fun CameraScanner(
         }, ContextCompat.getMainExecutor(context))
 
         onDispose {
+            disposed = true
             provider?.unbindAll()
             scanner.close()
             executor.shutdown()

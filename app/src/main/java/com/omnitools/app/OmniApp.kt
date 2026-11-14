@@ -96,9 +96,21 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
     val recents by prefs.recents.collectAsStateWithLifecycle(initialValue = emptyList())
     val showRecents by prefs.showRecents.collectAsStateWithLifecycle(initialValue = true)
 
+    // Double taps must not open a screen twice or pop past Home while the old screen is still animating out.
+    fun go(route: String) {
+        if (nav.currentBackStackEntry?.lifecycle?.currentState == androidx.lifecycle.Lifecycle.State.RESUMED) {
+            nav.navigate(route) { launchSingleTop = true }
+        }
+    }
+    fun back() {
+        if (nav.previousBackStackEntry != null &&
+            nav.currentBackStackEntry?.lifecycle?.currentState == androidx.lifecycle.Lifecycle.State.RESUMED
+        ) nav.popBackStack()
+    }
+
     fun openTool(id: String) {
         scope.launch { prefs.pushRecent(id) }
-        nav.navigate("tool/$id")
+        go("tool/$id")
     }
 
     // The "new" dot is hidden until the saved value has loaded, so it does not flash on every start.
@@ -139,11 +151,11 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
                 recents = recents,
                 showRecents = showRecents,
                 onOpenTool = ::openTool,
-                onOpenCategory = { nav.navigate("category/${it.name}") },
+                onOpenCategory = { go("category/${it.name}") },
                 onToggleFavorite = { id -> scope.launch { prefs.toggleFavorite(id) } },
-                onOpenSettings = { nav.navigate(ROUTE_SETTINGS) },
+                onOpenSettings = { go(ROUTE_SETTINGS) },
                 hasNewUpdate = seenUpdate != com.omnitools.app.tools.html.RunnerChangelog.latestVersion,
-                onOpenUpdates = { nav.navigate(ROUTE_UPDATES) },
+                onOpenUpdates = { go(ROUTE_UPDATES) },
             )
         }
         composable(ROUTE_CATEGORY) { entry ->
@@ -154,7 +166,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
                 CategoryScreen(
                     category = category,
                     favorites = favorites,
-                    onBack = { nav.popBackStack() },
+                    onBack = { back() },
                     onOpenTool = ::openTool,
                     onToggleFavorite = { id -> scope.launch { prefs.toggleFavorite(id) } },
                 )
@@ -162,18 +174,18 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         }
         composable(ROUTE_TOOL) { entry ->
             val id = entry.arguments?.getString("id").orEmpty()
-            ToolHost(toolId = id, prefs = prefs, onBack = { nav.popBackStack() })
+            ToolHost(toolId = id, prefs = prefs, onBack = { back() })
         }
         composable(ROUTE_SETTINGS) {
             SettingsScreen(
                 prefs = prefs,
                 themeMode = themeMode,
-                onBack = { nav.popBackStack() },
-                onOpenAbout = { nav.navigate(ROUTE_ABOUT) },
+                onBack = { back() },
+                onOpenAbout = { go(ROUTE_ABOUT) },
             )
         }
-        composable(ROUTE_UPDATES) { com.omnitools.app.ui.updates.UpdatesScreen(prefs = prefs, onBack = { nav.popBackStack() }) }
-        composable(ROUTE_ABOUT) { AboutScreen(onBack = { nav.popBackStack() }) }
+        composable(ROUTE_UPDATES) { com.omnitools.app.ui.updates.UpdatesScreen(prefs = prefs, onBack = { back() }) }
+        composable(ROUTE_ABOUT) { AboutScreen(onBack = { back() }) }
     }
     }
     androidx.compose.animation.AnimatedVisibility(
@@ -181,7 +193,7 @@ private fun AppNav(prefs: Prefs, themeMode: String) {
         enter = androidx.compose.animation.slideInVertically(tween(Dur.MEDIUM, easing = FastOutSlowInEasing)) { it / 2 } + fadeIn(tween(Dur.FAST)),
         exit = androidx.compose.animation.slideOutVertically(tween(Dur.FAST, easing = FastOutSlowInEasing)) { it / 2 } + fadeOut(tween(Dur.FAST)),
     ) {
-        com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { nav.navigate("tool/music_player") })
+        com.omnitools.app.tools.music.MiniPlayer(design, onOpen = { go("tool/music_player") })
     }
     }
 }

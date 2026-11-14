@@ -160,10 +160,16 @@ class PdfSession private constructor(
                     return context.contentResolver.openFileDescriptor(uri, "r") ?: throw OpenException("Could not open the file.")
                 } catch (e: OpenException) { throw e } catch (e: IOException) { /* not seekable: use the copy */ } catch (e: SecurityException) { throw OpenException("The app is not allowed to read this file.") }
             }
-            val file = File(context.cacheDir, "open.pdf")
-            context.contentResolver.openInputStream(uri)?.use { input -> file.outputStream().use { input.copyTo(it) } }
-                ?: throw OpenException("Could not open the file.")
-            return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            // A private temporary copy per file. It is deleted as soon as it is open (the open descriptor keeps working),
+            // so nothing is left in the cache and two open PDFs can never overwrite each other.
+            val file = File.createTempFile("pdf", ".tmp", context.cacheDir)
+            try {
+                context.contentResolver.openInputStream(uri)?.use { input -> file.outputStream().use { input.copyTo(it) } }
+                    ?: throw OpenException("Could not open the file.")
+                return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+            } finally {
+                file.delete()
+            }
         }
     }
 }

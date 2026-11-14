@@ -91,6 +91,8 @@ private fun ExtractTab() {
                     name = displayName
                     entries = list
                 } catch (e: ZipEngine.ZipLimitException) {
+                    name = null
+                    entries = emptyList()
                     error = e.message
                 } catch (e: java.util.zip.ZipException) {
                     name = null

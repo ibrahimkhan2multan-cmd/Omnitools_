@@ -348,7 +348,7 @@ private class HighlightTransformation(
 @Composable
 private fun CodeField(value: TextFieldValue, onChange: (TextFieldValue) -> Unit, language: Language, modifier: Modifier) {
     val scheme = MaterialTheme.colorScheme
-    val dark = scheme.background.luminance() < 0.5f
+    val dark = scheme.onSurface.luminance() > 0.5f
     val textStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 14.sp, lineHeight = 20.sp, color = scheme.onSurface)
     val styles = remember(dark) {
         mapOf(
